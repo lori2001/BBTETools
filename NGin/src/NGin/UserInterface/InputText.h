@@ -34,6 +34,7 @@ namespace ng {
 
 		sf::String getString() const { return text_.getString(); }
 		bool getisActive() const { return isActive_; }
+		bool hasChanged() const { return hasChanged_; }
 		sf::FloatRect getGlobalBounds() const { return shape_.getGlobalBounds(); }
 		sf::Vector2f getPosition() const { return shape_.getPosition(); }
 
@@ -50,5 +51,8 @@ namespace ng {
 		bool isActive_ = false; // true whenever writing may occur
 		bool isSelected_ = false; // true whenever object is selected by means(ex.mouse)
 		bool isDisabled_ = false; // true whenever object canot be selected or changed
+
+		bool hasChanged_ = false; // true whenever string content changed in previous iteration
+		sf::String previousText_; // value that haschanged_ has to check against
 	};
 }

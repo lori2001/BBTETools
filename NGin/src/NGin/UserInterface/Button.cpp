@@ -119,7 +119,7 @@ namespace ng
 	{
 		shape_.setScale(scale);
 
-		text_.setCharacterSize(int(38 * scale.y));
+		// text_.setCharacterSize(int(38 * scale.y));
 
 		centerTextInShape(text_, shape_);
 		textPos_ = text_.getPosition();

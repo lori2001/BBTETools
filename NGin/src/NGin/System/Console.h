@@ -115,9 +115,15 @@ namespace ng
 
 // --- call this to disable Console functions ---
 /*
+// in header
 #ifndef _DEBUG // limits to release window
-ShowWindow(GetConsoleWindow(), SW_HIDE); // hides console
-#define NG_CONSOLE_NOPRINT // disables unnecessary printing logic
+	#define NG_CONSOLE_NOPRINT // disables unnecessary printing logic
 #endif
+
+// inside code
+#ifndef _DEBUG // limits to release window
+	ShowWindow(GetConsoleWindow(), SW_HIDE); // hides console
+#endif
+
 */
 // ----------------------------------------------

@@ -14,6 +14,11 @@ namespace ng {
 			else
 				shape_.setOutlineThickness(0);
 
+
+			if (hasChanged_ == true && previousText_ == text_.getString()) {
+				hasChanged_ = false;
+			}
+
 			// if mouse button pressed on object
 			if (isSelected_ && event.mouseButton.button == sf::Mouse::Left && event.type == sf::Event::MouseButtonPressed
 				&& blockingException_ == -1)
@@ -28,10 +33,15 @@ namespace ng {
 
 				isActive_ = true; // makes active so writing may occur
 			}
-			// if mouse button pressed outside object or enter is pressed
-			else if ((!isSelected_ && event.mouseButton.button == sf::Mouse::Left && event.type == sf::Event::MouseButtonPressed)
-				|| sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+			// if mouse button pressed outside object or enter is pressed AND object was active
+			else if (((!isSelected_ && event.mouseButton.button == sf::Mouse::Left && event.type == sf::Event::MouseButtonPressed)
+				|| sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) && isActive_)
 			{
+				if (previousText_ != text_.getString()) {
+					hasChanged_ = true;
+					previousText_ = text_.getString();
+				}
+
 				// make object non-active
 				isActive_ = false;
 
@@ -43,6 +53,7 @@ namespace ng {
 			if (isActive_ && event.type == sf::Event::TextEntered)
 			{
 				char inputchar = event.text.unicode; // gets the character entered
+				previousText_ = text_.getString();
 				std::string container = text_.getString(); // holds the string that's going to be modified
 
 				// if backslash pressed and there are characters

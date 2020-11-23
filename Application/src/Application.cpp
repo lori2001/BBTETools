@@ -1,103 +1,156 @@
-#include "Application.h"
+﻿#include "Application.h"
+#include "wnfd.h"
 
 Application::Application()
 {
-	windowVideoMode = { 1000 ,600 };
-	windowName = "Client App";
+	#ifndef _DEBUG // limits to release window
+		ShowWindow(GetConsoleWindow(), SW_HIDE); // hides console
+	#endif
 
-	// ng::Resources::setLocation("assets/"); // default anyways
+	windowVideoMode = { 1366, 768 };
+	windowName = "University Tools";
+	windowClearColor = { 20, 20, 20 };
+
+	Settings::load();
 
 	// --- Button --------------------------
-	button_.setTexture(NG_TEXTURE("button.png"));
-	button_.setFont(NG_FONT("arial.ttf"));
-	button_.setString("Test Button");
-	button_.setPosition({ 30.0F, 50.0F });
+	m_gatherHomework.setPosition({ 50.0F, 925.0F });
+	m_gatherHomework.setTexture(NG_TEXTURE("button.png"));
+	m_gatherHomework.setFont(NG_FONT("arial.ttf"));
+	m_gatherHomework.setString("Házi Gyüjtés");
+	m_gatherHomework.setCharacterSize(40);
+	m_gatherHomework.setFillColor(ITEM_COLOR);
+	m_gatherHomework.setScale({ 0.85F, 1.5F });
+	m_gatherHomework.setSelectColor(SELECT_COLOR);
+	m_gatherHomework.setSelectThickness(2.0F);
 
-	// --- Confirm Dialog -------------------
-	confirmDialog_.setSize({ 600, 200 });
-	confirmDialog_.setPosition({ 600.0F, 480.0F });
-	confirmDialog_.setShapeColor(sf::Color::Cyan);
-	confirmDialog_.setButtonTexture(NG_TEXTURE("button.png"));
-	confirmDialog_.setString("This is a test string to see if\n"
-							 "everything works fine");
-	confirmDialog_.setFont(NG_FONT("arial.ttf"));
-	confirmDialog_.setTextColor(sf::Color::Magenta);
-	confirmDialog_.setButtonTextColor(sf::Color::Red);
+	m_inputFolderName.setPosition({ 480, 910 });
+	m_inputFolderName.setString(m_INPUT_BASE_STRING + Settings::inputPath.u8string());
 
-	confirmDialogButton_.setTexture(NG_TEXTURE("button.png"));
-	confirmDialogButton_.setFont(NG_FONT("arial.ttf"));
-	confirmDialogButton_.setPosition({ 600.0F, 400.0F });
-	confirmDialogButton_.setTextColor( sf::Color::Red );
-	confirmDialogButton_.setFillColor({123, 231, 231});
+	m_changeInputFolder.setPosition({ 1600.0F, 900.0F });
+	m_changeInputFolder.setTexture(NG_TEXTURE("button.png"));
+	m_changeInputFolder.setFont(NG_FONT("arial.ttf"));
+	m_changeInputFolder.setString("Cserélj");
+	m_changeInputFolder.setCharacterSize(40);
+	m_changeInputFolder.setFillColor(ITEM_COLOR);
+	m_changeInputFolder.setScale({ 0.5F, 1.15F });
+	m_changeInputFolder.setSelectColor(SELECT_COLOR);
+	m_changeInputFolder.setSelectThickness(2.5F);
 
-	// --- Dropdown -------------------------
-	dropdown_.setTexture(NG_TEXTURE("dropdown.png"));
-	dropdown_.setFont(NG_FONT("arial.ttf"));
-	dropdown_.setDropString(0, "Test Dropdown");
-	dropdown_.addDropString("test");
-	dropdown_.addDropColor(sf::Color::Cyan);
-	dropdown_.addDropString("test2");
-	dropdown_.setTextColor(sf::Color::Blue);
-	dropdown_.setHighlightColor({ 255, 0, 0, 50 });
-	dropdown_.setPosition({ 30.0F, 160.0F });
+	m_changeOutputFolder.setPosition({ 1600.0F, 980.0F });
+	m_changeOutputFolder.setTexture(NG_TEXTURE("button.png"));
+	m_changeOutputFolder.setFont(NG_FONT("arial.ttf"));
+	m_changeOutputFolder.setString("Cserélj");
+	m_changeOutputFolder.setCharacterSize(40);
+	m_changeOutputFolder.setFillColor(ITEM_COLOR);
+	m_changeOutputFolder.setScale({ 0.5F, 1.15F });
+	m_changeOutputFolder.setSelectColor(SELECT_COLOR);
+	m_changeOutputFolder.setSelectThickness(2.5F);
 
-	// --- Input Text ----------------------
-	inputText_.setTexture(NG_TEXTURE("inputtext.png"));
-	inputText_.setFont(NG_FONT("arial.ttf"));
-	inputText_.setString("Try writing here");
-	inputText_.setTextColor(sf::Color::Red);
-	inputText_.setPosition({ 30.0F, 350.0F });
+	m_newDirectorySwitcher.setTexture(NG_TEXTURE("switcher.png"));
+	m_newDirectorySwitcher.setButtonColor(ITEM_COLOR);
+	m_newDirectorySwitcher.setMarkColor(SELECT_COLOR);
+	m_newDirectorySwitcher.setSelectColor(SELECT_COLOR);
+	m_newDirectorySwitcher.setSelectThickness(2.5F);
+	m_newDirectorySwitcher.setPosition({ 1820.0F, 980.0F });
+	m_newDirectorySwitcher.setScale({ 0.95F, 0.95F });
 
-	// --- ScrollBox --------------------------
-	scrollBoxRect_.setFillColor(sf::Color::Red);
-	scrollBoxRect_.setSize({ 120, 120 });
-	scrollBox_.setTexture(NG_TEXTURE("scrollbox.png"));
-	scrollBox_.setPosition({ 30.0F, 450.0F });
-	scrollBox_.addElement(scrollBoxRect_, { 200.0F, 200.0F });
+	m_newDirectorySwitcher.setIsActive(Settings::hasNewFolder);
 
-	// --- Slider -----------------------------
-	slider_.setTexture(NG_TEXTURE("slider.png"));
-	slider_.setLevel(0.3F);
-	slider_.setMarkColor(sf::Color::Green);
-	slider_.setArrowsColor(sf::Color::Red);
-	slider_.setPosition({ 600.0F, 50.0F });
+	m_outputFolderName.setPosition({ 480, 990 });
+	m_outputFolderName.setString(m_OUTPUT_BASE_STRING + Settings::outputPath.u8string());
 
-	// --- Switcher -----------------------
-	switcher_.setTexture(NG_TEXTURE("switcher.png"));
-	switcher_.setMarkColor(sf::Color::Black);
-	switcher_.setPosition({ 600.0F, 200.0F });
+	m_LabNumberText.setPosition({ 50, 50 });
+	m_LabNumberText.setString(m_LAB_NUMBER_STRING);
+	m_LabNumberText.setFont(NG_FONT("arial.ttf"));
+	m_LabNumberText.setCharacterSize(30);
+
+	m_LabNumberInputText.setPosition({ 60, 100 });
+	m_LabNumberInputText.setFont(NG_FONT("arial.ttf"));
+	m_LabNumberInputText.setTexture(NG_TEXTURE("inputtext.png"));
+	m_LabNumberInputText.setFillColor(ITEM_COLOR);
+	m_LabNumberInputText.setSelectColor(SELECT_COLOR);
+	m_LabNumberInputText.setSize({150, 40});
+	m_LabNumberInputText.setString(Settings::labString);
+}
+
+Application::~Application()
+{
+	Settings::save();
 }
 
 void Application::handleEvents()
 {
-	button_.handleEvents(event_, ng::Cursor::getPosition());
-	dropdown_.handleEvents(event_, ng::Cursor::getPosition());
-	inputText_.handleEvents(event_, ng::Cursor::getPosition());
-	scrollBox_.handleEvents(event_, ng::Cursor::getPosition());
-	slider_.handleEvents(event_, ng::Cursor::getPosition());
-	switcher_.handleEvents(event_, ng::Cursor::getPosition());
-	confirmDialogButton_.handleEvents(event_, ng::Cursor::getPosition());
-	confirmDialog_.handleEvents(event_, ng::Cursor::getPosition());
+	m_changeInputFolder.handleEvents(event_, ng::Cursor::getPosition());
+	m_changeOutputFolder.handleEvents(event_, ng::Cursor::getPosition());
+	m_gatherHomework.handleEvents(event_, ng::Cursor::getPosition());
+	m_newDirectorySwitcher.handleEvents(event_, ng::Cursor::getPosition());
+	m_LabNumberInputText.handleEvents(event_, ng::Cursor::getPosition());
 
-	if (confirmDialogButton_.isActive()) {
-		confirmDialog_.setIsActive(true);
-		confirmDialog_.drawInWindow("ConfirmDialog");
+	if (m_changeInputFolder.isActive()) {
+		std::wstring dialogOutput;
+		nfdresult_t result = wnfd::pickFolder("", &dialogOutput);
+
+		Settings::inputPath = dialogOutput;
+		m_inputFolderName.setString(m_INPUT_BASE_STRING + Settings::inputPath.u8string());
+	}
+	else if (m_changeOutputFolder.isActive()) {
+		std::wstring dialogOutput;
+		nfdresult_t result = wnfd::pickFolder("", &dialogOutput);
+
+		Settings::outputPath = dialogOutput;
+
+		if (m_newDirectorySwitcher.isActive()) {
+			Settings::outputPath += "\\";
+			Settings::outputPath += m_DIRECTORY_NAME;
+		}
+
+		m_outputFolderName.setString(m_OUTPUT_BASE_STRING + Settings::outputPath.u8string());
+	}
+	else if (m_gatherHomework.isActive()) {
+		HomeworkHandler homeworkHandler{
+			Settings::outputPath, Settings::inputPath
+		};
+
+		homeworkHandler.setLabString(Settings::labString);
+
+		homeworkHandler.SaveFiles();
+		NG_LOG_INFO("Finished Generating Homework L", Settings::labString, " ...");
+	}
+
+	if (m_newDirectorySwitcher.hasChanged()) {
+		if (m_newDirectorySwitcher.isActive()) {
+			Settings::outputPath += m_DIRECTORY_NAME;
+			m_outputFolderName.setString(m_OUTPUT_BASE_STRING + Settings::outputPath.u8string());
+			Settings::hasNewFolder = true;
+		}
+		else {
+			auto tmp = Settings::outputPath;
+			Settings::outputPath = tmp.wstring().substr(0, tmp.wstring().size() - m_DIRECTORY_NAME.size());
+			m_outputFolderName.setString(m_OUTPUT_BASE_STRING + Settings::outputPath.u8string());
+			Settings::hasNewFolder = false;
+		}
+	}
+
+	if (m_LabNumberInputText.hasChanged()) {
+		Settings::labString = m_LabNumberInputText.getString();
 	}
 }
 
 void Application::update()
 {
-	// Empty bc im shit
 }
 
 void Application::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	target.draw(button_);
-	target.draw(dropdown_);
-	target.draw(inputText_);
-	target.draw(scrollBox_);
-	target.draw(slider_);
-	target.draw(switcher_);
-	target.draw(confirmDialogButton_);
-	target.draw(confirmDialog_);
+	target.draw(m_inputFolderName);
+	target.draw(m_outputFolderName);
+
+	target.draw(m_gatherHomework);
+	target.draw(m_changeInputFolder);
+	target.draw(m_changeOutputFolder);
+	target.draw(m_newDirectorySwitcher);
+
+	target.draw(m_LabNumberText);
+	target.draw(m_LabNumberInputText);
 }
