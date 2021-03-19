@@ -23,6 +23,9 @@
     <ClCompile Include="src\wnfd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Schedule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h">
@@ -33,5 +36,9 @@
     </ClInclude>
     <ClInclude Include="src\Settings.h" />
     <ClInclude Include="src\wnfd.h" />
+    <ClInclude Include="src\AppUISettings.h" />
+    <ClInclude Include="src\Schedule.h" />
+    <ClInclude Include="src\Time.h" />
+    <ClInclude Include="src\Appointment.h" />
   </ItemGroup>
 </Project>

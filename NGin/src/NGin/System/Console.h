@@ -51,7 +51,7 @@ namespace ng
 		static void setSize(const sf::Vector2u &size);
 		// !!! Changes all fonts (even those alredy printed)
 		static void setFontStyle(const sf::Vector2i& size, const bool isBold = false);
-		static void setName(const LPCSTR name);
+		static void setName(const char* name);
 		static bool isActive();
 
 	private:
@@ -115,15 +115,9 @@ namespace ng
 
 // --- call this to disable Console functions ---
 /*
-// in header
 #ifndef _DEBUG // limits to release window
-	#define NG_CONSOLE_NOPRINT // disables unnecessary printing logic
+ShowWindow(GetConsoleWindow(), SW_HIDE); // hides console
+#define NG_CONSOLE_NOPRINT // disables unnecessary printing logic
 #endif
-
-// inside code
-#ifndef _DEBUG // limits to release window
-	ShowWindow(GetConsoleWindow(), SW_HIDE); // hides console
-#endif
-
 */
 // ----------------------------------------------

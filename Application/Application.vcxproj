@@ -87,6 +87,7 @@
   <ItemGroup>
     <ClCompile Include="src\HomeworkHandler.cpp" />
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Schedule.cpp" />
     <ClCompile Include="src\Settings.cpp" />
     <ClCompile Include="src\wnfd.cpp" />
   </ItemGroup>
@@ -96,9 +97,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Appointment.h" />
+    <ClInclude Include="src\AppUISettings.h" />
     <ClInclude Include="src\HomeworkHandler.h" />
     <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\Schedule.h" />
     <ClInclude Include="src\Settings.h" />
+    <ClInclude Include="src\Time.h" />
     <ClInclude Include="src\wnfd.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -26,32 +26,76 @@ HomeworkHandler::HomeworkHandler(const std::filesystem::path& outputPath, const 
 HomeworkHandler::~HomeworkHandler()
 {
 	m_paths.clear();
-	m_files.clear();
+	m_renamableOriginal.clear();
+	m_renamableNew.clear();
+	m_unrenamableOriginal.clear();
+	m_unrenamableNew.clear();
 }
 
 void HomeworkHandler::SaveFiles()
 {
 	CreateDirectoryW(LPCWSTR(m_outputPath.c_str()), NULL);
+	
+	if (Settings::folderForEach) {
+		for (int i = 0; i < static_cast<int>(m_renamableNew.size()); i++) {
+			auto pathName = m_outputPath.wstring() + getFileOrFolderName(m_renamableNew[i]);
+			CreateDirectoryW(LPCWSTR(pathName.c_str()), NULL);
 
-	for (int i = 0; i < static_cast<int>(m_files.size()); i++)
-	{
-		auto extension = m_files[i].wstring().find_last_of('.'); // .blahblah
+			auto newLoc = pathName + std::wstring(L"\\")
+				+ getFileOrFolderName(m_renamableNew[i]) + getExtension(m_renamableNew[i]);
 
-		// if found and is .cpp
-		if (extension != std::string::npos && m_files[i].wstring().substr(extension) == L".cpp")
-		{
-			auto outfile = getOutFilePath(m_files[i]); // process file's name and location
-			copyFile(m_files[i], outfile);
+			copyFile(m_renamableOriginal[i], newLoc);
+			// NG_LOG_INFO(m_renamableOriginal[i].u8string(), " - renamable file copied!");
+		}
+
+		for (int i = 0; i < static_cast<int>(m_unrenamableNew.size()); i++) {
+			int fi = -1;
+
+			for (int j = 0; j < static_cast<int>(m_renamableOriginal.size()); j++) {
+				if (sameDirectory(m_renamableOriginal[j], m_unrenamableOriginal[i])) {
+					fi = j;
+					break;
+				}
+			}
+
+			if (fi == -1) {
+				copyFile(m_unrenamableOriginal[i], m_unrenamableNew[i]);
+
+				NG_LOG_WARN(m_unrenamableOriginal[i].u8string(), " - File project not recognised!");
+			}
+			else {
+				auto pathName = m_outputPath.wstring() + getFileOrFolderName(m_renamableNew[fi]);
+				auto newLoc = pathName + std::wstring(L"\\") +
+					getFileOrFolderName(m_unrenamableNew[i]) + getExtension(m_unrenamableNew[i]);
+
+				// NG_LOG_INFO(m_unrenamableOriginal[i].u8string(), " - unrenamable file copied!");
+
+				copyFile(m_unrenamableOriginal[i], newLoc, true);
+			}
+		}
+	}
+	else {
+		for (int i = 0; i < static_cast<int>(m_renamableNew.size()); i++) {
+			copyFile(m_renamableOriginal[i], m_renamableNew[i]);
+			// NG_LOG_INFO(m_renamableOriginal[i].u8string(), " - renamable file copied!");
+		}
+		for (int i = 0; i < static_cast<int>(m_unrenamableNew.size()); i++) {
+			copyFile(m_unrenamableOriginal[i], m_unrenamableNew[i], true);
+			// NG_LOG_INFO(m_renamableOriginal[i].u8string(), " - unrenamable file copied!");
 		}
 	}
 }
-void HomeworkHandler::setLabString(const std::string labString)
+
+std::wstring HomeworkHandler::toWString(const std::string& String)
 {
+	std::wstring WString;
 	// copy a/t
-	m_labString.resize(labString.size());
-	for (int i = 0; i < labString.size(); i++) {
-		m_labString[i] += labString[i];
+	WString.resize(String.size());
+	for (int i = 0; i < String.size(); i++) {
+		WString[i] += String[i];
 	}
+
+	return WString;
 }
 
 void HomeworkHandler::ReadFiles()
@@ -69,34 +113,66 @@ void HomeworkHandler::ReadFiles()
 	}
 	catch (...) {
 		// if can't open. assumes it's a file
-		m_files.push_back(m_paths.back()); //.u8string()
+
+		auto inFile = m_paths.back();
+		bool hasExtension = false;
+		auto extension = getExtension(inFile, &hasExtension);
+
+		// if extension exists and is accepted
+		if (hasExtension) {
+			for (auto& it : sourceExtensions) {
+				if (extension == it)
+				{
+					bool renameFailed = false;
+					auto outfile = getOutFilePath(inFile, &renameFailed);
+
+					if (renameFailed) {
+						m_unrenamableOriginal.push_back(inFile);
+						m_unrenamableNew.push_back(outfile);
+					}
+					else {
+						m_renamableOriginal.push_back(inFile);
+						m_renamableNew.push_back(outfile);
+					}
+				}
+			}
+			for (auto& it : inputExtensions) {
+				if (extension == it) {
+					auto outfile = getOutFilePath(inFile);
+					m_unrenamableOriginal.push_back(inFile);
+					m_unrenamableNew.push_back(outfile);
+				}
+			}
+		}
 	}
 }
 
 // input ex.: 2.cpp
-// output: saam0334_L3_2.cpp
-std::wstring HomeworkHandler::getOutFilePath(const std::filesystem::path& pathOfOldFile)
+// output: .../saam0334_L3_2.cpp
+std::wstring HomeworkHandler::getOutFilePath(const std::filesystem::path& pathOfOldFile, bool* renameFailed)
 {
-	auto fileNameStart = pathOfOldFile.wstring().find_last_of('\\');
-	auto fileNameEnd = pathOfOldFile.wstring().find_last_of('.');
+	const std::wstring extension = getExtension(pathOfOldFile);
+	const std::wstring oldfileName = getFileOrFolderName(pathOfOldFile);
+	std::wstring newFileName;
 
 	if (m_labString != L"") {
 		try {
-			// check if name of file can be converted to number
-			int homeworkNum =
-				stoi(pathOfOldFile.wstring().
-					substr(fileNameStart + 1, fileNameEnd - fileNameStart - 1));
+			stoi(oldfileName); // check if name of file starts with number (can be converted)
 
-			std::wstring newFileName = m_GENERIC_FILE_NAME;
+			newFileName = m_GENERIC_FILE_NAME;
 
 			auto finder = newFileName.find(L"!");
-			newFileName.replace(finder, 1, m_labString);
-
+			newFileName.replace(finder, 1, m_idString);
 			finder = newFileName.find(L"!");
-			newFileName.replace(finder, 1, std::to_wstring(homeworkNum));
+			newFileName.replace(finder, 1, m_labString);
+			finder = newFileName.find(L"!");
+			newFileName.replace(finder, 1, oldfileName);
 
-			m_renameFailed = false;
-			return std::wstring(m_outputPath) + newFileName;
+			if (renameFailed != nullptr) {
+				*renameFailed = false;
+			}
+
+			newFileName = std::wstring(m_outputPath) + newFileName + extension;
 		}
 		catch (...) {
 			goto conversion2;
@@ -105,14 +181,16 @@ std::wstring HomeworkHandler::getOutFilePath(const std::filesystem::path& pathOf
 	else {
 	conversion2:
 
-		m_renameFailed = true;
+		if (renameFailed != nullptr) {
+			*renameFailed = true;
+		}
 
-		NG_LOG_WARN("Can't convert filename of: ", 
-			pathOfOldFile.u8string().substr(fileNameStart),
-			" - Original name will be kept!");
+		// NG_LOG_WARN("Can't convert filename of: ", std::to_string(oldfileName), " - Original name will be kept!");
 
-		return std::wstring(m_outputPath) + pathOfOldFile.wstring().substr(fileNameStart);
+		newFileName = std::wstring(m_outputPath) + oldfileName + extension;
 	}
+
+	return newFileName;
 }
 
 // input ex.: 2.cpp
@@ -121,24 +199,31 @@ std::wstring HomeworkHandler::getOutFilePath(const std::filesystem::path& pathOf
 //    611-es csoport
 //    2.Feladat */
 // + input
-void HomeworkHandler::copyFile(const std::filesystem::path& from, const std::filesystem::path& to)
+void HomeworkHandler::copyFile(const std::filesystem::path& from, const std::filesystem::path& to, bool renameFailed)
 {
 	std::ifstream in(from);
 	std::ofstream out(to);
 
 	/// ------ Add generic comment --------------
-	if (!m_renameFailed) { // added for "backwards compatibility"
-		auto finder = from.wstring().find_last_of('\\'); // should find the homework number in file's name
-		finder++;
+	if (!renameFailed) {
+		auto fromPos = from.u8string().find_last_of('\\'); // should find the homework's name in file's name
+		auto untilPos = from.u8string().find_last_of('.');
+
 		try {
-			int homeworkNum = stoi(from.wstring().substr(finder));
+			std::string homeworkName = from.u8string().substr(fromPos + 1, untilPos - fromPos - 1);
 
-			auto m_genericComment = m_GENERIC_COMMENT;
-			auto finder2 = m_genericComment.find('!');
+			auto comment = m_GENERIC_COMMENT;
 
-			m_genericComment.replace(finder2, 1, std::to_string(homeworkNum));
+			auto finder2 = comment.find('!');
+			comment.replace(finder2, 1, m_nameString);
 
-			out << m_genericComment;
+			finder2 = comment.find('!');
+			comment.replace(finder2, 1, m_groupString);
+
+			finder2 = comment.find('!');
+			comment.replace(finder2, 1, homeworkName);
+
+			out << comment;
 		}
 		catch (...) {
 			NG_LOG_WARN("Failed to add generic comments to: ", to);
@@ -146,12 +231,55 @@ void HomeworkHandler::copyFile(const std::filesystem::path& from, const std::fil
 	}
 	/// ------ Add generic comment --------------
 
+	// ---- Copy File ----
 	std::string tmp;
 	while (getline(in, tmp)) {
 		out << tmp << "\n";
 	}
+	// --------------------
 
 	in.close();
 	out.close();
+}
+
+bool HomeworkHandler::sameDirectory(const std::filesystem::path& file1, const std::filesystem::path& file2)
+{
+	auto firstFinder = file1.wstring().find_last_of('\\');
+	auto firstString = file1.wstring().substr(0, firstFinder);
+
+	auto secondFinder = file2.wstring().find_last_of('\\');
+	auto secondString = file2.wstring().substr(0, secondFinder);
+
+	return firstString == secondString;
+}
+
+std::wstring HomeworkHandler::getFileOrFolderName(const std::filesystem::path& file, bool* isFolder)
+{
+	auto nameStart = file.wstring().find_last_of('\\');
+	auto nameEnd = file.wstring().find_last_of('.');
+
+	if (isFolder != nullptr && (nameEnd == std::string::npos || nameEnd < nameStart)) {
+		*isFolder = true;
+	}
+	else if (isFolder != nullptr) {
+		*isFolder = false;
+	}
+
+	return file.wstring().substr(nameStart + 1, nameEnd - nameStart - 1);
+}
+
+std::wstring HomeworkHandler::getExtension(const std::filesystem::path& file, bool* hasExtension)
+{
+	std::size_t startingIndex = file.wstring().find_last_of('.');
+	if (hasExtension != nullptr) {
+		if (startingIndex == std::string::npos) {
+			*hasExtension = false;
+		}
+		else {
+			*hasExtension = true;
+		}
+	}
+	
+	return file.wstring().substr(startingIndex); // (ex: ".cpp")
 }
 
