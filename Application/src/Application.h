@@ -9,7 +9,6 @@
 #include "HomeworkHandler.h"
 
 #include "Settings.h"
-#include "Schedule.h"
 
 #include "AppUISettings.h"
 
@@ -25,8 +24,6 @@ public:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 private:
 	const AppUISettings appUISettings;
-
-	Schedule scheduleHandler;
 
 	static constexpr unsigned MAX_LOCATION_CHARACTERS = 60;
 

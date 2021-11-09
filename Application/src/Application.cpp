@@ -7,14 +7,12 @@ Application::Application()
 		ShowWindow(GetConsoleWindow(), SW_HIDE); // hides console
 	#endif
 
+	setWindowIcon("assets/icon.png");
 	windowVideoMode = { 1366, 768 };
-	windowName = "University Tools";
+	windowName = "University Tools v.1.0.1";
 	windowClearColor = { 20, 20, 20 };
 
-	setWindowIcon("assets/icon.png");
-
 	Settings::load();
-	scheduleHandler.load();
 
 	// --- Button --------------------------
 	m_gatherHomework.setPosition({ 50.0F, 925.0F });
@@ -79,7 +77,6 @@ Application::Application()
 Application::~Application()
 {
 	Settings::save();
-	scheduleHandler.save();
 }
 
 void Application::handleEvents()
