@@ -11,6 +11,8 @@ Application::Application()
 	windowName = "University Tools";
 	windowClearColor = { 20, 20, 20 };
 
+	setWindowIcon("assets/icon.png");
+
 	Settings::load();
 	scheduleHandler.load();
 

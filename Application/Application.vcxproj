@@ -97,6 +97,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="src\Appointment.h" />
     <ClInclude Include="src\AppUISettings.h" />
     <ClInclude Include="src\HomeworkHandler.h" />
@@ -105,6 +106,12 @@
     <ClInclude Include="src\Settings.h" />
     <ClInclude Include="src\Time.h" />
     <ClInclude Include="src\wnfd.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Application.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
