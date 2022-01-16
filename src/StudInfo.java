@@ -6,6 +6,7 @@ import settings.Settings;
 import javax.swing.*;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.util.Objects;
 
 public class StudInfo extends JPanel {
     private final JTextField hwNum = new JTextField();
@@ -67,6 +68,10 @@ public class StudInfo extends JPanel {
     }
 
     private int getHwNum() {
+        if(Objects.equals(hwNum.getText(), "")) {
+            return 0;
+        }
+
         try {
             return Integer.parseInt(hwNum.getText());
         } catch (NumberFormatException e) {
@@ -77,6 +82,10 @@ public class StudInfo extends JPanel {
     }
 
     private int getGroupNum() {
+        if(Objects.equals(groupNum.getText(), "")) {
+            return 0;
+        }
+
         try {
             return Integer.parseInt(groupNum.getText());
         } catch (NumberFormatException e) {
