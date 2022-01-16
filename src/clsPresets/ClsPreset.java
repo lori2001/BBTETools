@@ -4,12 +4,14 @@ import models.StudData;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 
+import static utils.FilenameUtils.getExtension;
+
 public abstract class ClsPreset {
-    protected StudData studData = new StudData();
+    protected StudData studData;
     protected String[] validExtensions;
 
     public ClsPreset(StudData sd) {
@@ -17,10 +19,11 @@ public abstract class ClsPreset {
     }
 
     // ----- ABSTRACT CLASSES ---------
-    public abstract String getNewFileName(String origName);
-    public abstract void processContent(String fileContent, String origName, FileWriter writer) throws IOException;
+    public abstract String getNewFileName(Path origPath);
+    public abstract String processContent(String fileContent, String origName) throws IOException;
     public abstract boolean folderForEachFile();
-    public abstract boolean parentFolder();
+    // return null if you don't want zipping
+    public abstract String getParentZipName();
     protected abstract JLabel genLeftDesc();
     protected abstract JLabel genRightDesc();
     // ----- ABSTRACT CLASSES ---------
@@ -47,38 +50,4 @@ public abstract class ClsPreset {
         this.studData = studData;
     }
     // ----- PUBLIC CLASSES ---------
-
-    // ----- UTILITY CLASSES ---------
-    protected String getExtension(String f) {
-        return f.substring(f.lastIndexOf(".") + 1);
-    }
-
-    // params: file content, string to be searched, one line comment mark,
-    // multi line start comment mark, multi line end comment mark
-    // MIGHT GET CONFUSED BY "//*" strings
-    protected boolean stringExistsAsComment(String content, String str, String olComm, String sComm, String eComm) {
-        int strPos = content.indexOf(str); // check if string exists
-        boolean existsAndIsInComm = false;
-
-        if(strPos != -1) { // if string is found
-            if(content.substring(0, strPos).contains(sComm) && content.substring(strPos).contains(eComm))
-            {
-                existsAndIsInComm = true;
-            } else {
-                // search string's line
-                int newLineInd = 0;
-                for(int i = strPos; i >= 0 && content.charAt(i) != '\n'; i--) {
-                    newLineInd = i;
-                }
-
-                if(content.substring(newLineInd, strPos).contains(olComm)) {
-                    existsAndIsInComm = true;
-                }
-            }
-        }
-
-        return existsAndIsInComm;
-    }
-    // ----- UTILITY CLASSES ---------
-
 }

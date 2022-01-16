@@ -5,24 +5,30 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import static utils.FilenameUtils.removeExtension;
 
 public class ProcessDir {
     // TODO Multi thread this
-    public ProcessDir(Path inputPath, Path outputPath, ClsPreset clsPreset) {
+    public ProcessDir(Path inputDir, Path outputDir, ClsPreset clsPreset) {
         assert clsPreset != null;
 
-        HashMap<Path, Path> processedFilePaths = new HashMap<>();
-        HashMap<Path, Path> directoryChanges = new HashMap<>();
+        final ZipOutputStream zipOut = getZipObject(clsPreset, outputDir);
 
-        ArrayList<Path> unprocessedFiles = new ArrayList<Path>();
+        HashMap<Path, Path> processedFilePaths = new HashMap<>(); // for "overwrite"error messages
+        HashMap<Path, Path> directoryChanges = new HashMap<>(); // for "folderForEach" option
+
+        ArrayList<Path> unprocessedFiles = new ArrayList<Path>(); // contains unprocessed "folderForEach" files because alphabetical order
 
         try {
-            Files.walkFileTree(inputPath, new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(inputDir, new SimpleFileVisitor<Path>() {
                 @Override
-                public FileVisitResult visitFile(Path inFilePath, BasicFileAttributes attrs) {
+                public FileVisitResult visitFile(Path inFilePath, BasicFileAttributes attrs) throws IOException {
                     // if extension is validated by clsPreset
                     if(clsPreset.extensionIsValid(inFilePath.toString())) {
-                        Path outFilePath = getOutFilePath(clsPreset, inFilePath, outputPath);
+                        Path outFilePath = getOutFilePath(clsPreset, inFilePath, outputDir);
 
                         // TODO Switch to "#include" - based folders
                         // separate files into different folders
@@ -30,10 +36,19 @@ public class ProcessDir {
                             boolean wasRenamed = !outFilePath.getFileName().equals(inFilePath.getFileName());
                             // create directory
                             if(wasRenamed) {
-                                String newDirLoc = outputPath.toString() + "\\" + removeExtension(outFilePath.getFileName().toString());
+                                String newDirLoc = outputDir.toString() + "\\" + removeExtension(outFilePath.getFileName().toString());
                                 File newDir = new File(newDirLoc);
 
-                                if (!newDir.exists() && !newDir.mkdirs()) { // creates the directory if it does not exist
+                                // create zip directories explicitly!
+                                // this part is not necessary but is good practice
+                                if(zipOut != null) {
+                                    // ZipEntry --- Here file name can be created using the source file
+                                    ZipEntry ze = new ZipEntry(newDir.getName() +"\\");
+                                    // Putting zipEntry in zipoutputstream
+                                    zipOut.putNextEntry(ze);
+                                    zipOut.closeEntry();
+                                }
+                                else if (!newDir.exists() && !newDir.mkdirs()) { // creates the directory if it does not exist
                                     System.out.println("HIBÁS mappa készítés: " + newDirLoc); // if error
                                 }
 
@@ -56,7 +71,7 @@ public class ProcessDir {
                             }
                         }
 
-                        processFile(clsPreset, inFilePath, outFilePath);
+                        processFile(clsPreset, inFilePath, outFilePath, zipOut, outputDir);
                         checkForOverwriteError(processedFilePaths, inFilePath, outFilePath);
                     }
                     return FileVisitResult.CONTINUE;
@@ -78,7 +93,7 @@ public class ProcessDir {
             unprocessedFiles.forEach(
                 inFilePath -> {
                     System.out.println(inFilePath);
-                    Path outFilePath = getOutFilePath(clsPreset, inFilePath, outputPath);
+                    Path outFilePath = getOutFilePath(clsPreset, inFilePath, outputDir);
                     // copy element in proper folder
                     Path newDir = directoryChanges.get(inFilePath.getParent());
                     if(newDir != null) { // if parent directory was found
@@ -87,24 +102,23 @@ public class ProcessDir {
                         System.out.print("HIBA: nem lehet feldolgozni " + inFilePath + "mivel vagy nem része egy foldernek, ");
                         System.out.println("vagy a folder amelynek része nem tartalmaz olyan file-t ami egy feladatot jelöl!");
                     }
-                    processFile(clsPreset, inFilePath, outFilePath);
+                    processFile(clsPreset, inFilePath, outFilePath, zipOut, outputDir);
                     checkForOverwriteError(processedFilePaths, inFilePath, outFilePath);
                 }
             );
         }
-    }
 
-    private String removeExtension(String str) {
-        int pos = str.lastIndexOf(".");
-        if (pos == -1) return str;
-        return str.substring(0, pos);
+        try{
+            if(zipOut != null) zipOut.close();
+        }catch (IOException e) {
+            System.out.println("HIBA: Sikertelen .zip file bezárás!");
+        }
     }
 
     private Path getOutFilePath(ClsPreset clsPreset, Path filePath, Path outputPath) {
         Path outputFile = null;
 
-        String origName = filePath.getFileName().toString();
-        String newFileName = clsPreset.getNewFileName(origName);
+        String newFileName = clsPreset.getNewFileName(filePath);
 
         // write file with name according to class preset
         outputFile = Paths.get(outputPath + "\\" + newFileName);
@@ -112,31 +126,53 @@ public class ProcessDir {
         return outputFile;
     }
 
-    private void processFile(ClsPreset clsPreset, Path inFilePath, Path outFilePath) {
+    private void processFile(ClsPreset clsPreset, Path inFilePath, Path outFilePath, ZipOutputStream zipOut, Path outDir) {
         try {
             // create a reader
             FileInputStream inFile = new FileInputStream(inFilePath.toFile());
 
-            // read one byte at a time and add it to fileContent string
-            StringBuilder fileContent = new StringBuilder();
-            int ch;
-            while ((ch = inFile.read()) != -1) {
-                fileContent.append((char) ch);
-            }
-
             final String origName = inFilePath.getFileName().toString();
 
-            // write file with name according to class preset
-            FileWriter writer = new FileWriter(outFilePath.toString());
-
+            // read one byte at a time and add it to fileContent string
+            StringBuilder inFileContent = new StringBuilder();
+            int ch;
+            while ((ch = inFile.read()) != -1) {
+                inFileContent.append((char) ch);
+            }
             // process fileContent with class specific instructions
-            clsPreset.processContent(fileContent.toString(), origName, writer);
+            String outFileContent = clsPreset.processContent(inFileContent.toString(), origName);
 
-            // write content of old file to new file
-            writer.write(fileContent.toString());
+            // zipping output
+            if(zipOut != null) {
+                // find relative path from abolute path
+                String ofp = outFilePath.toString();
+                String odir = outDir.toString();
+                String outLoc = ofp.substring(ofp.indexOf(odir) + odir.length() + 1);
+
+                ZipEntry ze = new ZipEntry(outLoc);
+                zipOut.putNextEntry(ze);
+
+                ByteArrayInputStream bais = new ByteArrayInputStream(outFileContent.getBytes());
+
+                byte[] bytes = new byte[1024];
+                int length;
+                while((length = bais.read(bytes)) >= 0 ) {
+                    zipOut.write(bytes, 0, length);
+                }
+
+                zipOut.closeEntry(); // for zip output
+
+            } else { // normal output
+                // write file with name according to class preset
+                FileWriter fileWriter = new FileWriter(outFilePath.toString());
+
+                // write content of old file to new file
+                fileWriter.write(outFileContent.toString());
+
+                fileWriter.close();
+            }
 
             inFile.close();
-            writer.close();
         }
         catch (FileNotFoundException e) {
             System.out.print("SIKERTELEN FILEÍRÁS: A \"" + outFilePath + "\" folder nem létezik a gépen!");
@@ -156,5 +192,19 @@ public class ProcessDir {
             System.out.println("Az új file származása: " + inFilePath);
         }
         processedFilePaths.put(outFilePath, inFilePath);
+    }
+
+    // return the object in which zipping has to be done
+    private ZipOutputStream getZipObject(ClsPreset clsPreset, Path outputDir) {
+        if(clsPreset.getParentZipName() != null) {
+            String path = outputDir + "\\" + clsPreset.getParentZipName() + ".zip";
+            try{
+                return new ZipOutputStream(new FileOutputStream(path));
+            } catch (FileNotFoundException e){
+                System.out.println("Nem sikerül létrehozni a .zip file-t: " + path);
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 }

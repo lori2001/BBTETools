@@ -1,12 +1,15 @@
 package clsPresets;
 
 import models.StudData;
+import utils.FileProcessingUtils;
 
 import javax.swing.*;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.Arrays;
+
+import static utils.FilenameUtils.getExtension;
 
 public class ClsAlgoritmika extends ClsPreset{
 
@@ -18,18 +21,15 @@ public class ClsAlgoritmika extends ClsPreset{
     private String exerciseNrStr; // exercise number in string format
 
     @Override
-    public String getNewFileName(String origName) {
-        exerciseNrStr = genExerciseString(origName);
-        return genFileNamePrefix() + exerciseNrStr + "." + getExtension(origName);
+    public String getNewFileName(Path origPath) {
+        exerciseNrStr = genExerciseString(origPath);
+        return genFileNamePrefix() + exerciseNrStr + "." + getExtension(origPath.getFileName().toString());
     }
 
     @Override
-    public void processContent(String fileContent, String origName, FileWriter writer) throws IOException {
+    public String processContent(String fileContent, String origName) throws IOException {
         String ext = getExtension(origName);
-        // if(ext.equals("txt")) return; // do not process text files
-
-        // tried this regex: got StackOverflow
-        // /\*((?:.|\n|\r\n)*)Szõke András-Loránd((?:.|\n|\r\n)*)611((?:.|\n|\r\n)*)2((?:.|\n|\r\n)*)\*/
+        String newContent = null;
 
         boolean hasComment = false;
         if(ext.equals("cpp") || ext.equals("c")) {
@@ -47,10 +47,38 @@ public class ClsAlgoritmika extends ClsPreset{
 
         // write comments to start of file
         if(!hasComment) {
-            writer.write(genComment());
+            newContent = genComment();
         } else {
-            System.out.println("NOTE: Comment found in " + origName + " -> no auto comment added!");
+            System.out.println("MEGJEGYZÉS: Comment talált a " + origName + " fileban -> " +
+                    "auto komment nem lesz hozzádva az ebbõl generált kimeneti filehoz!");
         }
+
+        int exerciseNum = -1;
+        try {
+            exerciseNum = Integer.parseInt(exerciseNrStr);
+        }
+        catch (Exception ignored){}
+
+        if(exerciseNum != -1) {
+            String inFileInputText = "\"bemenet" + String.format("%02d", exerciseNum) + ".txt\"";
+            String inFileOutputText = "\"kimenet" + String.format("%02d", exerciseNum) + ".txt\"";
+
+            // check c++ file contents for ifstream and ofstream
+            if(strExAsNotCommCpp(fileContent, "ifstream") && !strExAsNotCommCpp(fileContent, inFileInputText))
+            {
+                System.out.println("VIGYÁZAT: A " + origName + " fileban talált az 'ifstream', de nem talált a '"
+                        + inFileInputText + "'! Ellenõrizd hogy a projekt megfelel-e a házi kritériumainak.");
+            }
+            if(strExAsNotCommCpp(fileContent, "ofstream") && !strExAsNotCommCpp(fileContent, inFileOutputText)) {
+                System.out.println("VIGYÁZAT: A " + origName + " fileban talált 'ifstream', de nem talált '"
+                        + inFileOutputText + "'! Ellenõrizd hogy a projekt megfelel-e a házi kritériumainak.");
+            }
+        }
+
+        // add back original contents to file
+        newContent += fileContent;
+
+        return newContent;
     }
 
     @Override
@@ -59,8 +87,8 @@ public class ClsAlgoritmika extends ClsPreset{
     }
 
     @Override
-    public boolean parentFolder() {
-        return false;
+    public String getParentZipName() {
+        return null;
     }
 
     @Override
@@ -82,17 +110,20 @@ public class ClsAlgoritmika extends ClsPreset{
                 "<li><h4>felismert kiterjesztések:<br>" +
                 Arrays.deepToString(validExtensions) + "</h4></li>" +
                 "<li><h4>kimenet: fileok a<br>megadott folderbe</h4></li>" +
-                "<li><h4>automatikus tesztelés</h4></li>" +
+                "<li><h4>bemenet/kimenet \".txt\" ellenõrzés</h4></li>" +
             "</ul></html>"
         );
     }
 
     private boolean strExAsCommCpp(String cont, String str) {
-        return stringExistsAsComment(cont, str, "//", "/*", "*/");
+        return FileProcessingUtils.stringExistsAsComment(cont, str, "//", "/*", "*/");
+    }
+    private boolean strExAsNotCommCpp(String cont, String str) {
+        return FileProcessingUtils.stringExistsAndIsNotComment(cont, str, "//", "/*", "*/");
     }
 
     private boolean strExAsCommPas(String cont, String str) {
-        return stringExistsAsComment(cont, str, "//", "{", "}");
+        return FileProcessingUtils.stringExistsAsComment(cont, str, "//", "{", "}");
     }
 
     private String genComment() {
@@ -104,14 +135,16 @@ public class ClsAlgoritmika extends ClsPreset{
         if(isHtml) nL = "<br>";
 
         return "// " + stdN + nL +
-               "//   " + grN + "-es csoport" + nL +
-               "//   " + exS + ".Feladat" + nL + nL;
+               "// " + grN + "-es csoport" + nL +
+               "// " + exS + ".Feladat" + nL + nL;
     }
 
     private final String[] fileNamePrefConsts = {"_L",  "_"};
+
     private String genFileNamePrefix() {
         return studData.idStr + fileNamePrefConsts[0] + studData.hwNum + fileNamePrefConsts[1];
     }
+
     // generates possible versions of file name prefixes to know what user input
     // to search for
     private String[] genFileNamePrefixVariations() {
@@ -141,8 +174,10 @@ public class ClsAlgoritmika extends ClsPreset{
             return new String[]{genFileNamePrefix()};
         }
     }
-    private String genExerciseString(String origName) {
+
+    private String genExerciseString(Path origPath) {
         // try (number).ext
+        String origName = origPath.getFileName().toString();
         String exerciseStr = "";
         try {
             exerciseStr = origName.substring(0, origName.lastIndexOf('.'));
@@ -167,7 +202,7 @@ public class ClsAlgoritmika extends ClsPreset{
                 if(!found) throw new Exception("a file hibásan van elnevezve");
             } catch (Exception ex) {
                 // if all renaming attempts fail warn the user and write file name as exerciseStr
-                System.out.println("VIGYÁZAT: Erre a filera nem talált a feladat szám: " + origName);
+                System.out.println("VIGYÁZAT: Erre a filera nem talált a feladat szám: " + origPath);
                 exerciseStr = origName.substring(0, origName.lastIndexOf('.'));
             }
         }

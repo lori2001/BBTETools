@@ -19,6 +19,7 @@ import java.io.IOException;
 public class AppFrame extends JFrame {
     public static final Vec APP_SIZE = new Vec(700, 540);
     public static final Vec APP_INIT_POS = new Vec(600, 50);
+    public static final String version = "v2.1";
     private static Image appIcon;
 
     public static Image getAppIcon() {
@@ -30,7 +31,7 @@ public class AppFrame extends JFrame {
     }
 
     public AppFrame() {
-        super("Házi Begyüjtő");
+        super("Házi Begyüjtő " + version);
         setResizable(false);
         setLayout(null);
         setBounds(APP_INIT_POS.x, APP_INIT_POS.y, APP_SIZE.x,APP_SIZE.y);
