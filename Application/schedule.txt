@@ -1,3 +1,0 @@
-ClassA 0 0:0 120
-ClassB 0 0:0 120
-ClassC 0 0:0 120
