@@ -21,7 +21,7 @@ public class Settings {
             Classes.Algoritmika.toString()
     };
 
-    private static final String settingsFile = "settings.txt";
+    private static final String settingsFile = "assets/settings.txt";
     private static final String[] fileContent = new String[Setting.SIZE.ordinal()];
 
     public static void readFromFile() {
