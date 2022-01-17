@@ -19,7 +19,7 @@ import java.io.IOException;
 public class AppFrame extends JFrame {
     public static final Vec APP_SIZE = new Vec(700, 540);
     public static final Vec APP_INIT_POS = new Vec(100, 100);
-    public static final String VERSION = "v2.2";
+    public static final String VERSION = "v2.2.1";
     private static Image appIcon;
 
     public static Image getAppIcon() {
@@ -91,12 +91,7 @@ public class AppFrame extends JFrame {
         add(infoPanel);
 
         // change preset description whenever preset changes
-        clsPresetPicker.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateDescPanel(clsPresetDesc, clsPresetPicker, studInfo);
-            }
-        });
+        clsPresetPicker.addActionListener(e -> updateDescPanel(clsPresetDesc, clsPresetPicker, studInfo));
         studInfo.addDocumentListener(new DocumentChanged() {
             @Override
             public void onContentChange(DocumentEvent e) {
@@ -119,36 +114,40 @@ public class AppFrame extends JFrame {
         JButton gatherHw = new JButton("Házi Begyüjtése");
         gatherHw.setBounds( 180, AppFrame.APP_SIZE.y - 90, 200, 35);
         add(gatherHw);
-        gatherHw.addActionListener(e -> {
-            new Thread(){
-                @Override
-                public void run() {
-                    super.run();
-                    // switch tab to logs
-                    logPanel.clearLogs(); // clear old logs
-                    infoPanel.setSelectedIndex(1);
-                    // enable loading icon
-                    loadingPrompt.isLoading(true);
-                    // process files
-                    new ProcessDir(inputFile.getPath(), outputFile.getPath(), clsPresetPicker.getClsPreset(studInfo));
-                    // play "done" sound
-                    try {
-                        File audioFile = new File("assets/complete.wav");
-                        AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
-                        AudioFormat format = audioStream.getFormat();
-                        DataLine.Info info = new DataLine.Info(Clip.class, format);
-                        Clip audioClip = (Clip) AudioSystem.getLine(info);
-                        audioClip.open(audioStream);
-                        audioClip.start();
-                    } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
-                        ex.printStackTrace();
-                    }
-                    // disable loading icon
-                    loadingPrompt.isLoading(false);
-                    System.out.println("A GENERÁLÁS KÉSZEN VAN!");
+        gatherHw.addActionListener(e -> new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                // switch tab to logs
+                logPanel.clearLogs(); // clear old logs
+                infoPanel.setSelectedIndex(1);
+                // enable loading icon
+                loadingPrompt.isLoading(true);
+                // auto-save settings
+                Settings.saveToFile(studInfo.getStudData(),
+                        inputFile.getPath().toString(),
+                        outputFile.getPath().toString(),
+                        clsPresetPicker.getActiveClsString()
+                );
+                // process files
+                new ProcessDir(inputFile.getPath(), outputFile.getPath(), clsPresetPicker.getClsPreset(studInfo));
+                // play "done" sound
+                try {
+                    File audioFile = new File("assets/complete.wav");
+                    AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+                    AudioFormat format = audioStream.getFormat();
+                    DataLine.Info info = new DataLine.Info(Clip.class, format);
+                    Clip audioClip = (Clip) AudioSystem.getLine(info);
+                    audioClip.open(audioStream);
+                    audioClip.start();
+                } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
+                    ex.printStackTrace();
                 }
-            }.start();
-        });
+                // disable loading icon
+                loadingPrompt.isLoading(false);
+                System.out.println("A GENERÁLÁS KÉSZEN VAN!");
+            }
+        }.start());
 
         // save settings when closing window
         addWindowListener(new WindowAdapter() {
