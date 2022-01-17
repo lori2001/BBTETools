@@ -44,7 +44,7 @@ public class AppInfoButton extends JPanel{
                             "<html><center><h1>App Információ</h1></center>" +
                             "<p>Ez az app a házi begyüjtésének unalmas folyamatát<br>" +
                                "automatizálja. Kézzel elnevezni és bekomentelni<br>" +
-                               "minden házit idõigényes és könnyen elrontható,<br>" +
+                               "minden házit időigényes és könnyen elrontható,<br>" +
                                "s elnevezési hiba esetén néhány tantárgyból a <br>" +
                                "diák a teljes pontszámát elveszítheti.</p>" +
                             "<center><h2>Hogyan használható?</h2></center>" +
@@ -52,18 +52,18 @@ public class AppInfoButton extends JPanel{
                                 "folderbe vagy annak bármely alfolderébe és nevezd<br>" +
                                 "el \"<alpont>.cpp\"-nek. Például 1.cpp,2.cpp stb.<br>" +
                                 "Töltsd ki az appet az adataiddal illetve a pirossal<br>" +
-                                "megjelölt mezõre írd be hogy hányas labort akarsz<br>" +
+                                "megjelölt mezőre írd be hogy hányas labort akarsz<br>" +
                                 "generálni. Végül pedig állítsd be bemenetnek a<br>" +
-                                "házis foldert, illetve kimenetnek bármely elérhetõ<br>" +
+                                "házis foldert, illetve kimenetnek bármely elérhető<br>" +
                                 "mappát, és kattints a \"Begyüjtés\" gombra</p>" +
-                            "<center><h2>Hogyan mûködik?</h2></center>" +
+                            "<center><h2>Hogyan működik?</h2></center>" +
                             "<p>A program bejárja a bemenetként adott foldert és<br>" +
-                               "annak minden alfolderét. Megkeresi a megfelelõ<br>" +
+                               "annak minden alfolderét. Megkeresi a megfelelő<br>" +
                                 "filetípust(például algoritmikából a \".cpp\") és<br>" +
-                                "az appbe beírt infóknak megfelelõen kimásolja az<br>" +
-                                "összes filet, majd megfelelõen átnevezi,<br>" +
+                                "az appbe beírt infóknak megfelelően kimásolja az<br>" +
+                                "összes filet, majd megfelelően átnevezi,<br>" +
                                 "bekommenteli és (egyes tantárgyakból)<br>" +
-                                "a tartalmát is ellenõrzi.</p>" +
+                                "a tartalmát is ellenőrzi.</p>" +
                             "</html>");
 
                     infoScreen.add(text);

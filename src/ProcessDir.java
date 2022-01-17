@@ -56,7 +56,7 @@ public class ProcessDir {
                                 if(directoryChanges.containsKey(inFilePath.getParent())) {
                                     System.out.println("HIBA: Két feladat file talált a" + inFilePath.getParent()
                                     + " mappában! Az app (még) nem tudja ezt feldolgozni. Kérlek válaszd külön folderbe az egyes feladatokat.");
-                                    System.out.println("Ez az egyik fõ file: " + inFilePath);
+                                    System.out.println("Ez az egyik fő file: " + inFilePath);
                                 } else {
                                     directoryChanges.put(inFilePath.getParent(), Paths.get(newDirLoc));
                                 }
@@ -187,9 +187,9 @@ public class ProcessDir {
     // check for "internal" file rewrites and prompt errors to screen
     private void checkForOverwriteError(HashMap<Path, Path> processedFilePaths, Path inFilePath, Path outFilePath) {
         if(processedFilePaths.containsKey(outFilePath)) {
-            System.out.println("HIBA: FELÜlÍRÁS! a " + outFilePath + " fileon!");
-            System.out.println("Felülírt file származása: " + processedFilePaths.get(outFilePath));
-            System.out.println("Az új file származása: " + inFilePath);
+            System.out.println("HIBA: FELÜlÍRÁS! a " + outFilePath + " fileon!" +
+                    "\nFelülírt file származása: " + processedFilePaths.get(outFilePath) +
+                    "\nAz új file származása: " + inFilePath);
         }
         processedFilePaths.put(outFilePath, inFilePath);
     }

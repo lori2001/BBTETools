@@ -50,7 +50,7 @@ public class ClsAlgoritmika extends ClsPreset{
             newContent = genComment();
         } else {
             System.out.println("MEGJEGYZÉS: Comment talált a " + origName + " fileban -> " +
-                    "auto komment nem lesz hozzádva az ebbõl generált kimeneti filehoz!");
+                    "auto komment nem lesz hozzádva az ebből generált kimeneti filehoz!");
         }
 
         int exerciseNum = -1;
@@ -67,11 +67,11 @@ public class ClsAlgoritmika extends ClsPreset{
             if(strExAsNotCommCpp(fileContent, "ifstream") && !strExAsNotCommCpp(fileContent, inFileInputText))
             {
                 System.out.println("VIGYÁZAT: A " + origName + " fileban talált az 'ifstream', de nem talált a '"
-                        + inFileInputText + "'! Ellenõrizd hogy a projekt megfelel-e a házi kritériumainak.");
+                        + inFileInputText + "'! Ellenőrizd hogy a projekt megfelel-e a házi kritériumainak.");
             }
             if(strExAsNotCommCpp(fileContent, "ofstream") && !strExAsNotCommCpp(fileContent, inFileOutputText)) {
                 System.out.println("VIGYÁZAT: A " + origName + " fileban talált 'ifstream', de nem talált '"
-                        + inFileOutputText + "'! Ellenõrizd hogy a projekt megfelel-e a házi kritériumainak.");
+                        + inFileOutputText + "'! Ellenőrizd hogy a projekt megfelel-e a házi kritériumainak.");
             }
         }
 
@@ -110,7 +110,7 @@ public class ClsAlgoritmika extends ClsPreset{
                 "<li><h4>felismert kiterjesztések:<br>" +
                 Arrays.deepToString(validExtensions) + "</h4></li>" +
                 "<li><h4>kimenet: fileok a<br>megadott folderbe</h4></li>" +
-                "<li><h4>bemenet/kimenet \".txt\" ellenõrzés</h4></li>" +
+                "<li><h4>bemenet/kimenet \".txt\" ellenőrzés</h4></li>" +
             "</ul></html>"
         );
     }

@@ -18,8 +18,8 @@ import java.io.IOException;
 
 public class AppFrame extends JFrame {
     public static final Vec APP_SIZE = new Vec(700, 540);
-    public static final Vec APP_INIT_POS = new Vec(600, 50);
-    public static final String version = "v2.1";
+    public static final Vec APP_INIT_POS = new Vec(100, 100);
+    public static final String VERSION = "v2.2";
     private static Image appIcon;
 
     public static Image getAppIcon() {
@@ -31,11 +31,14 @@ public class AppFrame extends JFrame {
     }
 
     public AppFrame() {
-        super("Házi Begyüjtő " + version);
+        super("Házi Begyüjtő " + VERSION);
         setResizable(false);
         setLayout(null);
         setBounds(APP_INIT_POS.x, APP_INIT_POS.y, APP_SIZE.x,APP_SIZE.y);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // display system prints in the gui
+        LogPanel logPanel = new LogPanel();
 
         // load app icon
         try {
@@ -49,36 +52,43 @@ public class AppFrame extends JFrame {
         Settings.readFromFile();
 
         FileInput inputFile = new FileInput("Bemenet:",
-                new Vec(25, 25 ),
+                new Vec(15, 25 ),
                 new Vec(AppFrame.APP_SIZE.x - 50, 40),
                 Settings.getFileContent(Setting.InputFolder)
         );
         add(inputFile);
 
         FileInput outputFile = new FileInput("Kimenet:",
-                new Vec(25, 100 ),
+                new Vec(15, 85 ),
                 new Vec(AppFrame.APP_SIZE.x - 50, 40),
                 Settings.getFileContent(Setting.OutputFolder)
         );
         add(outputFile);
 
-        StudInfo studInfo = new StudInfo(new Vec(25, 200), new Vec(AppFrame.APP_SIZE.x - 50, 50));
+        StudInfo studInfo = new StudInfo(new Vec(15, 155), new Vec(AppFrame.APP_SIZE.x - 50, 50));
         add(studInfo);
 
         // choose the uni class for which to target homework gathering on
         ClsPresetPicker clsPresetPicker = new ClsPresetPicker(
-                        new Vec(25, AppFrame.APP_SIZE.y - 270),
-                        new Vec(200, 30),
+                        new Vec(15, AppFrame.APP_SIZE.y - 90),
+                        new Vec(150, 35),
                         Settings.getFileContent(Setting.ClsPreset)
         );
         add(clsPresetPicker);
 
         // display description of class preset
         JPanel clsPresetDesc = new JPanel();
-        clsPresetDesc.setBounds(240, AppFrame.APP_SIZE.y - 270, 420, 150);
+        clsPresetDesc.setBackground(new Color(30, 30, 30));
+        clsPresetDesc.setForeground(new Color(212, 212, 212));
         clsPresetPicker.getClsPreset(studInfo).addDescriptionToPanel(clsPresetDesc);
-        clsPresetDesc.setBackground(new Color(248, 199, 106));
         add(clsPresetDesc);
+
+        // displays clsPresetDesc and Logs in a TabbedPane
+        InfoPanel infoPanel = new InfoPanel();
+        infoPanel.setBounds(15, 220, 655, 210);
+        infoPanel.addTab(clsPresetDesc, "Info", "Shows info of what the current class preset does");
+        infoPanel.addTab(logPanel.getScrollableTextArea(), "Logs", "Shows the output log");
+        add(infoPanel);
 
         // change preset description whenever preset changes
         clsPresetPicker.addActionListener(new ActionListener() {
@@ -102,18 +112,21 @@ public class AppFrame extends JFrame {
         add(loadingPrompt);
 
         AppInfoButton appInfoButton =
-                new AppInfoButton(new Vec(240, AppFrame.APP_SIZE.y - 97), new Vec(40, 40));
+                new AppInfoButton(new Vec(395, AppFrame.APP_SIZE.y - 90), new Vec(35, 35));
         appInfoButton.toggleInfoFrameOnClick();
         add(appInfoButton);
 
         JButton gatherHw = new JButton("Házi Begyüjtése");
-        gatherHw.setBounds( 25, AppFrame.APP_SIZE.y - 100, 200, 50);
+        gatherHw.setBounds( 180, AppFrame.APP_SIZE.y - 90, 200, 35);
         add(gatherHw);
         gatherHw.addActionListener(e -> {
             new Thread(){
                 @Override
                 public void run() {
                     super.run();
+                    // switch tab to logs
+                    logPanel.clearLogs(); // clear old logs
+                    infoPanel.setSelectedIndex(1);
                     // enable loading icon
                     loadingPrompt.isLoading(true);
                     // process files
@@ -132,6 +145,7 @@ public class AppFrame extends JFrame {
                     }
                     // disable loading icon
                     loadingPrompt.isLoading(false);
+                    System.out.println("A GENERÁLÁS KÉSZEN VAN!");
                 }
             }.start();
         });

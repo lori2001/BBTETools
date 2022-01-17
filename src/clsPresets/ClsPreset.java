@@ -33,10 +33,12 @@ public abstract class ClsPreset {
         panel.setLayout(new GridLayout(1, 2, 5, 0));
 
         JLabel leftDesc = genLeftDesc();
-        leftDesc.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
+        leftDesc.setBorder(BorderFactory.createEmptyBorder(0, 40, 0, 0));
+        leftDesc.setForeground(panel.getForeground());
 
         JLabel rightDesc = genRightDesc();
-        rightDesc.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+        rightDesc.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 30));
+        rightDesc.setForeground(panel.getForeground());
 
         panel.add(leftDesc);
         panel.add(rightDesc);
