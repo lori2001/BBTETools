@@ -22,9 +22,9 @@ DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputDir=D:\Workspace\IntelliJ\BBTETools\out\artifacts\BBTETools_jar\setup
+OutputDir=.\
 OutputBaseFilename=BBTEToolsSetup{#MyAppVersion}
-SetupIconFile=D:\Workspace\IntelliJ\BBTETools\out\artifacts\BBTETools_jar\assets\icon.ico
+SetupIconFile=.\assets\icon.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -36,8 +36,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "D:\Workspace\IntelliJ\BBTETools\out\artifacts\BBTETools_jar\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\Workspace\IntelliJ\BBTETools\out\artifacts\BBTETools_jar\assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ".\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
