@@ -1,4 +1,3 @@
-import clsPresets.Classes;
 import models.Vec;
 import settings.Setting;
 import settings.Settings;
@@ -9,22 +8,15 @@ import javax.sound.sampled.*;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
 public class AppFrame extends JFrame {
-    public static final Vec APP_SIZE = new Vec(700, 540);
-    public static final Vec APP_INIT_POS = new Vec(100, 100);
-    public static final String VERSION = "v2.2.1";
-    private static Image appIcon;
-
-    public static Image getAppIcon() {
-        return appIcon;
-    }
+    private static final Vec APP_SIZE = new Vec(700, 540);
+    private static final Vec APP_INIT_POS = new Vec(100, 100);
+    private static final String VERSION = "v2.2.2";
 
     public static void main (String[] args) {
         new AppFrame();
@@ -36,18 +28,19 @@ public class AppFrame extends JFrame {
         setLayout(null);
         setBounds(APP_INIT_POS.x, APP_INIT_POS.y, APP_SIZE.x,APP_SIZE.y);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         // display system prints in the gui
         LogPanel logPanel = new LogPanel();
 
         // load app icon
         try {
-            appIcon = ImageIO.read(new File("./assets/icon.png"));
+            Image appIcon = ImageIO.read(new File("./assets/icon.png"));
+            setIconImage(appIcon);
         }
         catch (Exception e){
             e.printStackTrace();
         }
-        setIconImage(getAppIcon());
 
         Settings.readFromFile();
 
@@ -108,7 +101,7 @@ public class AppFrame extends JFrame {
 
         AppInfoButton appInfoButton =
                 new AppInfoButton(new Vec(395, AppFrame.APP_SIZE.y - 90), new Vec(35, 35));
-        appInfoButton.toggleInfoFrameOnClick();
+        appInfoButton.toggleInfoFrameOnClick(this);
         add(appInfoButton);
 
         JButton gatherHw = new JButton("Házi Begyüjtése");

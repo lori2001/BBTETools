@@ -1,10 +1,13 @@
 import models.Vec;
+import settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class AppInfoButton extends JPanel{
-    private JButton button;
+    private final JButton button;
     private JFrame infoScreen = null;
 
     public AppInfoButton(Vec pos, Vec size) {
@@ -26,19 +29,19 @@ public class AppInfoButton extends JPanel{
         add(button);
     }
 
-    public void toggleInfoFrameOnClick() {
+    public void toggleInfoFrameOnClick(JFrame parentFrame) {
         button.addActionListener(e -> {
                 if(infoScreen == null) {
                     infoScreen = new JFrame("info");
 
                     int yOffset = 10;
                     infoScreen.setBounds(
-                            AppFrame.APP_INIT_POS.x + AppFrame.APP_SIZE.x / 4,
-                            AppFrame.APP_INIT_POS.y + yOffset,
-                            AppFrame.APP_SIZE.x / 2,
-                            AppFrame.APP_SIZE.y - yOffset * 2);
+                            parentFrame.getX() + parentFrame.getWidth()  / 4,
+                            parentFrame.getY() + yOffset,
+                            parentFrame.getWidth() / 2,
+                            parentFrame.getHeight() - yOffset * 2);
                     infoScreen.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-                    infoScreen.setIconImage(AppFrame.getAppIcon());
+                    infoScreen.setIconImage(parentFrame.getIconImage());
 
                     JLabel text = new JLabel(
                             "<html><center><h1>App Információ</h1></center>" +
@@ -65,6 +68,17 @@ public class AppInfoButton extends JPanel{
                                 "bekommenteli és (egyes tantárgyakból)<br>" +
                                 "a tartalmát is ellenőrzi.</p>" +
                             "</html>");
+
+                    // save settings when closing window
+                    infoScreen.addWindowListener(new WindowAdapter() {
+                              @Override
+                              public void windowClosing(WindowEvent e) {
+                                  super.windowClosing(e);
+                                  infoScreen.dispose();
+                                  infoScreen = null;
+                              }
+                          }
+                    );
 
                     infoScreen.add(text);
                     infoScreen.setVisible(true);

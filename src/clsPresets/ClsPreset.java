@@ -18,7 +18,7 @@ public abstract class ClsPreset {
         studData = sd;
     }
 
-    // ----- ABSTRACT CLASSES ---------
+    // ----- ABSTRACT FUNCTIONS ---------
     public abstract String getNewFileName(Path origPath);
     public abstract String processContent(String fileContent, String origName) throws IOException;
     public abstract boolean folderForEachFile();
@@ -26,9 +26,9 @@ public abstract class ClsPreset {
     public abstract String getParentZipName();
     protected abstract JLabel genLeftDesc();
     protected abstract JLabel genRightDesc();
-    // ----- ABSTRACT CLASSES ---------
+    // ----- ABSTRACT FUNCTIONS ---------
 
-    // ----- PUBLIC CLASSES ---------
+    // ----- PUBLIC FUNCTIONS ---------
     public void addDescriptionToPanel(JPanel panel) {
         panel.setLayout(new GridLayout(1, 2, 5, 0));
 
@@ -51,5 +51,5 @@ public abstract class ClsPreset {
     public void setStudData(StudData studData) {
         this.studData = studData;
     }
-    // ----- PUBLIC CLASSES ---------
+    // ----- PUBLIC FUNCTIONS ---------
 }

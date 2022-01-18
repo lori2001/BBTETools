@@ -4,15 +4,15 @@
   <headerType>gui</headerType>
   <jar>D:\Workspace\IntelliJ\BBTETools\out\artifacts\BBTETools_jar\BBTETools.jar</jar>
   <outfile>D:\Workspace\IntelliJ\BBTETools\out\artifacts\BBTETools_jar\BBTETools.exe</outfile>
-  <errTitle></errTitle>
+  <errTitle>Hiba. A program lefuttatásához töltsd le a java-t!</errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
   <downloadUrl>http://java.com/download</downloadUrl>
-  <supportUrl></supportUrl>
+  <supportUrl>https://www.lorand.eu</supportUrl>
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
-  <manifest></manifest>
+  <manifest>D:\Workspace\IntelliJ\BBTETools\out\artifacts\BBTETools_jar\BBTETools.manifest</manifest>
   <icon>D:\Workspace\IntelliJ\BBTETools\out\artifacts\BBTETools_jar\assets\icon.ico</icon>
   <jre>
     <path></path>
