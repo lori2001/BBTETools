@@ -2,6 +2,7 @@ import clsPresets.Classes;
 import clsPresets.ClsAlgoritmika;
 import clsPresets.ClsOOP;
 import clsPresets.ClsPreset;
+import logging.LogPanel;
 import models.Vec;
 
 import javax.swing.*;
@@ -41,7 +42,7 @@ public class ClsPresetPicker extends JComboBox<String> {
                 activeClsPreset = new ClsOOP(studInfo.getStudData());
             }
             else {
-                System.out.println("HIBA: ez a \"class preset\" nem létezik");
+                LogPanel.logln("HIBA: ez a \"class preset\" nem létezik");
                 System.exit(1);
             }
             activeSelection = currSelection;

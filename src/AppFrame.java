@@ -1,3 +1,4 @@
+import logging.LogPanel;
 import models.Vec;
 import settings.Setting;
 import settings.Settings;
@@ -7,6 +8,9 @@ import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -30,8 +34,8 @@ public class AppFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // display system prints in the gui
-        LogPanel logPanel = new LogPanel();
+        // displays logs in GUI
+        LogPanel.init();
 
         // load app icon
         try {
@@ -39,7 +43,7 @@ public class AppFrame extends JFrame {
             setIconImage(appIcon);
         }
         catch (Exception e){
-            e.printStackTrace();
+            LogPanel.logln("MEGJEGYZÉS: az icon.png file nem található!");
         }
 
         Settings.readFromFile();
@@ -79,8 +83,8 @@ public class AppFrame extends JFrame {
         // displays clsPresetDesc and Logs in a TabbedPane
         InfoPanel infoPanel = new InfoPanel();
         infoPanel.setBounds(15, 220, 655, 210);
-        infoPanel.addTab(clsPresetDesc, "Info", "Shows info of what the current class preset does");
-        infoPanel.addTab(logPanel.getScrollableTextArea(), "Logs", "Shows the output log");
+        infoPanel.addTab(clsPresetDesc, "Info", "Információkat mutat arról hogy a jelenleg kiválasztott tantárgy mit csinál.");
+        infoPanel.addTab(LogPanel.getScrollableTextArea(), "Logs", "A generálási folyamatrol ír ki hasznos infókat");
         add(infoPanel);
 
         // change preset description whenever preset changes
@@ -107,12 +111,13 @@ public class AppFrame extends JFrame {
         JButton gatherHw = new JButton("Házi Begyüjtése");
         gatherHw.setBounds( 180, AppFrame.APP_SIZE.y - 90, 200, 35);
         add(gatherHw);
+        DirectoryProcessor directoryProcesser = new DirectoryProcessor();
         gatherHw.addActionListener(e -> new Thread(){
             @Override
             public void run() {
                 super.run();
                 // switch tab to logs
-                logPanel.clearLogs(); // clear old logs
+                LogPanel.clearLogs(); // clear old logs
                 infoPanel.setSelectedIndex(1);
                 // enable loading icon
                 loadingPrompt.isLoading(true);
@@ -123,22 +128,14 @@ public class AppFrame extends JFrame {
                         clsPresetPicker.getActiveClsString()
                 );
                 // process files
-                new ProcessDir(inputFile.getPath(), outputFile.getPath(), clsPresetPicker.getClsPreset(studInfo));
-                // play "done" sound
-                try {
-                    File audioFile = new File("assets/complete.wav");
-                    AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
-                    AudioFormat format = audioStream.getFormat();
-                    DataLine.Info info = new DataLine.Info(Clip.class, format);
-                    Clip audioClip = (Clip) AudioSystem.getLine(info);
-                    audioClip.open(audioStream);
-                    audioClip.start();
-                } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
-                    ex.printStackTrace();
-                }
+                boolean success = directoryProcesser.processDir(inputFile.getPath(), outputFile.getPath(), clsPresetPicker.getClsPreset(studInfo));
                 // disable loading icon
                 loadingPrompt.isLoading(false);
-                System.out.println("A GENERÁLÁS KÉSZEN VAN!");
+                if(success) {
+                    dirProcWasGood();
+                } else {
+                    dirProcWasBad();
+                }
             }
         }.start());
 
@@ -166,4 +163,34 @@ public class AppFrame extends JFrame {
         clsPresetDesc.revalidate();
     }
 
+    private void dirProcWasGood() {
+        // play "good" sound
+        try {
+            File audioFile = new File("assets/complete.wav");
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+            AudioFormat format = audioStream.getFormat();
+            DataLine.Info info = new DataLine.Info(Clip.class, format);
+            Clip audioClip = (Clip) AudioSystem.getLine(info);
+            audioClip.open(audioStream);
+            audioClip.start();
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
+            LogPanel.logln("MEGJEGYZÉS: A \"kész\" hang lejátszása sikertelen!");
+        }
+
+        // log "good" message
+        MutableAttributeSet attributes = new SimpleAttributeSet(LogPanel.getDefaultAttributes());
+        StyleConstants.setBackground(attributes, new Color(15, 117, 21));
+        StyleConstants.setFontSize(attributes, 14);
+        StyleConstants.setBold(attributes, true);
+        LogPanel.logln("SIKERES GENERÁLÁS!", attributes);
+    }
+
+    private void dirProcWasBad() {
+        // log "bad" message
+        MutableAttributeSet attributes = new SimpleAttributeSet(LogPanel.getDefaultAttributes());
+        StyleConstants.setBackground(attributes, new Color(185, 8, 8));
+        StyleConstants.setFontSize(attributes, 14);
+        StyleConstants.setBold(attributes, true);
+        LogPanel.logln("SIKERTELEN GENERÁLÁS!", attributes);
+    }
 }

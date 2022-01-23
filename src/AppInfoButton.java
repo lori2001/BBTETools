@@ -1,3 +1,4 @@
+import logging.LogPanel;
 import models.Vec;
 import settings.Settings;
 
@@ -22,7 +23,7 @@ public class AppInfoButton extends JPanel{
             button = new JButton(icon);
         } else {
             button = new JButton("info");
-            System.out.println("\""+iconLoc+"\" not found! Replacing with text");
+            LogPanel.logln("MEGJEGYZÉS: \"" + iconLoc + "\" nem talált! Írással lesz helyettesítve");
         }
 
         button.setPreferredSize(size.toDim());
@@ -53,7 +54,7 @@ public class AppInfoButton extends JPanel{
                             "<center><h2>Hogyan használható?</h2></center>" +
                                 "<p>Készítsd el az összes algoritmika házid egy<br>" +
                                 "folderbe vagy annak bármely alfolderébe és nevezd<br>" +
-                                "el \"<alpont>.cpp\"-nek. Például 1.cpp,2.cpp stb.<br>" +
+                                "el \"alpont.cpp\"-nek. Például 1.cpp,2.cpp stb.<br>" +
                                 "Töltsd ki az appet az adataiddal illetve a pirossal<br>" +
                                 "megjelölt mezőre írd be hogy hányas labort akarsz<br>" +
                                 "generálni. Végül pedig állítsd be bemenetnek a<br>" +

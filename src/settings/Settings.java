@@ -1,6 +1,7 @@
 package settings;
 
 import clsPresets.Classes;
+import logging.LogPanel;
 import models.StudData;
 
 import java.io.File;
@@ -39,7 +40,7 @@ public class Settings {
 
             reader.close();
         } catch (IOException e) { // if no file
-            System.out.println("Hiba történt a köv. file olvasásakor: " + settingsFile + ", a beállítások alapértelmezettre lesznek visszaállítva!");
+            LogPanel.log("MEGJEGYZÉS: A " + settingsFile + " file olvasása helytelen, a beállítások alapértelmezettre lesznek visszaállítva!");
 
             // RESET ALL to DEFAULTS
             System.arraycopy(DEFAULTS, 0, fileContent, 0, DEFAULTS.length);
@@ -56,14 +57,13 @@ public class Settings {
                 try {
                     writer.write(s + "\n");
                 } catch (IOException err1) {
-                    err1.printStackTrace();
+                    LogPanel.logln("HIBA: "  + settingsFile + " ba való íráskor!");
                 }
             });
 
             writer.close();
         } catch (IOException err2) {
-            System.out.println("HIBA történt a köv. file készítésekor: "  + settingsFile);
-            err2.printStackTrace();
+            LogPanel.logln("HIBA: A következõ file készítésekor: "  + settingsFile);
         }
     }
 

@@ -1,5 +1,6 @@
 package clsPresets;
 
+import logging.LogPanel;
 import models.StudData;
 import utils.FileProcessingUtils;
 
@@ -41,7 +42,7 @@ public class ClsOOP extends ClsPreset {
     }
 
     @Override
-    public String processContent(String fileContent, String origName) throws IOException {
+    public String processContent(String fileContent, String origName) {
         String newContent = null;
 
         boolean hasComment = strExAsCommCpp(fileContent, studData.name) &&
@@ -52,7 +53,7 @@ public class ClsOOP extends ClsPreset {
         if(!hasComment) {
             newContent = genComment();
         } else {
-            System.out.println("NOTE: Comment found in " + origName + " -> no auto comment added!");
+            LogPanel.logln("MEGJEGYZÉS: Van már komment a " + origName + " -> automatikus komment nem lesz hozzáadva!");
         }
 
         // add back oridinal file content
@@ -172,8 +173,7 @@ public class ClsOOP extends ClsPreset {
 
                 if(!found) throw new Exception("a file hibásan van elnevezve");
             } catch (Exception ex) {
-                // if all renaming attempts fail warn the user and write file name as exerciseStr
-                System.out.println("VIGYÁZAT: Erre a filera nem talált a feladat szám: " + origPath);
+                // LogPanel.logln("MEGJEGYZÉS: Erre a filera nem talált a feladat szám: " + origPath);
                 exerciseStr = origName.substring(0, origName.lastIndexOf('.'));
             }
         }

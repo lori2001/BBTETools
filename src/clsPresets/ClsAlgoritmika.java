@@ -1,5 +1,6 @@
 package clsPresets;
 
+import logging.LogPanel;
 import models.StudData;
 import utils.FileProcessingUtils;
 
@@ -27,7 +28,7 @@ public class ClsAlgoritmika extends ClsPreset{
     }
 
     @Override
-    public String processContent(String fileContent, String origName) throws IOException {
+    public String processContent(String fileContent, String origName) {
         String ext = getExtension(origName);
         String newContent = null;
 
@@ -49,8 +50,7 @@ public class ClsAlgoritmika extends ClsPreset{
         if(!hasComment) {
             newContent = genComment();
         } else {
-            System.out.println("MEGJEGYZÉS: Comment talált a " + origName + " fileban -> " +
-                    "auto komment nem lesz hozzádva az ebből generált kimeneti filehoz!");
+            LogPanel.logln("MEGJEGYZÉS: Van már komment a " + origName + " -> automatikus komment nem lesz hozzáadva!");
         }
 
         int exerciseNum = -1;
@@ -66,11 +66,11 @@ public class ClsAlgoritmika extends ClsPreset{
             // check c++ file contents for ifstream and ofstream
             if(strExAsNotCommCpp(fileContent, "ifstream") && !strExAsNotCommCpp(fileContent, inFileInputText))
             {
-                System.out.println("VIGYÁZAT: A " + origName + " fileban talált az 'ifstream', de nem talált a '"
+                LogPanel.logln("VIGYÁZAT: A " + origName + " fileban talált az 'ifstream', de nem talált a '"
                         + inFileInputText + "'! Ellenőrizd hogy a projekt megfelel-e a házi kritériumainak.");
             }
             if(strExAsNotCommCpp(fileContent, "ofstream") && !strExAsNotCommCpp(fileContent, inFileOutputText)) {
-                System.out.println("VIGYÁZAT: A " + origName + " fileban talált 'ifstream', de nem talált '"
+                LogPanel.logln("VIGYÁZAT: A " + origName + " fileban talált 'ifstream', de nem talált '"
                         + inFileOutputText + "'! Ellenőrizd hogy a projekt megfelel-e a házi kritériumainak.");
             }
         }
@@ -202,7 +202,7 @@ public class ClsAlgoritmika extends ClsPreset{
                 if(!found) throw new Exception("a file hibásan van elnevezve");
             } catch (Exception ex) {
                 // if all renaming attempts fail warn the user and write file name as exerciseStr
-                System.out.println("VIGYÁZAT: Erre a filera nem talált a feladat szám: " + origPath);
+                LogPanel.logln("VIGYÁZAT: Erre a filera nem talált a feladat szám: " + origPath);
                 exerciseStr = origName.substring(0, origName.lastIndexOf('.'));
             }
         }

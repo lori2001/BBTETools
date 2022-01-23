@@ -1,3 +1,4 @@
+import logging.LogPanel;
 import models.StudData;
 import models.Vec;
 import settings.Setting;
@@ -76,7 +77,7 @@ public class StudInfo extends JPanel {
             return Integer.parseInt(hwNum.getText());
         } catch (NumberFormatException e) {
             hwNum.setText(Settings.getDefault(Setting.HwNum));
-            e.printStackTrace();
+            LogPanel.logln("HIBA: Sikertelen számmá alakítás: " + hwNum.getText() + " (házi sorszám)");
             return Integer.parseInt(Settings.getDefault(Setting.HwNum));
         }
     }
@@ -90,7 +91,7 @@ public class StudInfo extends JPanel {
             return Integer.parseInt(groupNum.getText());
         } catch (NumberFormatException e) {
             hwNum.setText(Settings.getDefault(Setting.GroupNum));
-            e.printStackTrace();
+            LogPanel.logln("HIBA: Sikertelen számmá alakítás: " + groupNum.getText() + " (tanuló csoportszám)");
             return Integer.parseInt(Settings.getDefault(Setting.GroupNum));
         }
     }

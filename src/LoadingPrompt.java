@@ -1,3 +1,4 @@
+import logging.LogPanel;
 import models.Vec;
 
 import javax.swing.*;
@@ -18,7 +19,7 @@ public class LoadingPrompt extends JPanel {
             label = new JLabel(icon);
         } else {
             label = new JLabel("Loading...");
-            System.out.println("\""+iconLoc+"\" not found! Replacing with text");
+            LogPanel.logln("\""+iconLoc+"\" not found! Replacing with text");
         }
 
         isLoading(false);
