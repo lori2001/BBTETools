@@ -18,6 +18,10 @@ public class DirectoryProcessor {
     public boolean processDir(Path inputDir, Path outputDir, ClsPreset clsPreset) {
         assert clsPreset != null;
 
+        if(!Files.isDirectory(inputDir)) {
+            LogPanel.logln("HIBA: A bemeneti folder nem létezik! (" + inputDir + ")");
+            return false;
+        }
         if(!Files.isDirectory(outputDir)) {
             LogPanel.logln("HIBA: A kimeneti folder nem létezik! (" + outputDir + ")");
             return false;

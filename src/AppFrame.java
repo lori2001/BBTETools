@@ -20,7 +20,7 @@ import java.io.IOException;
 public class AppFrame extends JFrame {
     private static final Vec APP_SIZE = new Vec(700, 540);
     private static final Vec APP_INIT_POS = new Vec(100, 100);
-    private static final String VERSION = "v2.2.3";
+    private static final String VERSION = "v2.2.4";
 
     public static void main (String[] args) {
         new AppFrame();
