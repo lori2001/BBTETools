@@ -16,11 +16,13 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class AppFrame extends JFrame {
     private static final Vec APP_SIZE = new Vec(700, 540);
     private static final Vec APP_INIT_POS = new Vec(100, 100);
-    private static final String VERSION = "v2.2.4";
+    public static final String VERSION = "v.2.3.0";
 
     public static void main (String[] args) {
         new AppFrame();
@@ -154,6 +156,24 @@ public class AppFrame extends JFrame {
         );
 
         setVisible(true);
+
+        // check for updates
+        try {
+            URL u = new URL("https://github.com/lori2001/BBTETools/releases/latest");
+            HttpURLConnection hr = (HttpURLConnection) u.openConnection();
+            if(hr.getResponseCode() == 200) {
+                String githubUrl = hr.getURL().toString(); // the url changes(and shows latest version) as a result of opening github page
+                String lastVersion = githubUrl.substring(githubUrl.lastIndexOf("/") + 1);
+
+                if(!githubUrl.contains(VERSION)) {
+                    // display update prompt
+                    UpdatePrompt updatePrompt = new UpdatePrompt(this, lastVersion);
+                }
+            }
+            else throw new Exception();
+        } catch (Exception e) {
+            LogPanel.logln("VIGYÁZAT: Sikertelen verzió ellenõrzés! " + e);
+        }
     }
 
     private void updateDescPanel(JPanel clsPresetDesc, ClsPresetPicker clsPresetPicker, StudInfo studInfo) {
