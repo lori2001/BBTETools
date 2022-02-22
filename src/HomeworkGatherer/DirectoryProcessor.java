@@ -1,5 +1,7 @@
-import clsPresets.ClsPreset;
-import logging.LogPanel;
+package HomeworkGatherer;
+
+import HomeworkGatherer.clsPresets.ClsPreset;
+import HomeworkGatherer.logging.LogPanel;
 
 import java.io.*;
 import java.nio.file.*;
@@ -10,7 +12,7 @@ import java.util.HashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static utils.FilenameUtils.removeExtension;
+import static HomeworkGatherer.utils.FilenameUtils.removeExtension;
 
 public class DirectoryProcessor {
 

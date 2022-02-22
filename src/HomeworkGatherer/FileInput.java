@@ -1,4 +1,6 @@
-import models.Vec;
+package HomeworkGatherer;
+
+import HomeworkGatherer.models.Vec;
 
 import javax.swing.*;
 import java.awt.*;

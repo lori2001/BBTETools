@@ -1,10 +1,12 @@
+package HomeworkGatherer;
+
 import javax.swing.JTabbedPane;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import java.awt.GridLayout;
 
 public class InfoPanel extends JPanel {
-    private JTabbedPane tabbedPane = new JTabbedPane();
+    private final JTabbedPane tabbedPane = new JTabbedPane();
 
     public InfoPanel() {
         super(new GridLayout(1, 1));

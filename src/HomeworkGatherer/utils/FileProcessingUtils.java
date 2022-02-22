@@ -1,9 +1,9 @@
-package utils;
+package HomeworkGatherer.utils;
 
 public class FileProcessingUtils {
     // params: file content, string to be searched, one line comment mark,
     // multi line start comment mark, multi line end comment mark
-    // MIGHT GET CONFUSED BY "//*" strings
+    // MIGHT GET CONFUSED BY "\/*" strings
     public static boolean stringExistsAsComment(String content, String str, String olComm, String sComm, String eComm) {
         int strPos = content.indexOf(str); // check if string exists
         boolean existsAndIsInComm = false;

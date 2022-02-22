@@ -1,16 +1,15 @@
-package clsPresets;
+package HomeworkGatherer.clsPresets;
 
-import logging.LogPanel;
-import models.StudData;
-import utils.FileProcessingUtils;
+import HomeworkGatherer.logging.LogPanel;
+import HomeworkGatherer.models.StudData;
+import HomeworkGatherer.utils.FileProcessingUtils;
 
 import javax.swing.*;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.Arrays;
 
-import static utils.FilenameUtils.getExtension;
+import static HomeworkGatherer.utils.FilenameUtils.getExtension;
 
 public class ClsAlgoritmika extends ClsPreset{
 

@@ -1,6 +1,6 @@
-package clsPresets;
+package HomeworkGatherer.clsPresets;
 
-import models.StudData;
+import HomeworkGatherer.models.StudData;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 
-import static utils.FilenameUtils.getExtension;
+import static HomeworkGatherer.utils.FilenameUtils.getExtension;
 
 public abstract class ClsPreset {
     protected StudData studData;

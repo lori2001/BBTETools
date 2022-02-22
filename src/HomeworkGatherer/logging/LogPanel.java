@@ -1,4 +1,4 @@
-package logging;
+package HomeworkGatherer.logging;
 
 import javax.swing.*;
 import javax.swing.text.*;

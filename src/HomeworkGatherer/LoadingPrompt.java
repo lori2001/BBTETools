@@ -1,5 +1,7 @@
-import logging.LogPanel;
-import models.Vec;
+package HomeworkGatherer;
+
+import HomeworkGatherer.logging.LogPanel;
+import HomeworkGatherer.models.Vec;
 
 import javax.swing.*;
 import java.awt.*;

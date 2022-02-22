@@ -1,4 +1,4 @@
-package models;
+package HomeworkGatherer.models;
 
 import java.awt.*;
 

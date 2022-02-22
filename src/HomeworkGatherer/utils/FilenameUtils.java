@@ -1,4 +1,4 @@
-package utils;
+package HomeworkGatherer.utils;
 
 public class FilenameUtils {
     public static String getExtension(String f) {

@@ -1,4 +1,4 @@
-package settings;
+package HomeworkGatherer.settings;
 
 public enum Setting {
     HwNum,

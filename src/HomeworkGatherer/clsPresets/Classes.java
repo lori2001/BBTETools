@@ -1,4 +1,4 @@
-package clsPresets;
+package HomeworkGatherer.clsPresets;
 
 public enum Classes {
     Algoritmika,

@@ -1,9 +1,11 @@
-import clsPresets.Classes;
-import clsPresets.ClsAlgoritmika;
-import clsPresets.ClsOOP;
-import clsPresets.ClsPreset;
-import logging.LogPanel;
-import models.Vec;
+package HomeworkGatherer;
+
+import HomeworkGatherer.clsPresets.Classes;
+import HomeworkGatherer.clsPresets.ClsAlgoritmika;
+import HomeworkGatherer.clsPresets.ClsOOP;
+import HomeworkGatherer.clsPresets.ClsPreset;
+import HomeworkGatherer.logging.LogPanel;
+import HomeworkGatherer.models.Vec;
 
 import javax.swing.*;
 import java.util.Arrays;

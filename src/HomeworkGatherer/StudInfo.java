@@ -1,8 +1,10 @@
-import logging.LogPanel;
-import models.StudData;
-import models.Vec;
-import settings.Setting;
-import settings.Settings;
+package HomeworkGatherer;
+
+import HomeworkGatherer.logging.LogPanel;
+import HomeworkGatherer.models.StudData;
+import HomeworkGatherer.models.Vec;
+import HomeworkGatherer.settings.Setting;
+import HomeworkGatherer.settings.Settings;
 
 import javax.swing.*;
 import javax.swing.event.DocumentListener;

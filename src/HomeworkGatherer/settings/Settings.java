@@ -1,8 +1,8 @@
-package settings;
+package HomeworkGatherer.settings;
 
-import clsPresets.Classes;
-import logging.LogPanel;
-import models.StudData;
+import HomeworkGatherer.clsPresets.Classes;
+import HomeworkGatherer.logging.LogPanel;
+import HomeworkGatherer.models.StudData;
 
 import java.io.File;
 import java.io.FileWriter;

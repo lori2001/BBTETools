@@ -1,6 +1,7 @@
-import logging.LogPanel;
-import models.Vec;
-import settings.Settings;
+package HomeworkGatherer;
+
+import HomeworkGatherer.logging.LogPanel;
+import HomeworkGatherer.models.Vec;
 
 import javax.swing.*;
 import java.awt.*;
@@ -70,7 +71,7 @@ public class AppInfoButton extends JPanel{
                                 "a tartalmát is ellenőrzi.</p>" +
                             "</html>");
 
-                    // save settings when closing window
+                    // save HomeworkGatherer.settings when closing window
                     infoScreen.addWindowListener(new WindowAdapter() {
                               @Override
                               public void windowClosing(WindowEvent e) {
