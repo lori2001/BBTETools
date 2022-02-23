@@ -5,7 +5,7 @@ import HomeworkGatherer.clsPresets.ClsAlgoritmika;
 import HomeworkGatherer.clsPresets.ClsOOP;
 import HomeworkGatherer.clsPresets.ClsPreset;
 import HomeworkGatherer.logging.LogPanel;
-import HomeworkGatherer.models.Vec;
+import Common.models.Vec;
 
 import javax.swing.*;
 import java.util.Arrays;

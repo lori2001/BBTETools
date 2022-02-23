@@ -1,6 +1,6 @@
 package HomeworkGatherer.clsPresets;
 
-import HomeworkGatherer.models.StudData;
+import Common.models.StudData;
 
 import javax.swing.*;
 import java.awt.*;

@@ -2,7 +2,7 @@ import Common.AppVersionHandler;
 import HomeworkGatherer.HWGMainPanel;
 import HomeworkGatherer.InfoPanel;
 import HomeworkGatherer.logging.LogPanel;
-import HomeworkGatherer.models.Vec;
+import Common.models.Vec;
 import ScheduleGenerator.SGMainPanel;
 
 import javax.imageio.ImageIO;
@@ -34,9 +34,9 @@ public class AppFrame extends JFrame {
         SGMainPanel scheduleGeneratorPanel = new SGMainPanel(this, APP_SIZE);
 
         InfoPanel infoPanel = new InfoPanel();
-        infoPanel.setBounds(0, 0, APP_SIZE.x, APP_SIZE.y);
-        infoPanel.addTab(homeworkGathererPanel, "Hazibegyüjtõ", "Begyüjti, majd megfelelõen elnevezi, kommenteli és ellenõrzi a házikat");
+        infoPanel.setBounds(0, 0, APP_SIZE.x, APP_SIZE.y); // TODO: Change
         infoPanel.addTab(scheduleGeneratorPanel, "Órarend generáló", "Kigenerál egy személyes órarendet html-ben vagy nyomtatható formában");
+        infoPanel.addTab(homeworkGathererPanel, "Hazibegyüjtõ", "Begyüjti, majd megfelelõen elnevezi, kommenteli és ellenõrzi a házikat");
         add(infoPanel);
 
         // load app icon

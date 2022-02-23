@@ -2,7 +2,7 @@ package HomeworkGatherer.settings;
 
 import HomeworkGatherer.clsPresets.Classes;
 import HomeworkGatherer.logging.LogPanel;
-import HomeworkGatherer.models.StudData;
+import Common.models.StudData;
 
 import java.io.File;
 import java.io.FileWriter;

@@ -1,7 +1,7 @@
 package HomeworkGatherer.clsPresets;
 
 import HomeworkGatherer.logging.LogPanel;
-import HomeworkGatherer.models.StudData;
+import Common.models.StudData;
 import HomeworkGatherer.utils.FileProcessingUtils;
 
 import javax.swing.*;

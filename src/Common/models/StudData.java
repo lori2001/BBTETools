@@ -1,4 +1,4 @@
-package HomeworkGatherer.models;
+package Common.models;
 
 public class StudData {
     public int hwNum, group;

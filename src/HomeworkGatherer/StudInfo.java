@@ -1,8 +1,8 @@
 package HomeworkGatherer;
 
 import HomeworkGatherer.logging.LogPanel;
-import HomeworkGatherer.models.StudData;
-import HomeworkGatherer.models.Vec;
+import Common.models.StudData;
+import Common.models.Vec;
 import HomeworkGatherer.settings.Setting;
 import HomeworkGatherer.settings.Settings;
 

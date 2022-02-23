@@ -1,7 +1,7 @@
 package HomeworkGatherer;
 
 import HomeworkGatherer.logging.LogPanel;
-import HomeworkGatherer.models.Vec;
+import Common.models.Vec;
 import HomeworkGatherer.settings.Setting;
 import HomeworkGatherer.settings.Settings;
 import HomeworkGatherer.utils.DocumentChanged;
