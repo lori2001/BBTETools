@@ -9,42 +9,34 @@ import org.jsoup.select.Elements;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 
 public class SGMainPanel extends JPanel {
+    Parser parser = new Parser();
 
-    Map<String, String> professions  = new HashMap<>() {{
-        put("IM", "Informatika");
-        put("MIM", "Matek-Info");
-        put("MM", "Matek");
-    }};
-
-    int[] groups = { 123, 1213 };
-
-    int year = 2021;
-    int semester = 2;
-    String profession = "MIM";
-    int yearOfStud = 2;
-
-    String getLink() {
-        return "https://www.cs.ubbcluj.ro/files/orar/" + year + "-" + semester + "/grafic/" + profession + ".html";
-    }
+    PrintScheduleDrawer printScheduleDrawer;
+    ArrayList<Course> courses = parser.getCourses("621");
 
     @Override
     public void paint(Graphics g) {
         super.paint(g);
         PrintScheduleDrawer printScheduleDrawer =
-                new PrintScheduleDrawer(new Point2D.Double(30, 50), new Point2D.Double(2D, 2D));
-        printScheduleDrawer.paintComponents(g);
+                new PrintScheduleDrawer(
+                        new Point2D.Double(30, 50),
+                        new Point2D.Double(2D, 2D),
+                        parser.getHourIntervals()
+                );
+        printScheduleDrawer.paintComponents(g, courses);
     }
 
     public SGMainPanel(JFrame appFrame, Vec appSize) {
         setLayout(new FlowLayout());
         setBounds(0,0, appSize.x, appSize.y);
 
-        JLabel parsedLink = new JLabel(getLink());
+        /*JLabel parsedLink = new JLabel(getLink());
         add(parsedLink);
 
         JTextField yearSelector = new JTextField("2021");
@@ -54,19 +46,22 @@ public class SGMainPanel extends JPanel {
         add(profSelector);
 
         JComboBox<String> groupSelector = new JComboBox<>(professions.keySet().toArray(new String[0]));
-        add(profSelector);
+        add(profSelector);*/
 
         //PrintScheduleDrawer printScheduleDrawer = new PrintScheduleDrawer();
         //add(printScheduleDrawer);
 
         //JComboBox<String>
 
+        JButton btn = new JButton("TEST");
+        btn.addActionListener(e -> repaint());
+
+        add(btn);
+
         setVisible(true);
     }
 
-    String[] WORK_DAYS_OF_WEEK = { "Hetfõ" , "Kedd", "Szerda", "Csütörtök", "Péntek" };
-
-    public void parse() {
+    /*public void parse() {
         try {
             Document doc = Jsoup.connect("https://www.cs.ubbcluj.ro/files/orar/2021-2/grafic/IM2.html").get();
 
@@ -82,27 +77,26 @@ public class SGMainPanel extends JPanel {
             int day = 0;
             for (Element link : links) {
 
-                if(i == 1) { // th's contain groups
+                if (i == 1) { // th's contain groups
                     //System.out.println(link.select("th").text());
-                }
-                else if(i == 2) { // th's contain subgroups
+                } else if (i == 2) { // th's contain subgroups
                     subgroups = link.select("th").text();
                     //System.out.println(link.select("th").text());
                 }
 
-                if(i >= 2 && link.select("th").text().contains(subgroups)) {
+                if (i >= 2 && link.select("th").text().contains(subgroups)) {
                     //  System.out.println(WORK_DAYS_OF_WEEK[day]);
                     day++;
                 }
 
-                /*if(link.hasAttr("[class=\"tipC\"]")) {
-                    System.out.println(link.select("th").text());
-                }*/
+                //if(link.hasAttr("[class=\"tipC\"]")) {
+               //     System.out.println(link.select("th").text());
+                //}
 
                 // System.out.println(link.select("th").text());
 
 
-                if(!link.select("td").text().equals("")) { // classes
+                if (!link.select("td").text().equals("")) { // classes
                     Elements cls = link.select("td");
                     System.out.println(link.select("th").text());
                     System.out.println(cls.attr("rowspan"));
@@ -114,5 +108,7 @@ public class SGMainPanel extends JPanel {
         } catch (Exception e) {
             LogPanel.logln("VIGYÁZAT: Sikertelen verzió ellenõrzés! " + e);
         }
-    }
+    }*/
+
+
 }
