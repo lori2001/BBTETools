@@ -1,7 +1,7 @@
 package HomeworkGatherer;
 
 import HomeworkGatherer.clsPresets.ClsPreset;
-import HomeworkGatherer.logging.LogPanel;
+import Common.logging.LogPanel;
 
 import java.io.*;
 import java.nio.file.*;

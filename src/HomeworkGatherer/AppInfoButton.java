@@ -1,7 +1,6 @@
 package HomeworkGatherer;
 
-import HomeworkGatherer.logging.LogPanel;
-import Common.models.Vec;
+import Common.logging.LogPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,7 +11,7 @@ public class AppInfoButton extends JPanel{
     private final JButton button;
     private JFrame infoScreen = null;
 
-    public AppInfoButton(Vec pos, Vec size) {
+    public AppInfoButton(Point pos, Point size) {
         setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
         setBounds(pos.x, pos.y, size.x, size.y);
 
@@ -27,7 +26,7 @@ public class AppInfoButton extends JPanel{
             LogPanel.logln("MEGJEGYZÉS: \"" + iconLoc + "\" nem talált! Írással lesz helyettesítve");
         }
 
-        button.setPreferredSize(size.toDim());
+        button.setPreferredSize(new Dimension(size.x, size.y));
         add(button);
     }
 
@@ -71,7 +70,7 @@ public class AppInfoButton extends JPanel{
                                 "a tartalmát is ellenőrzi.</p>" +
                             "</html>");
 
-                    // save HomeworkGatherer.settings when closing window
+                    // save Common.settings when closing window
                     infoScreen.addWindowListener(new WindowAdapter() {
                               @Override
                               public void windowClosing(WindowEvent e) {

@@ -1,15 +1,18 @@
 package HomeworkGatherer;
 
-import HomeworkGatherer.logging.LogPanel;
+import Common.logging.LogPanel;
 import Common.models.StudData;
-import Common.models.Vec;
-import HomeworkGatherer.settings.Setting;
-import HomeworkGatherer.settings.Settings;
+import Common.settings.Settings;
+import HomeworkGatherer.utils.DocumentChanged;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.util.Objects;
+import java.awt.event.FocusListener;
+import java.util.regex.Pattern;
 
 public class StudInfo extends JPanel {
     private final JTextField hwNum = new JTextField();
@@ -17,19 +20,24 @@ public class StudInfo extends JPanel {
     private final JTextField groupNum = new JTextField();
     private final JTextField studId = new JTextField();
 
-    private String loc;
+    private static final Pattern STUD_ID_FORMAT = Pattern.compile("[a-z]{4}[0-9]{4}");
 
-    public StudInfo(Vec pos, Vec size) {
-        setLayout(new GridLayout(2, 4, 10 ,0));
+    private final Border DEFAULT_BORDER;
+    private final Border WARN_BORDER = new LineBorder(Color.RED, 2, true);
+
+    private String groupWarnMsg, hwNumWarnMsg, studIdWarnMsg;
+
+    public StudInfo(Point pos, Point size) {
+        setLayout(new GridLayout(2, 4, 10, 0));
         setBounds(pos.x, pos.y, size.x, size.y);
 
-        StudData sd = Settings.getStudData();
-        hwNum.setText(Integer.toString(sd.hwNum));
-        name.setText(sd.name);
-        groupNum.setText(Integer.toString(sd.group));
-        studId.setText(sd.idStr);
+        DEFAULT_BORDER = hwNum.getBorder();
 
-        int elemHeight = size.y / 2;
+        StudData sd = Settings.getStudData();
+        hwNum.setText(sd.hwNum);
+        name.setText(sd.name);
+        groupNum.setText(sd.group);
+        studId.setText(sd.idStr);
 
         JLabel hwNumL = new JLabel("Házi sorszám:");
         JLabel nameL = new JLabel("Név:");
@@ -37,7 +45,7 @@ public class StudInfo extends JPanel {
         JLabel studIdL = new JLabel("Azonosító");
 
         // highlight this as it's most important
-        hwNum.setBackground(new Color(255, 172, 13));
+        hwNum.setBackground(new Color(36, 168, 217));
 
         add(hwNumL);
         add(nameL);
@@ -48,6 +56,14 @@ public class StudInfo extends JPanel {
         add(name);
         add(groupNum);
         add(studId);
+
+        inputChecker(); // check right after loading
+        addDocumentListener(new DocumentChanged() {
+            @Override
+            public void onContentChange(DocumentEvent e) {
+                inputChecker();
+            }
+        });
     }
 
     public void addDocumentListener(DocumentListener documentListener) {
@@ -55,6 +71,13 @@ public class StudInfo extends JPanel {
         name.getDocument().addDocumentListener(documentListener);
         groupNum.getDocument().addDocumentListener(documentListener);
         studId.getDocument().addDocumentListener(documentListener);
+    }
+
+    public void addFocusListener(FocusListener focusListener) {
+        hwNum.addFocusListener(focusListener);
+        name.addFocusListener(focusListener);
+        groupNum.addFocusListener(focusListener);
+        studId.addFocusListener(focusListener);
     }
 
     public StudData getStudData() {
@@ -70,35 +93,61 @@ public class StudInfo extends JPanel {
         return name.getText();
     }
 
-    private int getHwNum() {
-        if(Objects.equals(hwNum.getText(), "")) {
-            return 0;
-        }
-
-        try {
-            return Integer.parseInt(hwNum.getText());
-        } catch (NumberFormatException e) {
-            hwNum.setText(Settings.getDefault(Setting.HwNum));
-            LogPanel.logln("HIBA: Sikertelen számmá alakítás: " + hwNum.getText() + " (házi sorszám)");
-            return Integer.parseInt(Settings.getDefault(Setting.HwNum));
-        }
+    private String getHwNum() {
+        return hwNum.getText();
     }
 
-    private int getGroupNum() {
-        if(Objects.equals(groupNum.getText(), "")) {
-            return 0;
-        }
-
-        try {
-            return Integer.parseInt(groupNum.getText());
-        } catch (NumberFormatException e) {
-            hwNum.setText(Settings.getDefault(Setting.GroupNum));
-            LogPanel.logln("HIBA: Sikertelen számmá alakítás: " + groupNum.getText() + " (tanuló csoportszám)");
-            return Integer.parseInt(Settings.getDefault(Setting.GroupNum));
-        }
+    private String getGroupNum() {
+        return groupNum.getText();
     }
 
     private String getStudId() {
         return studId.getText();
     }
+
+    private void inputChecker() {
+        String gN = groupNum.getText();
+        groupWarnMsg = null;
+        if (gN.length() != 3) {
+            groupWarnMsg = "VIGYÁZAT: A csoportszám várt hossza: 3, a kapott hossz:" + gN.length();
+        }
+
+        try {
+            Integer.parseInt(gN);
+        } catch (Exception err) {
+            groupWarnMsg = "VIGYÁZAT: A csoportszám(" + gN + ") nem alakítható számmá!";
+        }
+
+        if (groupWarnMsg == null) groupNum.setBorder(DEFAULT_BORDER);
+        else groupNum.setBorder(WARN_BORDER);
+
+        hwNumWarnMsg = null;
+        try {
+            Integer.parseInt(hwNum.getText());
+        } catch (Exception err) {
+            hwNumWarnMsg = "VIGYÁZAT: A laborszám(" + hwNum.getText() + ") nem alakítható számmá!";
+        }
+
+        if (hwNumWarnMsg == null) hwNum.setBorder(DEFAULT_BORDER);
+        else hwNum.setBorder(WARN_BORDER);
+
+        studIdWarnMsg = null;
+
+        if(!STUD_ID_FORMAT.matcher(studId.getText()).matches()) {
+            studIdWarnMsg = "VIGYÁZAT: A tanuló azonosító(" + hwNum.getText() + ") nincs elvárt formátumban (abcd1234)!";
+        }
+
+        if (studIdWarnMsg == null) studId.setBorder(DEFAULT_BORDER);
+        else studId.setBorder(WARN_BORDER);
+    }
+
+    public void printErrMsges() {
+        if(groupWarnMsg != null)
+            LogPanel.logln(groupWarnMsg);
+        if(hwNumWarnMsg != null)
+            LogPanel.logln(hwNumWarnMsg);
+        if(studIdWarnMsg != null)
+            LogPanel.logln(studIdWarnMsg);
+    }
+
 }

@@ -1,19 +1,12 @@
 package Common.models;
 
 public class StudData {
-    public int hwNum, group;
-    public String name, idStr;
+    public String hwNum, group, name, idStr;
 
-    public StudData() {
-        hwNum = 0;
-        group = 0;
-        name = "";
-        idStr = "";
-    }
-    public StudData(int hwN, String name, int stdGr, String id) {
-        hwNum = hwN;
-        group = stdGr;
+    public StudData(String hwN, String name, String stdGr, String id) {
+        this.hwNum = hwN;
+        this.group = stdGr;
         this.name = name;
-        idStr = id;
+        this.idStr = id;
     }
 }

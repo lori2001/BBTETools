@@ -1,8 +1,8 @@
 import Common.AppVersionHandler;
+import Common.settings.Settings;
 import HomeworkGatherer.HWGMainPanel;
 import HomeworkGatherer.InfoPanel;
-import HomeworkGatherer.logging.LogPanel;
-import Common.models.Vec;
+import Common.logging.LogPanel;
 import ScheduleGenerator.SGMainPanel;
 
 import javax.imageio.ImageIO;
@@ -13,8 +13,8 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 
 public class AppFrame extends JFrame {
-    public static final Vec APP_SIZE = new Vec(700, 555);
-    public static final Vec APP_INIT_POS = new Vec(100, 100);
+    public static final Point APP_SIZE = new Point(700, 555);
+    public static final Point APP_INIT_POS = new Point(100, 100);
 
     private final JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -24,6 +24,9 @@ public class AppFrame extends JFrame {
 
     public AppFrame() {
         super("BBTETools " + AppVersionHandler.VERSION);
+
+        Settings.readFromFile();
+
         setResizable(false);
         setLayout(null);
         setBounds(APP_INIT_POS.x, APP_INIT_POS.y, APP_SIZE.x, APP_SIZE.y);
@@ -36,7 +39,7 @@ public class AppFrame extends JFrame {
         InfoPanel infoPanel = new InfoPanel();
         infoPanel.setBounds(0, 0, APP_SIZE.x, APP_SIZE.y); // TODO: Change
         infoPanel.addTab(scheduleGeneratorPanel, "Órarend generáló", "Kigenerál egy személyes órarendet html-ben vagy nyomtatható formában");
-        infoPanel.addTab(homeworkGathererPanel, "Hazibegyüjtõ", "Begyüjti, majd megfelelõen elnevezi, kommenteli és ellenõrzi a házikat");
+        infoPanel.addTab(homeworkGathererPanel, "Házi begyüjtõ", "Begyüjti, majd megfelelõen elnevezi, kommenteli és ellenõrzi a házikat");
         add(infoPanel);
 
         // load app icon
@@ -48,7 +51,7 @@ public class AppFrame extends JFrame {
             LogPanel.logln("MEGJEGYZÉS: az icon.png file nem található!");
         }
 
-        // save HomeworkGatherer.settings when closing window
+        // save Common.settings when closing window
         addWindowListener(new WindowAdapter() {
               @Override
               public void windowClosing(WindowEvent e) {

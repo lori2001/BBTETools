@@ -1,114 +1,76 @@
 package ScheduleGenerator;
 
-import HomeworkGatherer.logging.LogPanel;
-import Common.models.Vec;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import Common.logging.LogPanel;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.Arrays;
 
 public class SGMainPanel extends JPanel {
-    Parser parser = new Parser();
+    Parser parser;
 
-    PrintScheduleDrawer printScheduleDrawer;
-    ArrayList<Course> courses = parser.getCourses("621");
+    ScheduleDrawer scheduleDrawer =
+            new ScheduleDrawer(
+                    new Point2D.Double(30, 100),
+                    new Point2D.Double(1.5, 1.5),
+                    Parser.getHourIntervals()
+            );
 
     @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-        PrintScheduleDrawer printScheduleDrawer =
-                new PrintScheduleDrawer(
-                        new Point2D.Double(30, 50),
-                        new Point2D.Double(2D, 2D),
-                        parser.getHourIntervals()
-                );
-        printScheduleDrawer.paintComponents(g, courses);
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        scheduleDrawer.paintComponent(g);
     }
 
-    public SGMainPanel(JFrame appFrame, Vec appSize) {
+    public SGMainPanel(JFrame appFrame, Point appSize) {
         setLayout(new FlowLayout());
         setBounds(0,0, appSize.x, appSize.y);
 
-        /*JLabel parsedLink = new JLabel(getLink());
-        add(parsedLink);
-
-        JTextField yearSelector = new JTextField("2021");
-        add(yearSelector);
-
-        JComboBox<String> profSelector = new JComboBox<>(professions.keySet().toArray(new String[0]));
-        add(profSelector);
-
-        JComboBox<String> groupSelector = new JComboBox<>(professions.keySet().toArray(new String[0]));
-        add(profSelector);*/
-
-        //PrintScheduleDrawer printScheduleDrawer = new PrintScheduleDrawer();
-        //add(printScheduleDrawer);
-
-        //JComboBox<String>
-
-        JButton btn = new JButton("TEST");
+        JButton btn = new JButton("Generálás");
         btn.addActionListener(e -> repaint());
 
         add(btn);
+        btn.addActionListener(e -> {
+            try {
+                saveSchedule();
+            } catch (Exception ex) {
+                LogPanel.logln(Arrays.toString(ex.getStackTrace()));
+            }
+        });
+
+        parser = new Parser("621");
+        scheduleDrawer.setSpecificProps(parser.getTopLeftCont(), parser.getCourses());
+
+        ControlPanel controlPanel = new ControlPanel(new Point(0,0), new Point(300,50),
+                parser.getMajor(), parser.getGroup(), Integer.toString(parser.getStudYear()));
+        add(controlPanel);
+
+        controlPanel.addActionListener(e -> {
+            String selGroup = controlPanel.getSelectedGroup();
+            if(selGroup != null) {
+                System.out.println("sel group" + selGroup);
+                parser = new Parser(selGroup);
+                scheduleDrawer.setSpecificProps(parser.getTopLeftCont(), parser.getCourses());
+                repaint();
+            }
+        });
 
         setVisible(true);
     }
 
-    /*public void parse() {
-        try {
-            Document doc = Jsoup.connect("https://www.cs.ubbcluj.ro/files/orar/2021-2/grafic/IM2.html").get();
-
-            Elements links = doc.select("tr");
-
-            String groups;
-            String subgroups = "";
-
-            // [szak][gr][subgr][tantargyszam]
-            // pl. i[521][1][]
-
-            int i = 0;
-            int day = 0;
-            for (Element link : links) {
-
-                if (i == 1) { // th's contain groups
-                    //System.out.println(link.select("th").text());
-                } else if (i == 2) { // th's contain subgroups
-                    subgroups = link.select("th").text();
-                    //System.out.println(link.select("th").text());
-                }
-
-                if (i >= 2 && link.select("th").text().contains(subgroups)) {
-                    //  System.out.println(WORK_DAYS_OF_WEEK[day]);
-                    day++;
-                }
-
-                //if(link.hasAttr("[class=\"tipC\"]")) {
-               //     System.out.println(link.select("th").text());
-                //}
-
-                // System.out.println(link.select("th").text());
-
-
-                if (!link.select("td").text().equals("")) { // classes
-                    Elements cls = link.select("td");
-                    System.out.println(link.select("th").text());
-                    System.out.println(cls.attr("rowspan"));
-                    System.out.println(cls.text());
-                }
-
-                i++;
-            }
-        } catch (Exception e) {
-            LogPanel.logln("VIGYÁZAT: Sikertelen verzió ellenõrzés! " + e);
-        }
-    }*/
+    public void saveSchedule() throws Exception {
+        ScheduleDrawer highRes = scheduleDrawer.getHighResVersion();
+        Dimension d = highRes.getSize();
+        BufferedImage image = new BufferedImage(d.width, d.height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = image.createGraphics();
+        highRes.paintComponent(g2d);
+        g2d.dispose();
+        ImageIO.write(image, "png", new File("file.png"));
+    }
 
 
 }

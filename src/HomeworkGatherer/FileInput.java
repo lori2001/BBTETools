@@ -1,7 +1,5 @@
 package HomeworkGatherer;
 
-import Common.models.Vec;
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -14,7 +12,7 @@ public class FileInput extends JPanel {
 
     private Path path;
 
-    public FileInput(String text, Vec pos, Vec size, String pathStr) {
+    public FileInput(String text, Point pos, Point size, String pathStr) {
         setBounds(pos.x, pos.y, size.x, size.y);
         setLayout(new FlowLayout(FlowLayout.CENTER, 15, 0));
 

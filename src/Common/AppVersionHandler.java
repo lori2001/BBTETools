@@ -1,6 +1,6 @@
 package Common;
 
-import HomeworkGatherer.logging.LogPanel;
+import Common.logging.LogPanel;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,8 +1,9 @@
-package HomeworkGatherer.logging;
+package Common.logging;
 
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,25 +39,6 @@ public class LogPanel {
 
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-        /*OutputStream out = new OutputStream() {
-            @Override
-            public void write(int b) throws IOException {
-                updateTextArea(String.valueOf((char) b));
-            }
-
-            @Override
-            public void write(byte[] b, int off, int len) throws IOException {
-                updateTextArea(new String(b, off, len));
-            }
-
-            @Override
-            public void write(byte[] b) throws IOException {
-                write(b, 0, b.length);
-            }
-        };
-
-        System.setOut(new PrintStream(out, true));
-        System.setErr(new PrintStream(out, true));*/
         clearLogs(); // text: No logs
     }
 
@@ -114,6 +96,10 @@ public class LogPanel {
             if(noLogs) {
                 textPane.setText("");
                 noLogs = false;
+
+                // Notify everybody that may be interested.
+                for (LogsListener hl : listeners)
+                    hl.logsCleared();
             }
 
             try {
@@ -123,6 +109,12 @@ public class LogPanel {
                 e.printStackTrace();
             }
         });
+    }
+
+    private static final ArrayList<LogsListener> listeners = new ArrayList<>();
+
+    public static void addListener(LogsListener toAdd) {
+        listeners.add(toAdd);
     }
 
     public static void clearLogs() {

@@ -1,9 +1,8 @@
 package HomeworkGatherer;
 
-import HomeworkGatherer.logging.LogPanel;
-import Common.models.Vec;
-import HomeworkGatherer.settings.Setting;
-import HomeworkGatherer.settings.Settings;
+import Common.logging.LogPanel;
+import Common.settings.Setting;
+import Common.settings.Settings;
 import HomeworkGatherer.utils.DocumentChanged;
 
 import javax.sound.sampled.*;
@@ -23,36 +22,34 @@ public class HWGMainPanel extends JPanel {
     FileInput outputFile;
     ClsPresetPicker clsPresetPicker;
 
-    public HWGMainPanel(JFrame appFrame, Vec appSize) {
+    public HWGMainPanel(JFrame appFrame, Point appSize) {
         setLayout(null);
         setBounds(0,0, appSize.x, appSize.y);
 
         // displays logs in GUI
         LogPanel.init();
 
-        Settings.readFromFile();
-
         inputFile = new FileInput("Bemenet:",
-                new Vec(12, 15 ),
-                new Vec(appSize.x - 50, 40),
+                new Point(12, 15 ),
+                new Point(appSize.x - 50, 40),
                 Settings.getFileContent(Setting.InputFolder)
         );
         add(inputFile);
 
         outputFile = new FileInput("Kimenet:",
-                new Vec(12, 75 ),
-                new Vec(appSize.x - 50, 40),
+                new Point(12, 75 ),
+                new Point(appSize.x - 50, 40),
                 Settings.getFileContent(Setting.OutputFolder)
         );
         add(outputFile);
 
-        studInfo = new StudInfo(new Vec(15, 145), new Vec(appSize.x - 50, 50));
+        studInfo = new StudInfo(new Point(15, 145), new Point(appSize.x - 50, 50));
         add(studInfo);
 
         // choose the uni class for which to target homework gathering on
         clsPresetPicker = new ClsPresetPicker(
-                        new Vec(12, 440),
-                        new Vec(150, 35),
+                        new Point(12, 440),
+                        new Point(150, 35),
                         Settings.getFileContent(Setting.ClsPreset)
         );
         add(clsPresetPicker);
@@ -70,6 +67,7 @@ public class HWGMainPanel extends JPanel {
         infoPanel.addTab(clsPresetDesc, "Info", "Információkat mutat arról hogy a jelenleg kiválasztott tantárgy mit csinál.");
         infoPanel.addTab(LogPanel.getScrollableTextArea(), "Logs", "A generálási folyamatrol ír ki hasznos infókat");
         add(infoPanel);
+        LogPanel.addListener(() -> infoPanel.setSelectedIndex(1));
 
         // change preset description whenever preset changes
         clsPresetPicker.addActionListener(e -> updateDescPanel(clsPresetDesc, clsPresetPicker, studInfo));
@@ -82,13 +80,13 @@ public class HWGMainPanel extends JPanel {
         });
 
         LoadingPrompt loadingPrompt = new LoadingPrompt(
-                new Vec( appSize.x - 80, 440),
-                new Vec (45, 45)
+                new Point( appSize.x - 80, 440),
+                new Point(45, 45)
         );
         add(loadingPrompt);
 
         AppInfoButton appInfoButton =
-                new AppInfoButton(new Vec(395, 440), new Vec(35, 35));
+                new AppInfoButton(new Point(395, 440), new Point(35, 35));
         appInfoButton.toggleInfoFrameOnClick(appFrame);
         add(appInfoButton);
 
@@ -100,13 +98,13 @@ public class HWGMainPanel extends JPanel {
             @Override
             public void run() {
                 super.run();
-                // switch tab to logs
-                LogPanel.clearLogs(); // clear old logs
-                infoPanel.setSelectedIndex(1);
-                // enable loading icon
-                loadingPrompt.isLoading(true);
-                saveSettingsToFile(); // auto-save HomeworkGatherer.settings
 
+                studInfo.printErrMsges();
+
+                LogPanel.clearLogs(); // clear old logs
+                loadingPrompt.isLoading(true); // enable loading icon
+
+                saveSettingsToFile(); // auto-save Common.settings
                 boolean success = directoryProcesser.processDir(inputFile.getPath(), outputFile.getPath(), clsPresetPicker.getClsPreset(studInfo)); // process files
 
                 loadingPrompt.isLoading(false); // disable loading icon

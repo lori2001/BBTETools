@@ -1,7 +1,7 @@
-package HomeworkGatherer.settings;
+package Common.settings;
 
 import HomeworkGatherer.clsPresets.Classes;
-import HomeworkGatherer.logging.LogPanel;
+import Common.logging.LogPanel;
 import Common.models.StudData;
 
 import java.io.File;
@@ -68,9 +68,9 @@ public class Settings {
     }
 
     public static void saveToFile(StudData studData, String inputFold, String outputFold, String clsString) {
-        fileContent[Setting.HwNum.ordinal()] = String.valueOf(studData.hwNum);
+        fileContent[Setting.HwNum.ordinal()] = studData.hwNum;
         fileContent[Setting.Name.ordinal()] = studData.name;
-        fileContent[Setting.GroupNum.ordinal()] = String.valueOf(studData.group);
+        fileContent[Setting.GroupNum.ordinal()] = studData.group;
         fileContent[Setting.StudId.ordinal()] = studData.idStr;
         fileContent[Setting.InputFolder.ordinal()] = inputFold;
         fileContent[Setting.OutputFolder.ordinal()] = outputFold;
@@ -93,9 +93,9 @@ public class Settings {
 
     public static StudData getStudData() {
         return new StudData(
-                Integer.parseInt(fileContent[Setting.HwNum.ordinal()]),
+                fileContent[Setting.HwNum.ordinal()],
                 fileContent[Setting.Name.ordinal()],
-                Integer.parseInt(fileContent[Setting.GroupNum.ordinal()]),
+                fileContent[Setting.GroupNum.ordinal()],
                 fileContent[Setting.StudId.ordinal()]);
     }
 }

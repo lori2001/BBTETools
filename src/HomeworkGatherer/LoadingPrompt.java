@@ -1,7 +1,6 @@
 package HomeworkGatherer;
 
-import HomeworkGatherer.logging.LogPanel;
-import Common.models.Vec;
+import Common.logging.LogPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +8,7 @@ import java.awt.*;
 public class LoadingPrompt extends JPanel {
     private final JLabel label;
 
-    public LoadingPrompt(Vec pos, Vec size) {
+    public LoadingPrompt(Point pos, Point size) {
         setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
         setBounds(pos.x, pos.y, size.x, size.y);
 
@@ -25,7 +24,7 @@ public class LoadingPrompt extends JPanel {
         }
 
         isLoading(false);
-        label.setPreferredSize(size.toDim());
+        label.setPreferredSize(new Dimension(size.x, size.y));
         add(label);
     }
 

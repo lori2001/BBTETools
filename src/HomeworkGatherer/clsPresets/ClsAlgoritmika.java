@@ -1,6 +1,6 @@
 package HomeworkGatherer.clsPresets;
 
-import HomeworkGatherer.logging.LogPanel;
+import Common.logging.LogPanel;
 import Common.models.StudData;
 import HomeworkGatherer.utils.FileProcessingUtils;
 
@@ -35,13 +35,13 @@ public class ClsAlgoritmika extends ClsPreset{
         if(ext.equals("cpp") || ext.equals("c")) {
             hasComment =
             strExAsCommCpp(fileContent, studData.name) &&
-            strExAsCommCpp(fileContent, Integer.toString(studData.group)) &&
+            strExAsCommCpp(fileContent, studData.group) &&
             strExAsCommCpp(fileContent, exerciseNrStr);
         }
         else if(ext.equals("pas")) {
             hasComment =
             strExAsCommPas(fileContent, studData.name) &&
-            strExAsCommPas(fileContent, Integer.toString(studData.group)) &&
+            strExAsCommPas(fileContent, studData.group) &&
             strExAsCommPas(fileContent, exerciseNrStr);
         }
 
@@ -129,12 +129,12 @@ public class ClsAlgoritmika extends ClsPreset{
         return genComment(studData.name, studData.group, exerciseNrStr, false);
     }
 
-    private String genComment(String stdN, int grN, String exS, boolean isHtml) {
+    private String genComment(String stdN, String groupNum, String exS, boolean isHtml) {
         String nL = "\n";
         if(isHtml) nL = "<br>";
 
         return "// " + stdN + nL +
-               "// " + grN + "-es csoport" + nL +
+               "// " + groupNum + "-es csoport" + nL +
                "// " + exS + ".Feladat" + nL + nL;
     }
 
@@ -158,9 +158,12 @@ public class ClsAlgoritmika extends ClsPreset{
             int studIdNum =
                     NumberFormat.getInstance().parse(s2).intValue();
 
+            int hwNumber =
+                    NumberFormat.getInstance().parse(studData.hwNum).intValue();
+
             // s2 with leading zeros
             String s2WithLz = String.format("%04d", studIdNum);
-            String hwNumWithLz = String.format("%02d", studData.hwNum);
+            String hwNumWithLz = String.format("%02d", hwNumber);
 
             return new String[] {
                     s1 + s2 + fileNamePrefConsts[0] + studData.hwNum + fileNamePrefConsts[1],

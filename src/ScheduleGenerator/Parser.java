@@ -1,45 +1,133 @@
 package ScheduleGenerator;
 
-import HomeworkGatherer.logging.LogPanel;
+import Common.logging.LogPanel;
+import ScheduleGenerator.models.Major;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.text.NumberFormat;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static ScheduleGenerator.data.SGData.*;
 
 public class Parser {
-    // before the 8th month it's considered 2nd semester of previous year
-    // after this it' s considered first semester of given year
-    private static final int SEMESTER_SPLITTER_MONTH = 8;
+    private Major major = null;
+    private final String group;
+    private int studYear = -1;
 
-    private static final Map<Integer, String> MAJORS_CODES = new HashMap<>() {{
-        put(1, "M");
-        put(2, "I");
-        put(3, "MI");
-        put(4, "MM");
-        put(5, "IM");
-        put(6, "MIM");
-        put(7, "IG");
-        put(8, "MIE");
-        put(9, "IE");
-    }};
+    public Parser(String group) {
+        this.group = group;
+        System.out.println(group);
 
-    private final String yearAndSem = getSysYearAndSemester(); // "2019-2";
+        // process group num
+        try {
+            if(group.length() != 3) throw new Exception("HIBA: Az órarend link feldolgozó által kapott csoport szám hossza váratlan!");
+            int groupNum = Integer.parseInt(group);
 
-    private ArrayList<LocalTime[]> hourIntervals = null;
+            int majorNum = groupNum / 100;
+            major = MAJORS.get(majorNum);
+            if(major == null) throw new Exception("HIBA: Az órarend link feldolgozó által kapott csoport számnak megfelelõ szak nem talált!");
 
-    public ArrayList<LocalTime[]> getHourIntervals() {
+            studYear = (groupNum / 10) % 10;
+        }
+        catch (NumberFormatException e) {
+            System.out.println("HIBA: Az órarend link feldolgozó által kapott csoport szám váratlan karaktereket tartalmaz!");
+            e.printStackTrace();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Major getMajor() {
+        return major;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public int getStudYear() {
+        return studYear;
+    }
+
+    public String getTopLeftCont() {
+        if(major.getCode() != null && studYear != -1 && getCalendarSemester() != -1) {
+            return major.getCode() + "\n" + studYear + "." + getCalendarSemester();
+        } else {
+            LogPanel.logln("HIBA: A tanuló évfolyamának meghatározásakor");
+        }
+        return null;
+    }
+
+    public ArrayList<Course> getCourses() {
+        String[] headers = null;
+        ArrayList<Course> courses = new ArrayList<>();
+
+        try {
+            String url = getScheduleUrl();
+            Document doc = Jsoup.connect(url).get();
+
+            Elements groupElements = doc.select("h");
+            int tableI = 0;
+            for(Element gr : groupElements) {
+                if(gr.text().equals(group)) break;
+                tableI++;
+            }
+
+            Element table = doc.select("table").get(tableI);
+            if(table == null) throw new Exception("Az " + url + " en levõ adatokat sikertelen volt értelmezni!");
+
+            Elements tableRows = table.select("tr");
+
+            int i = 0;
+            for (Element tableRow : tableRows) {
+                if (i == 0) { // header
+                    Elements hdrs = tableRow.select("th");
+
+                    headers = new String[hdrs.size()];
+                    for(int j = 0; j < hdrs.size(); j++) {
+                        headers[j] = hdrs.get(j).text();
+                    }
+
+                } else {
+                    Elements courseContent = tableRow.select("td");
+                    HashMap<String, String> contentMap = new HashMap<>();
+
+                    for(int j = 0; j < courseContent.size(); j++) {
+                        contentMap.put(headers[j], courseContent.get(j).text());
+                    }
+
+                    courses.add(new Course(contentMap));
+                }
+
+                i++;
+            }
+        } catch (Exception e) {
+            LogPanel.logln("VIGYÁZAT: Sikertelen volt a tantárgyak beszerzése! " + e);
+        }
+
+        return courses;
+    }
+
+    // assumes group num means [majorNum, studYear, groupId]
+    private String getScheduleUrl() {
+        return genLinkPrefix() + "tabelar/" + major.getCode() + studYear + ".html";
+    }
+
+    private static ArrayList<LocalTime[]> hourIntervals = null;
+    public static ArrayList<LocalTime[]> getHourIntervals() {
         if(hourIntervals != null) {
             return hourIntervals;
         }
 
         hourIntervals = new ArrayList<>();
-        String url = getLinkPrefix() + "grafic/IM1.html";
+        String url = genLinkPrefix() + "grafic/IM1.html";
         try {
             Document doc = Jsoup.connect(url).get();
             Elements table = doc.select("tr");
@@ -74,101 +162,58 @@ public class Parser {
                 i++;
             }
         } catch (Exception e) {
-            LogPanel.logln("HIBA: A ! " + e);
+            LogPanel.logln("HIBA: Az óra-intervallumok leolvasása az internetrõl nem sikerült! "
+                    + Arrays.toString(e.getStackTrace()));
         }
 
         return hourIntervals;
     }
 
-    public ArrayList<Course> getCourses(String group) {
-        System.out.println(getScheduleUrl(group));
+    private static String genLinkPrefix() {
+        return "https://www.cs.ubbcluj.ro/files/orar/" + YEAR_AND_SEM + "/";
+    }
 
-        String[] headers = null;
-        ArrayList<Course> courses = new ArrayList<>();
+    public static ArrayList<String> genGroupsFor(String lang, String major, String studYear) {
+        Integer majorNum = -1;
+        for (Map.Entry<Integer, Major> set : MAJORS.entrySet()) {
+            if(Objects.equals(set.getValue().getName(), major) && Objects.equals(set.getValue().getLang(), lang)) {
+                majorNum = set.getKey();
+            }
+        }
 
+        if(majorNum == -1) {
+            LogPanel.logln("HIBA: A kiválasztott adatok alapján sikertelen volt kialakítani egy csoportot");
+        }
+
+        ArrayList<String> groups = new ArrayList<>();
         try {
-            Document doc = Jsoup.connect(getScheduleUrl(group)).get();
+            String url = genLinkPrefix() + "tabelar/" + MAJORS.get(majorNum).getCode() + studYear + ".html";
+            System.out.println(url);
+            Document doc = Jsoup.connect(url).get();
 
-            Elements tableRows = doc.select("tr");
-
-            int i = 0;
-            for (Element tableRow : tableRows) {
-                if (i == 0) { // header
-                    Elements hdrs = tableRow.select("th");
-
-                    headers = new String[hdrs.size()];
-                    for(int j = 0; j < hdrs.size(); j++) {
-                        headers[j] = hdrs.get(j).text();
-                    }
-
-                } else {
-                    Elements courseContent = tableRow.select("td");
-                    HashMap<String, String> contentMap = new HashMap<>();
-
-                    for(int j = 0; j < courseContent.size(); j++) {
-                        contentMap.put(headers[j], courseContent.get(j).text());
-                    }
-
-                    courses.add(new Course(contentMap));
-                }
-
-                i++;
+            Elements groupElements = doc.select("h1");
+            for(int i = 1; i < groupElements.size(); i ++) {
+                groups.add(findFirstInt(groupElements.get(i).text()));
             }
         } catch (Exception e) {
-            LogPanel.logln("VIGYÁZAT: Sikertelen verzió ellenõrzés! " + e);
+            LogPanel.logln("HIBA: A csoportokat nem sikerült beszerezni! " + e);
         }
 
-        return courses;
+        return groups;
     }
 
-    // assumes group num means [majorNum, studYear, groupId]
-    private String getScheduleUrl(String group) {
-        String url = getLinkPrefix();
+    // gets numbers from anywhere in the string
+    // if it doesn't find any, returns null
+    private static String findFirstInt(String stringToSearch) {
+        Pattern integerPattern = Pattern.compile("-?\\d+");
+        Matcher matcher = integerPattern.matcher(stringToSearch);
 
-        try {
-            if(group.length() != 3) throw new Exception("HIBA: Az órarend link feldolgozó által kapott csoport szám hossza váratlan!");
-            int groupNum = Integer.parseInt(group);
-
-            int majorNum = groupNum / 100;
-            String majorString = MAJORS_CODES.get(majorNum);
-            if(majorString == null) throw new Exception("HIBA: Az órarend link feldolgozó által kapott csoport számnak megfelelõ szak nem talált!");
-
-            int studYear = (groupNum / 10) % 10;
-
-            url += "tabelar/" + majorString + studYear + ".html";
-        }
-        catch (NumberFormatException e) {
-            System.out.println("HIBA: Az órarend link feldolgozó által kapott csoport szám váratlan karaktereket tartalmaz!");
-            e.printStackTrace();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
+        if (matcher.find()) {
+            return matcher.group();
         }
 
-        return url;
+        return null;
     }
 
-    private String getLinkPrefix() {
-        return "https://www.cs.ubbcluj.ro/files/orar/" + yearAndSem + "/";
-    }
-
-    // returns year-sem (ex. 2021-2)
-    private String getSysYearAndSemester() {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM");
-        LocalDateTime now = LocalDateTime.now();
-        String[] date = dtf.format(now).split("/");
-
-        int year = Integer.parseInt(date[0]);
-        int month = Integer.parseInt(date[1]);
-
-        int semester = 2;
-        if(month >= SEMESTER_SPLITTER_MONTH) {
-            semester = 1;
-        } else {
-            year--;
-        }
-
-        return year + "-" + semester;
-    }
 
 }

@@ -4,10 +4,10 @@ import HomeworkGatherer.clsPresets.Classes;
 import HomeworkGatherer.clsPresets.ClsAlgoritmika;
 import HomeworkGatherer.clsPresets.ClsOOP;
 import HomeworkGatherer.clsPresets.ClsPreset;
-import HomeworkGatherer.logging.LogPanel;
-import Common.models.Vec;
+import Common.logging.LogPanel;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -17,7 +17,7 @@ public class ClsPresetPicker extends JComboBox<String> {
 
     Object[] classes = Classes.Algoritmika.getDeclaringClass().getEnumConstants();
 
-    public ClsPresetPicker(Vec pos, Vec size, String initialSelection) {
+    public ClsPresetPicker(Point pos, Point size, String initialSelection) {
         Arrays.stream(classes).map(Object::toString).forEach(this::addItem);
 
         setSelectedItem(initialSelection);

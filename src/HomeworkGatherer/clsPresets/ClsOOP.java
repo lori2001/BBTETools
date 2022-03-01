@@ -1,6 +1,6 @@
 package HomeworkGatherer.clsPresets;
 
-import HomeworkGatherer.logging.LogPanel;
+import Common.logging.LogPanel;
 import Common.models.StudData;
 import HomeworkGatherer.utils.FileProcessingUtils;
 
@@ -45,7 +45,7 @@ public class ClsOOP extends ClsPreset {
         String newContent = null;
 
         boolean hasComment = strExAsCommCpp(fileContent, studData.name) &&
-                             strExAsCommCpp(fileContent, Integer.toString(studData.group)) &&
+                             strExAsCommCpp(fileContent, studData.group) &&
                              strExAsCommCpp(fileContent, exerciseNrStr);
 
         // write comments to start of file
@@ -78,7 +78,7 @@ public class ClsOOP extends ClsPreset {
                         "<h3>filenév:</h3>" +
                         "<p>n.cpp-> " + genFileNamePrefix() + "n.cpp<br>" +
                         "<h3>komment: </h3>" +
-                        "<p>"  + genComment(studData.name, studData.group, "n", true) + "</p>" +
+                        "<p>"  + genComment(studData.name, studData.group, true) + "</p>" +
                         "</html>"
         );
     }
@@ -99,15 +99,15 @@ public class ClsOOP extends ClsPreset {
     }
 
     private String genComment() {
-        return genComment(studData.name, studData.group, exerciseNrStr, false);
+        return genComment(studData.name, studData.group, false);
     }
 
-    private String genComment(String stdN, int grN, String exS, boolean isHtml) {
+    private String genComment(String stdN, String groupNum, boolean isHtml) {
         String nL = "\n";
         if(isHtml) nL = "<br>";
 
         return "// " + stdN + nL +
-               "// " + grN + "-es csoport" + nL + nL;
+               "// " + groupNum + "-es csoport" + nL + nL;
     }
 
     private final String[] fileNamePrefConsts = {"_L",  "_"};
@@ -130,9 +130,12 @@ public class ClsOOP extends ClsPreset {
             int studIdNum =
                     NumberFormat.getInstance().parse(s2).intValue();
 
+            int hwNumber =
+                    NumberFormat.getInstance().parse(studData.hwNum).intValue();
+
             // s2 with leading zeros
             String s2WithLz = String.format("%04d", studIdNum);
-            String hwNumWithLz = String.format("%02d", studData.hwNum);
+            String hwNumWithLz = String.format("%02d", hwNumber);
 
             return new String[] {
                     s1 + s2 + fileNamePrefConsts[0] + studData.hwNum + fileNamePrefConsts[1],

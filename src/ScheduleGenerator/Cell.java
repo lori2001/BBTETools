@@ -1,118 +1,135 @@
 package ScheduleGenerator;
 
 import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 public class Cell {
-    private static final float MAX_FONT_SIZE = 30;
+    private final float maxFontSize;
 
-    public Rectangle2D.Double rect;
+    public Rectangle rect;
     public Color col;
 
-    public String centerText;
+    private final String centerText;
     private Font centerFont = null;
     private Point2D.Double centerTextLoc = null;
-    private double centerTextWidth = 0;
+    private Point2D.Double centerTextSize = null;
 
-    public String southText;
+    private final String southText;
     private Font southFont = null;
     private Point2D.Double southTextLoc = null;
-    private double southTextWidth = 0;
+    private Point2D.Double southTextSize = null;
 
-    private Point2D.Float textMargin;
+    private final String topLeftText;
+    private Font topLeftFont = null;
+    private Point2D.Double topLeftTextLoc = null;
+    private Point2D.Double topLeftTextSize = null;
 
-    public Cell(Rectangle2D.Double rect, Color col, String centerText, String underText) {
+    private final double lineGap;
+
+    public Cell(Rectangle rect, Color col, String centerText, String underText, String topLeftText,
+                Point2D.Double scale, double lineGap)
+    {
+        maxFontSize = (float) (7.5f * scale.x);
+        this.lineGap = lineGap;
+
         this.rect = rect;
         this.col = col;
         this.centerText = centerText;
         this.southText = underText;
-    }
-    public Cell(Rectangle2D.Double rect, Color col) {
-        this(rect, col, "", "");
-    }
-    public Cell(Rectangle2D.Double rect) {
-        this(rect, Color.WHITE, "", "");
+        this.topLeftText = topLeftText;
     }
 
-    public void calcFontsPosAndScale(Rectangle2D.Double drawCell, Graphics2D g2d, Point2D.Float margin) {
-        textMargin = margin;
-
+    public void calcTextsPosAndScale(Rectangle2D.Double drawCell, Graphics2D g2d, Point2D.Double margin) {
         if(southText != null) {
-            String longestLine = getLongestLine(southText);
-            float linesMul = southText.lines().count() * 1.2F;
-
             if(southFont == null)
-                southFont = scaleFont(longestLine, (float) drawCell.width, g2d, margin.x);
+                southFont = scaleFont(southText, (float) drawCell.width, g2d, margin.x);
 
-            southTextWidth = g2d.getFontMetrics(southFont).stringWidth(longestLine);
+            southTextSize = getTextSize(g2d, southFont, southText, 0);
 
             this.southTextLoc = new Point2D.Double(
-                    drawCell.x + drawCell.width / 2 - southTextWidth / 2,
-                    drawCell.y + drawCell.height
+                    drawCell.x + drawCell.width / 2 - southTextSize.x / 2,
+                    drawCell.y + drawCell.height - margin.y
             );
+        }
 
-            this.southTextLoc.y -= margin.y;
+        // this needs no "auto scale" !!
+        if(topLeftText != null && topLeftFont != null) {
+            topLeftTextSize = getTextSize(g2d, topLeftFont, topLeftText, 0);
+
+            this.topLeftTextLoc = new Point2D.Double(
+                    drawCell.x + margin.x,
+                    drawCell.y + topLeftTextSize.y + margin.y
+            );
         }
 
         if(centerText != null) {
             String longestLine = getLongestLine(centerText);
-            double linesMul = centerText.lines().count() * 1.2F;
 
-            if (centerFont == null)
+            if (centerFont == null){
                 centerFont = scaleFont(longestLine, (float) drawCell.width, g2d, margin.x);
-
-            Rectangle2D.Double fakeDrawCell = drawCell;
-
-            // move the center up
-            if(southText != null) {
-                double southH = g2d.getFontMetrics(southFont).getHeight() + margin.y;
-
-                fakeDrawCell = new Rectangle2D.Double(
-                        drawCell.x,
-                        drawCell.y,
-                        drawCell.width,
-                        drawCell.height - southH
-                );
             }
 
-            centerTextWidth = g2d.getFontMetrics(centerFont).stringWidth(longestLine);
-            double fontHeight = g2d.getFontMetrics(centerFont).getHeight();
+            centerTextSize = getTextSize(g2d, centerFont, centerText, lineGap);
 
             this.centerTextLoc = new Point2D.Double(
-                    fakeDrawCell.x + fakeDrawCell.width / 2 - centerTextWidth / 2,
-                    fakeDrawCell.y + fakeDrawCell.height / 2 - (fontHeight * linesMul) / 2
+                    drawCell.x + drawCell.width / 2  - centerTextSize.x / 2,
+                    drawCell.y + drawCell.height / 2 - centerTextSize.y / 2
             );
         }
     }
 
-    private Font scaleFont(String longestLine, float recWidth, Graphics2D g, float xMargin) {
+    private Font scaleFont(String longestLine, double recWidth, Graphics2D g, double xMargin) {
         float fontSize = 20.0f;
 
         Font font = g.getFont().deriveFont(fontSize);
         int width = g.getFontMetrics(font).stringWidth(longestLine);
-        fontSize = ((recWidth - xMargin) / width) * fontSize;
+        fontSize = (float) (((recWidth - xMargin * 2) / width) * fontSize);
 
-        return g.getFont().deriveFont(min(fontSize, MAX_FONT_SIZE));
+        return g.getFont().deriveFont(min(fontSize, maxFontSize));
     }
 
-    public String getLongestLine(String text) {
-        int longestLineLenght = 0, lastNewLinePos = 0;
+    public static String getLongestLine(String text) {
+        int longestLineLenght = 0;
         String longestLine = text;
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == '\n') {
-                String line = text.substring(lastNewLinePos, i);
-                if(longestLineLenght < line.length()) {
-                    longestLineLenght = line.length();
-                    longestLine = line;
-                }
-                lastNewLinePos = i;
+
+        String[] lines = text.split("\n");
+        for (String line: lines) {
+            if(line.length() > longestLineLenght) {
+                longestLineLenght = line.length();
+                longestLine = line;
             }
         }
 
         return longestLine;
+    }
+
+    public static Point2D.Double getTextSize(Graphics2D g2, Font font, String text, double lineGap)
+    {
+        // TODO: this is a bit of a hack, change if you can come up w something better
+        double height = 0;
+        int nrOfLines = (int) text.lines().count();
+        if(nrOfLines == 1)
+            height += lineGap * nrOfLines;
+        else
+            height += lineGap * (nrOfLines - 1);
+
+        for(String line : text.lines().toList()) {
+            FontRenderContext frcH = g2.getFontRenderContext();
+            GlyphVector gvH = font.createGlyphVector(frcH, line);
+            height += gvH.getPixelBounds(null, 0, 0).height;
+        }
+
+        // width
+        String longestLine = getLongestLine(text);
+        double width = g2.getFontMetrics(font).stringWidth(longestLine);
+
+        return new Point2D.Double(width, height);
     }
 
     public void setCenterFontSize(Font font, float fontSize) {
@@ -123,12 +140,20 @@ public class Cell {
         this.southFont = font.deriveFont(fontSize);
     }
 
+    public void setTopLeftFontSize(Font font, float fontSize) {
+        this.topLeftFont = font.deriveFont(fontSize);
+    }
+
     public Point2D.Double getCenterTextLoc() {
         return centerTextLoc;
     }
 
     public Point2D.Double getSouthTextLoc() {
         return southTextLoc;
+    }
+
+    public Point2D.Double getTopLeftTextLoc() {
+        return topLeftTextLoc;
     }
 
     public Font getCenterFont() {
@@ -139,15 +164,35 @@ public class Cell {
         return southFont;
     }
 
-    public Point2D.Float getTextMargin() {
-        return textMargin;
+    public Font getTopLeftFont() {
+        return topLeftFont;
     }
 
-    public double getCenterTextWidth() {
-        return centerTextWidth;
+    public Point2D.Double getCenterTextSize() {
+        return centerTextSize;
     }
 
-    public double getSouthTextWidth() {
-        return southTextWidth;
+    public Point2D.Double getSouthTextSize() {
+        return southTextSize;
+    }
+
+    public Point2D.Double getTopLeftTextSize() {
+        return topLeftTextSize;
+    }
+
+    public String getCenterText() {
+        return centerText;
+    }
+
+    public String getSouthText() {
+        return southText;
+    }
+
+    public String getTopLeftText() {
+        return topLeftText;
+    }
+
+    public double getLineGap() {
+        return lineGap;
     }
 }
