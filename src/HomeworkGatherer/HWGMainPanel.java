@@ -1,6 +1,7 @@
 package HomeworkGatherer;
 
 import Common.logging.LogPanel;
+import Common.logging.LogsListener;
 import Common.settings.Setting;
 import Common.settings.Settings;
 import HomeworkGatherer.utils.DocumentChanged;
@@ -22,12 +23,11 @@ public class HWGMainPanel extends JPanel {
     FileInput outputFile;
     ClsPresetPicker clsPresetPicker;
 
+    public static final int HWG_LOG_INSTANCE = LogPanel.createNewInstance();
+
     public HWGMainPanel(JFrame appFrame, Point appSize) {
         setLayout(null);
         setBounds(0,0, appSize.x, appSize.y);
-
-        // displays logs in GUI
-        LogPanel.init();
 
         inputFile = new FileInput("Bemenet:",
                 new Point(12, 15 ),
@@ -65,9 +65,17 @@ public class HWGMainPanel extends JPanel {
         InfoPanel infoPanel = new InfoPanel();
         infoPanel.setBounds(12, 210, 655, 210);
         infoPanel.addTab(clsPresetDesc, "Info", "Információkat mutat arról hogy a jelenleg kiválasztott tantárgy mit csinál.");
-        infoPanel.addTab(LogPanel.getScrollableTextArea(), "Logs", "A generálási folyamatrol ír ki hasznos infókat");
+        infoPanel.addTab(LogPanel.getScrollableTextArea(HWG_LOG_INSTANCE), "Logs", "A generálási folyamatrol ír ki hasznos infókat");
         add(infoPanel);
-        LogPanel.addListener(() -> infoPanel.setSelectedIndex(1));
+        LogPanel.addListener(new LogsListener() {
+            @Override
+            public void logsCleared() {
+                infoPanel.setSelectedIndex(1);
+            }
+
+            @Override
+            public void logsWritten() {}
+        }, HWG_LOG_INSTANCE);
 
         // change preset description whenever preset changes
         clsPresetPicker.addActionListener(e -> updateDescPanel(clsPresetDesc, clsPresetPicker, studInfo));
@@ -101,7 +109,7 @@ public class HWGMainPanel extends JPanel {
 
                 studInfo.printErrMsges();
 
-                LogPanel.clearLogs(); // clear old logs
+                LogPanel.clearLogs(HWG_LOG_INSTANCE); // clear old logs
                 loadingPrompt.isLoading(true); // enable loading icon
 
                 saveSettingsToFile(); // auto-save Common.settings
@@ -146,7 +154,7 @@ public class HWGMainPanel extends JPanel {
             audioClip.open(audioStream);
             audioClip.start();
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
-            LogPanel.logln("MEGJEGYZÉS: A \"kész\" hang lejátszása sikertelen!");
+            LogPanel.logln("MEGJEGYZÉS: A \"kész\" hang lejátszása sikertelen!", HWG_LOG_INSTANCE);
         }
 
         // log "good" message
@@ -154,7 +162,7 @@ public class HWGMainPanel extends JPanel {
         StyleConstants.setBackground(attributes, new Color(15, 117, 21));
         StyleConstants.setFontSize(attributes, 14);
         StyleConstants.setBold(attributes, true);
-        LogPanel.logln("SIKERES GENERÁLÁS!", attributes);
+        LogPanel.logln("SIKERES GENERÁLÁS!", attributes, HWG_LOG_INSTANCE);
     }
 
     private void dirProcWasBad() {
@@ -163,6 +171,6 @@ public class HWGMainPanel extends JPanel {
         StyleConstants.setBackground(attributes, new Color(185, 8, 8));
         StyleConstants.setFontSize(attributes, 14);
         StyleConstants.setBold(attributes, true);
-        LogPanel.logln("SIKERTELEN GENERÁLÁS!", attributes);
+        LogPanel.logln("SIKERTELEN GENERÁLÁS!", attributes, HWG_LOG_INSTANCE);
     }
 }

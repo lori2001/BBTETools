@@ -10,6 +10,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Arrays;
 
+import static HomeworkGatherer.HWGMainPanel.HWG_LOG_INSTANCE;
 import static HomeworkGatherer.utils.FilenameUtils.getExtension;
 
 public class ClsOOP extends ClsPreset {
@@ -52,7 +53,7 @@ public class ClsOOP extends ClsPreset {
         if(!hasComment) {
             newContent = genComment();
         } else {
-            LogPanel.logln("MEGJEGYZÉS: Van már komment a " + origName + " -> automatikus komment nem lesz hozzáadva!");
+            LogPanel.logln("MEGJEGYZÉS: Van már komment a " + origName + " -> automatikus komment nem lesz hozzáadva!", HWG_LOG_INSTANCE);
         }
 
         // add back oridinal file content

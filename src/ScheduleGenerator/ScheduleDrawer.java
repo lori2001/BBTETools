@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import static ScheduleGenerator.data.SGData.DAYS_OF_WEEK_HU;
 
@@ -18,7 +19,7 @@ public class ScheduleDrawer extends JComponent {
     private final Point2D.Double cellMargin;
 
     private final Point2D.Double A4InMM = new Point2D.Double(297, 210);
-    private final Point2D.Double border = new Point2D.Double(3, 3); // mm
+    private final Point2D.Double border = new Point2D.Double(2, 2); // mm
     private final Point2D.Double pos;
     private final Point2D.Double size;
     private final Point2D.Double scale;
@@ -54,7 +55,7 @@ public class ScheduleDrawer extends JComponent {
         rows = 1 + DAYS_OF_WEEK_HU.length * 2; // side + dow * 2
 
         textMargin = new Point2D.Double(2.5 * scale.x, 2.5 * scale.y);
-        cellMargin = new Point2D.Double(1 * scale.x,1  * scale.y); // milimeters
+        cellMargin = new Point2D.Double(0.5 * scale.x,0.5  * scale.y); // milimeters
     }
 
     public  void setSpecificProps(String topLeftCText, ArrayList<Course> courses) {
@@ -86,7 +87,7 @@ public class ScheduleDrawer extends JComponent {
 
         tSize.x -= border.x * scale.x * 2; // left, right
         tSize.y -= border.y * scale.y * 2; // top, bottom
-        absPos.x += border.x * scale.x + tPos.x;
+        absPos.x += border.x * scale.x  + tPos.x;
         absPos.y += border.y * scale.y + tPos.y;
 
         int xI = 0, yI, i = 0;
@@ -99,14 +100,14 @@ public class ScheduleDrawer extends JComponent {
 
                 Rectangle2D.Double cellCoords = new Rectangle2D.Double(
                         absPos.x + x + cellMargin.x, absPos.y + y + cellMargin.y,
-                        xOffs - cellMargin.y, yOffs - cellMargin.y);
+                        xOffs - (cellMargin.y * 2), yOffs - (cellMargin.y * 2));
 
                 boolean inAnyCell = false;
                 for(Cell cell : cells) {
                     if(cell.rect.x == xI && cell.rect.y == yI) {
 
-                        cellCoords.width = cell.rect.width * xOffs - cellMargin.x;
-                        cellCoords.height = cell.rect.height * yOffs - cellMargin.y;
+                        cellCoords.width = cell.rect.width * xOffs - (cellMargin.x * 2);
+                        cellCoords.height = cell.rect.height * yOffs - (cellMargin.y * 2);
 
                         cell.calcTextsPosAndScale(cellCoords, g2d, textMargin);
 
@@ -234,11 +235,23 @@ public class ScheduleDrawer extends JComponent {
 
             Rectangle cellCoords = new Rectangle(startX, dayIndex * 2 + 1, width, 2);
 
+            /*Optional<Cell> celOnSameRect = cells.stream().
+                    filter(p -> p.rect == cellCoords).
+                    findFirst();
+
+            if(celOnSameRect.isPresent()){
+                celOnSameRect.get().rect.height = 1;
+                cellCoords.y += 1;
+                cellCoords.height = 1;
+            }*/
+
             // course name and frequency
             String courseFreq = course.getFreq();
             String courseName = course.getCourseAlias();
+            String courseHall =  course.getHall();
             if(courseFreq != null) {
-                courseName += "\n(" + courseFreq + ")";
+               // courseName += "\n(" + courseFreq + ")";
+                courseHall +=  " (" + courseFreq + ")";
             }
 
             Cell clsDrw = new Cell(
@@ -246,7 +259,7 @@ public class ScheduleDrawer extends JComponent {
                     course.getHuType().getCol(),
                     courseName,
                     course.getHuType().getStr(),
-                    course.getHall(),
+                    courseHall,
                     scale,
                     0
             );

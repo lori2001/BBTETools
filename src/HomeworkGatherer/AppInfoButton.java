@@ -7,6 +7,8 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import static HomeworkGatherer.HWGMainPanel.HWG_LOG_INSTANCE;
+
 public class AppInfoButton extends JPanel{
     private final JButton button;
     private JFrame infoScreen = null;
@@ -23,7 +25,7 @@ public class AppInfoButton extends JPanel{
             button = new JButton(icon);
         } else {
             button = new JButton("info");
-            LogPanel.logln("MEGJEGYZÉS: \"" + iconLoc + "\" nem talált! Írással lesz helyettesítve");
+            LogPanel.logln("MEGJEGYZÉS: \"" + iconLoc + "\" nem talált! Írással lesz helyettesítve", HWG_LOG_INSTANCE);
         }
 
         button.setPreferredSize(new Dimension(size.x, size.y));

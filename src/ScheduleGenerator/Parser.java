@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static ScheduleGenerator.SGMainPanel.SG_LOG_INSTANCE;
 import static ScheduleGenerator.data.SGData.*;
 
 public class Parser {
@@ -22,7 +23,6 @@ public class Parser {
 
     public Parser(String group) {
         this.group = group;
-        System.out.println(group);
 
         // process group num
         try {
@@ -60,7 +60,7 @@ public class Parser {
         if(major.getCode() != null && studYear != -1 && getCalendarSemester() != -1) {
             return major.getCode() + "\n" + studYear + "." + getCalendarSemester();
         } else {
-            LogPanel.logln("HIBA: A tanuló évfolyamának meghatározásakor");
+            LogPanel.logln("HIBA: A tanuló évfolyamának meghatározásakor", SG_LOG_INSTANCE);
         }
         return null;
     }
@@ -73,11 +73,22 @@ public class Parser {
             String url = getScheduleUrl();
             Document doc = Jsoup.connect(url).get();
 
-            Elements groupElements = doc.select("h");
-            int tableI = 0;
-            for(Element gr : groupElements) {
-                if(gr.text().equals(group)) break;
+            System.out.println(url);
+
+            Elements groupElements = doc.select("h1");
+            int tableI = -1; // -1 because there's a "bonus" header
+            boolean found = false;
+            for(String gr : groupElements.eachText()) {
+                if(gr.contains(group)) {
+                    found = true;
+                    break;
+                }
                 tableI++;
+            }
+
+            if(!found)
+            {
+                LogPanel.logln("HIBA: A kiválasztott csoport(" + group + ") nem talált a " +  url + " linken!" , SG_LOG_INSTANCE);
             }
 
             Element table = doc.select("table").get(tableI);
@@ -109,7 +120,7 @@ public class Parser {
                 i++;
             }
         } catch (Exception e) {
-            LogPanel.logln("VIGYÁZAT: Sikertelen volt a tantárgyak beszerzése! " + e);
+            LogPanel.logln("VIGYÁZAT: Sikertelen volt a tantárgyak beszerzése! " + e, SG_LOG_INSTANCE);
         }
 
         return courses;
@@ -163,7 +174,7 @@ public class Parser {
             }
         } catch (Exception e) {
             LogPanel.logln("HIBA: Az óra-intervallumok leolvasása az internetrõl nem sikerült! "
-                    + Arrays.toString(e.getStackTrace()));
+                    + Arrays.toString(e.getStackTrace()), SG_LOG_INSTANCE);
         }
 
         return hourIntervals;
@@ -182,13 +193,12 @@ public class Parser {
         }
 
         if(majorNum == -1) {
-            LogPanel.logln("HIBA: A kiválasztott adatok alapján sikertelen volt kialakítani egy csoportot");
+            LogPanel.logln("HIBA: A kiválasztott adatok alapján sikertelen volt kialakítani egy csoportot", SG_LOG_INSTANCE);
         }
 
         ArrayList<String> groups = new ArrayList<>();
         try {
             String url = genLinkPrefix() + "tabelar/" + MAJORS.get(majorNum).getCode() + studYear + ".html";
-            System.out.println(url);
             Document doc = Jsoup.connect(url).get();
 
             Elements groupElements = doc.select("h1");
@@ -196,7 +206,7 @@ public class Parser {
                 groups.add(findFirstInt(groupElements.get(i).text()));
             }
         } catch (Exception e) {
-            LogPanel.logln("HIBA: A csoportokat nem sikerült beszerezni! " + e);
+            LogPanel.logln("HIBA: A csoportokat nem sikerült beszerezni! " + e, SG_LOG_INSTANCE);
         }
 
         return groups;

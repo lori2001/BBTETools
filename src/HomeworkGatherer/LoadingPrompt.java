@@ -5,6 +5,8 @@ import Common.logging.LogPanel;
 import javax.swing.*;
 import java.awt.*;
 
+import static HomeworkGatherer.HWGMainPanel.HWG_LOG_INSTANCE;
+
 public class LoadingPrompt extends JPanel {
     private final JLabel label;
 
@@ -20,7 +22,7 @@ public class LoadingPrompt extends JPanel {
             label = new JLabel(icon);
         } else {
             label = new JLabel("Loading...");
-            LogPanel.logln("\""+iconLoc+"\" not found! Replacing with text");
+            LogPanel.logln("\""+iconLoc+"\" nem talált! Írással lesz helyettesítve.", HWG_LOG_INSTANCE);
         }
 
         isLoading(false);

@@ -14,6 +14,8 @@ import java.awt.*;
 import java.awt.event.FocusListener;
 import java.util.regex.Pattern;
 
+import static HomeworkGatherer.HWGMainPanel.HWG_LOG_INSTANCE;
+
 public class StudInfo extends JPanel {
     private final JTextField hwNum = new JTextField();
     private final JTextField name = new JTextField();
@@ -143,11 +145,11 @@ public class StudInfo extends JPanel {
 
     public void printErrMsges() {
         if(groupWarnMsg != null)
-            LogPanel.logln(groupWarnMsg);
+            LogPanel.logln(groupWarnMsg, HWG_LOG_INSTANCE);
         if(hwNumWarnMsg != null)
-            LogPanel.logln(hwNumWarnMsg);
+            LogPanel.logln(hwNumWarnMsg, HWG_LOG_INSTANCE);
         if(studIdWarnMsg != null)
-            LogPanel.logln(studIdWarnMsg);
+            LogPanel.logln(studIdWarnMsg, HWG_LOG_INSTANCE);
     }
 
 }

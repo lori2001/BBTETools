@@ -12,6 +12,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 
+import static HomeworkGatherer.HWGMainPanel.HWG_LOG_INSTANCE;
+import static ScheduleGenerator.SGMainPanel.SG_LOG_INSTANCE;
+
 public class AppFrame extends JFrame {
     public static final Point APP_SIZE = new Point(700, 555);
     public static final Point APP_INIT_POS = new Point(100, 100);
@@ -48,7 +51,8 @@ public class AppFrame extends JFrame {
             setIconImage(appIcon);
         }
         catch (Exception e){
-            LogPanel.logln("MEGJEGYZÉS: az icon.png file nem található!");
+            LogPanel.logln("MEGJEGYZÉS: az icon.png file nem található!", HWG_LOG_INSTANCE);
+            LogPanel.logln("MEGJEGYZÉS: az icon.png file nem található!", SG_LOG_INSTANCE);
         }
 
         // save Common.settings when closing window

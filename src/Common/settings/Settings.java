@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import static HomeworkGatherer.HWGMainPanel.HWG_LOG_INSTANCE;
+
 public class Settings {
 
     private static final String[] DEFAULTS = new String[] {
@@ -40,7 +42,8 @@ public class Settings {
 
             reader.close();
         } catch (IOException e) { // if no file
-            LogPanel.log("MEGJEGYZÉS: A " + settingsFile + " file olvasása helytelen, a beállítások alapértelmezettre lesznek visszaállítva!");
+            LogPanel.log("MEGJEGYZÉS: A " + settingsFile + " file olvasása helytelen, a beállítások alapértelmezettre lesznek visszaállítva!",
+                    HWG_LOG_INSTANCE);
 
             // RESET ALL to DEFAULTS
             System.arraycopy(DEFAULTS, 0, fileContent, 0, DEFAULTS.length);
@@ -57,13 +60,13 @@ public class Settings {
                 try {
                     writer.write(s + "\n");
                 } catch (IOException err1) {
-                    LogPanel.logln("HIBA: "  + settingsFile + " ba való íráskor!");
+                    LogPanel.logln("HIBA: "  + settingsFile + " ba való íráskor!", HWG_LOG_INSTANCE);
                 }
             });
 
             writer.close();
         } catch (IOException err2) {
-            LogPanel.logln("HIBA: A következõ file készítésekor: "  + settingsFile);
+            LogPanel.logln("HIBA: A következõ file készítésekor: "  + settingsFile, HWG_LOG_INSTANCE);
         }
     }
 

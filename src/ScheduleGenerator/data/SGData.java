@@ -54,18 +54,18 @@ public class SGData {
         return langsArr;
     }
 
-    public static final String[] MAJOR_OPTIONS = getMajorOptions();
-    private static String[] getMajorOptions() {
-        ArrayList<String> langs = new ArrayList<>();
+    public static String[] getMajorOptionsFor(String language) {
+        ArrayList<String> majors = new ArrayList<>();
         for (Map.Entry<Integer,Major> entry : MAJORS.entrySet()) {
-            if(langs.stream().noneMatch(entry.getValue().getName()::equals)) {
-                langs.add(entry.getValue().getName());
+            if(majors.stream().noneMatch(entry.getValue().getName()::equals)
+                && entry.getValue().getLang().contains(language)) {
+                majors.add(entry.getValue().getName());
             }
         }
 
-        String [] langsArr = new String[langs.size()];
-        langsArr = langs.toArray(langsArr);
-        return langsArr;
+        String [] majorsArr = new String[majors.size()];
+        majorsArr = majors.toArray(majorsArr);
+        return majorsArr;
     }
 
     private static int calendarSemester = -1;

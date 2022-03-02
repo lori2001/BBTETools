@@ -12,6 +12,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import static HomeworkGatherer.HWGMainPanel.HWG_LOG_INSTANCE;
+import static ScheduleGenerator.SGMainPanel.SG_LOG_INSTANCE;
+
 public class AppVersionHandler {
 
     public static final String VERSION = "v.2.3.0";
@@ -31,7 +34,7 @@ public class AppVersionHandler {
                 }
             } else throw new Exception();
         } catch (Exception e) {
-            LogPanel.logln("VIGYÁZAT: Sikertelen verzió ellenõrzés! " + e);
+            LogPanel.loglnAll("VIGYÁZAT: Sikertelen verzió ellenõrzés! " + e);
         }
     }
 

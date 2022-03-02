@@ -11,6 +11,8 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.Objects;
 
+import static HomeworkGatherer.HWGMainPanel.HWG_LOG_INSTANCE;
+
 public class ClsPresetPicker extends JComboBox<String> {
     private ClsPreset activeClsPreset;
     private String activeSelection;
@@ -44,7 +46,7 @@ public class ClsPresetPicker extends JComboBox<String> {
                 activeClsPreset = new ClsOOP(studInfo.getStudData());
             }
             else {
-                LogPanel.logln("HIBA: ez a \"class preset\" nem létezik");
+                LogPanel.logln("HIBA: ez a \"class preset\" nem létezik", HWG_LOG_INSTANCE);
                 System.exit(1);
             }
             activeSelection = currSelection;

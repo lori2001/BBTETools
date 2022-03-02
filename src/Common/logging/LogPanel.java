@@ -3,122 +3,186 @@ package Common.logging;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class LogPanel {
+    private static final ArrayList<JTextPane> textPaneInstances = new ArrayList<>();
+    private static final ArrayList<JScrollPane> scrollInstances = new ArrayList<>();
+    private static final ArrayList<ArrayList<LogsListener>> listenersArr = new ArrayList<>();
+    private static final ArrayList<Boolean> noLogs = new ArrayList<>();
 
-    private static final JTextPane textPane = new JTextPane();
-    private static final MutableAttributeSet defaultTextAttributes = new SimpleAttributeSet(textPane.getInputAttributes());
-    private static final JScrollPane scroll = new JScrollPane(textPane);
-
-    private static final String NO_LOGS = "Nincs üzenet. Begyüjtéshez kattincs a \"Házi Begyüjtése\" gombra!";
-    private static boolean noLogs = true;
-
+    private static MutableAttributeSet defaultTextAttributes;
+    private static final String NO_LOGS_MSG = "Nincs üzenet. Begyüjtéshez kattincs a \"Házi Begyüjtése\" gombra!";
     private static final HashMap<String, Color> SEVERITIES = new HashMap<>() {{
         put("HIBA:", new Color(196, 33, 33));
         put("VIGYÁZAT:", new Color(232, 87, 17));
         put("MEGJEGYZÉS:", new Color(76, 195, 161));
     }};
 
-    public static void init() {
+    public static int createNewInstance() {
+        JTextPane newPane = new JTextPane();
         Color fG = new Color(230, 230, 230);
         Color bG = new Color(30, 30, 30);
 
+        defaultTextAttributes = new SimpleAttributeSet(newPane.getInputAttributes());
         StyleConstants.setLineSpacing(defaultTextAttributes, 0.2f);
         StyleConstants.setBackground(defaultTextAttributes, bG);
         StyleConstants.setForeground(defaultTextAttributes, fG);
 
-        textPane.setBackground(bG);
-        textPane.setForeground(fG);
-        textPane.setCharacterAttributes(defaultTextAttributes, false);
-        textPane.setParagraphAttributes(defaultTextAttributes, false);
+        newPane.setBackground(bG);
+        newPane.setForeground(fG);
+        newPane.setCharacterAttributes(defaultTextAttributes, false);
+        newPane.setParagraphAttributes(defaultTextAttributes, false);
+        newPane.setEditable(false);
 
-        textPane.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        newPane.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane newScroll = new JScrollPane(newPane);
+        newScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-        clearLogs(); // text: No logs
+        ArrayList<LogsListener> newListeners = new ArrayList<>();
+
+        textPaneInstances.add(newPane);
+        scrollInstances.add(newScroll);
+        listenersArr.add(newListeners);
+        noLogs.add(false);
+
+        int instance = textPaneInstances.size() - 1;
+        clearLogs(instance); // text: No logs
+        return instance;
     }
 
-    public static JScrollPane getScrollableTextArea() {
-        textPane.setEditable(false); // set textArea non-editable
-
-        return scroll;
+    public static JScrollPane getScrollableTextArea(int instance) {
+        try {
+            return scrollInstances.get(instance);
+        }
+        catch (IndexOutOfBoundsException e) {
+            System.out.println("CODE ERROR: Failed to access log scroll instance " + instance);
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return null;
     }
 
     public static MutableAttributeSet getDefaultAttributes() {
         return defaultTextAttributes;
     }
 
-    /*public static void log(String text, Color foreground) {
-        MutableAttributeSet attributes = new SimpleAttributeSet(textPane.getInputAttributes());
-        StyleConstants.setForeground(attributes, foreground);
-        log(text, attributes);
-    }*/
+    public static void log(String text, int instance) {
+        try {
+            boolean severityFound = false;
+            for (Map.Entry<String, Color> e : SEVERITIES.entrySet()) {
+                if (text.startsWith(e.getKey())) {
+                    severityFound = true;
+                    MutableAttributeSet attr = new SimpleAttributeSet(textPaneInstances.get(instance).getInputAttributes());
 
-    public static void log(String text) {
+                    // style the matched part
+                    StyleConstants.setBackground(attr, e.getValue());
+                    StyleConstants.setBold(attr, true);
+                    log(text.substring(0, e.getKey().length()), attr, instance); // write with the style
 
-        boolean severityFound = false;
-        for (Map.Entry<String, Color> e : SEVERITIES.entrySet()) {
-            if (text.startsWith(e.getKey())) {
-                severityFound = true;
-                MutableAttributeSet attr = new SimpleAttributeSet(textPane.getInputAttributes());
-
-                // style the matched part
-                StyleConstants.setBackground(attr, e.getValue());
-                StyleConstants.setBold(attr, true);
-                log(text.substring(0, e.getKey().length()), attr); // write with the style
-
-                // unstyle the non-matched part
-                text = text.substring(e.getKey().length()); // substract the matched part from the original text
-                log(text, getDefaultAttributes());
+                    // unstyle the non-matched part
+                    text = text.substring(e.getKey().length()); // substract the matched part from the original text
+                    log(text, getDefaultAttributes(), instance);
+                }
             }
+
+            if(!severityFound) {
+                log(text, getDefaultAttributes(), instance);
+            }
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("CODE ERROR: Failed to access log instance " + instance);
+            e.printStackTrace();
+            System.exit(1);
         }
-
-        if(!severityFound) {
-            log(text, getDefaultAttributes());
-        }
     }
-
-    public static void logln(String text) {
-        log(text + '\n');
+    public static void logln(String text, int instance) {
+        log(text + '\n', instance);
     }
-
-    public static void logln(String text, AttributeSet attributeSet) {
-        log(text + '\n', attributeSet);
+    public static void logln(String text, AttributeSet attributeSet, int instance) {
+        log(text + '\n', attributeSet, instance);
     }
-
-    public static void log(final String text, AttributeSet attributeSet) {
+    public static void log(final String text, AttributeSet attributeSet, int instance) {
         SwingUtilities.invokeLater(() -> {
-            // clear "no logs" message
-            if(noLogs) {
-                textPane.setText("");
-                noLogs = false;
-
-                // Notify everybody that may be interested.
-                for (LogsListener hl : listeners)
-                    hl.logsCleared();
-            }
-
             try {
-                Document doc = textPane.getDocument();
-                doc.insertString(doc.getLength(), text, attributeSet);
-            } catch (BadLocationException e) {
+                // clear "no logs" message
+                if(noLogs.get(instance)) {
+                    textPaneInstances.get(instance).setText("");
+                    noLogs.set(instance, false);
+
+                    for (LogsListener hl : listenersArr.get(instance))
+                        hl.logsCleared();
+                }
+
+                try {
+                    Document doc = textPaneInstances.get(instance).getDocument();
+                    doc.insertString(doc.getLength(), text, attributeSet);
+
+                    for (LogsListener hl : listenersArr.get(instance))
+                        hl.logsWritten();
+
+                } catch (BadLocationException e) {
+                    e.printStackTrace();
+                }
+
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println("CODE ERROR: Failed to write to log instance " + instance);
                 e.printStackTrace();
+                System.exit(1);
             }
         });
     }
-
-    private static final ArrayList<LogsListener> listeners = new ArrayList<>();
-
-    public static void addListener(LogsListener toAdd) {
-        listeners.add(toAdd);
+    public static void addListener(LogsListener toAdd, int instance) {
+        try {
+            listenersArr.get(instance).add(toAdd);
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("CODE ERROR: Failed to access log listener instance " + instance);
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+    public static void clearLogs(int instance) {
+        try {
+            textPaneInstances.get(instance).setText(NO_LOGS_MSG);
+            noLogs.set(instance, true);
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("CODE ERROR: Failed to clear log instance " + instance);
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
-    public static void clearLogs() {
-        textPane.setText(NO_LOGS);
-        noLogs = true;
+    public static void logAll(String text) {
+        for(int i =0; i < textPaneInstances.size(); i++) {
+            log(text, i);
+        }
+    }
+    public static void logAll(String text, AttributeSet attributeSet) {
+        for(int i =0; i < textPaneInstances.size(); i++) {
+            log(text, attributeSet, i);
+        }
+    }
+    public static void loglnAll(String text) {
+        for(int i =0; i < textPaneInstances.size(); i++) {
+            logln(text, i);
+        }
+    }
+    public static void loglnAll(String text, AttributeSet attributeSet) {
+        for(int i =0; i < textPaneInstances.size(); i++) {
+            logln(text, attributeSet, i);
+        }
+    }
+    public static void addListenerToAll(LogsListener toAdd) {
+        for(int i =0; i < listenersArr.size(); i++) {
+            addListener(toAdd, i);
+        }
+    }
+    public static void clearLogsInAll() {
+        for(int i =0; i < textPaneInstances.size(); i++) {
+            clearLogs(i);
+        }
     }
 }

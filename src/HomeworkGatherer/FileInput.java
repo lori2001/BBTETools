@@ -18,6 +18,7 @@ public class FileInput extends JPanel {
 
         path = Paths.get(pathStr);
         chooser = new JFileChooser(pathStr);
+        chooser.setDialogTitle(text);
 
         JLabel textLabel = new JLabel();
         textLabel.setText(text);

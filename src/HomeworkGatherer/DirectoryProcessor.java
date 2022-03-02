@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static HomeworkGatherer.HWGMainPanel.HWG_LOG_INSTANCE;
 import static HomeworkGatherer.utils.FilenameUtils.removeExtension;
 
 public class DirectoryProcessor {
@@ -21,11 +22,11 @@ public class DirectoryProcessor {
         assert clsPreset != null;
 
         if(!Files.isDirectory(inputDir)) {
-            LogPanel.logln("HIBA: A bemeneti folder nem létezik! (" + inputDir + ")");
+            LogPanel.logln("HIBA: A bemeneti folder nem létezik! (" + inputDir + ")", HWG_LOG_INSTANCE);
             return false;
         }
         if(!Files.isDirectory(outputDir)) {
-            LogPanel.logln("HIBA: A kimeneti folder nem létezik! (" + outputDir + ")");
+            LogPanel.logln("HIBA: A kimeneti folder nem létezik! (" + outputDir + ")", HWG_LOG_INSTANCE);
             return false;
         }
 
@@ -63,14 +64,15 @@ public class DirectoryProcessor {
                                     zipOut.closeEntry();
                                 }
                                 else if (!newDir.exists() && !newDir.mkdirs()) { // creates the directory if it does not exist
-                                    LogPanel.logln("HIBA: mappa készítés közben: " + newDirLoc); // if error
+                                    LogPanel.logln("HIBA: mappa készítés közben: " + newDirLoc, HWG_LOG_INSTANCE); // if error
                                 }
 
                                 // save directory output changes for this parent directory
                                 if(directoryChanges.containsKey(inFilePath.getParent())) {
                                     LogPanel.logln("HIBA: Két feladat file talált a" + inFilePath.getParent()
-                                    + " mappában! Az app (még) nem tudja ezt feldolgozni. Kérlek válaszd külön folderbe az egyes feladatokat.");
-                                    LogPanel.logln("Ez az egyik feladat file: " + inFilePath);
+                                    + " mappában! Az app (még) nem tudja ezt feldolgozni. Kérlek válaszd külön folderbe az egyes feladatokat."
+                                    , HWG_LOG_INSTANCE);
+                                    LogPanel.logln("Ez az egyik feladat file: " + inFilePath, HWG_LOG_INSTANCE);
                                 } else {
                                     directoryChanges.put(inFilePath.getParent(), Paths.get(newDirLoc));
                                 }
@@ -94,12 +96,12 @@ public class DirectoryProcessor {
 
                 @Override
                 public FileVisitResult visitFileFailed(Path file, IOException e) {
-                    LogPanel.logln("HIBA: Nem lehet feldolgozni: " + file.toString());
+                    LogPanel.logln("HIBA: Nem lehet feldolgozni: " + file.toString(), HWG_LOG_INSTANCE);
                     return FileVisitResult.CONTINUE;
                 }
             });
         } catch (IOException err) {
-            LogPanel.logln("HIBA: A folderrendszer bejárásakor " + Arrays.toString(err.getStackTrace()));
+            LogPanel.logln("HIBA: A folderrendszer bejárásakor " + Arrays.toString(err.getStackTrace()), HWG_LOG_INSTANCE);
             return false; // breaking error
         }
 
@@ -114,8 +116,8 @@ public class DirectoryProcessor {
                     if(newDir != null) { // if parent directory was found
                         outFilePath = Paths.get(newDir + "\\" + outFilePath.getFileName().toString());
                     } else {
-                        LogPanel.log("HIBA: nem lehet feldolgozni " + inFilePath + "mivel vagy nem része egy foldernek, ");
-                        LogPanel.logln("vagy a folder amelynek része nem tartalmaz olyan file-t ami egy feladatot jelöl!");
+                        LogPanel.log("HIBA: nem lehet feldolgozni " + inFilePath + "mivel vagy nem része egy foldernek, ", HWG_LOG_INSTANCE);
+                        LogPanel.logln("vagy a folder amelynek része nem tartalmaz olyan file-t ami egy feladatot jelöl!", HWG_LOG_INSTANCE);
                     }
 
                     processFile(clsPreset, inFilePath, outFilePath, zipOut, outputDir);
@@ -127,7 +129,7 @@ public class DirectoryProcessor {
         try{
             if(zipOut != null) zipOut.close();
         }catch (IOException e) {
-            LogPanel.logln("HIBA: Sikertelen .zip file bezárás!");
+            LogPanel.logln("HIBA: Sikertelen .zip file bezárás!", HWG_LOG_INSTANCE);
             return false; // breaking error
         }
 
@@ -189,10 +191,10 @@ public class DirectoryProcessor {
             inFile.close();
         }
         catch (FileNotFoundException e) {
-            LogPanel.log("HIBA: SIKERTELEN FILEÍRÁS! A \"" + outFilePath + "\" file nem található!");
+            LogPanel.log("HIBA: SIKERTELEN FILEÍRÁS! A \"" + outFilePath + "\" file nem található!", HWG_LOG_INSTANCE);
         }
         catch (IOException e){
-            LogPanel.log("HIBA: IO hiba történt." + Arrays.toString(e.getStackTrace()));
+            LogPanel.log("HIBA: IO hiba történt." + Arrays.toString(e.getStackTrace()), HWG_LOG_INSTANCE);
         }
     }
 
@@ -201,7 +203,7 @@ public class DirectoryProcessor {
         if(processedFilePaths.containsKey(outFilePath)) {
             LogPanel.logln("HIBA: FELÜlÍRÁS! a " + outFilePath + " fileon!" +
                     "\nFelülírt file származása: " + processedFilePaths.get(outFilePath) +
-                    "\nAz új file származása: " + inFilePath);
+                    "\nAz új file származása: " + inFilePath, HWG_LOG_INSTANCE);
         }
         processedFilePaths.put(outFilePath, inFilePath);
     }
@@ -213,7 +215,7 @@ public class DirectoryProcessor {
             try{
                 return new ZipOutputStream(new FileOutputStream(path));
             } catch (FileNotFoundException e){
-                LogPanel.logln("HIBA: Nem sikerül létrehozni a .zip file-t: " + path);
+                LogPanel.logln("HIBA: Nem sikerül létrehozni a .zip file-t: " + path, HWG_LOG_INSTANCE);
             }
         }
         return null;

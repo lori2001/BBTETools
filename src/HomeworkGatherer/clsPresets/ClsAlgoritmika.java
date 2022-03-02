@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.Arrays;
 
+import static HomeworkGatherer.HWGMainPanel.HWG_LOG_INSTANCE;
 import static HomeworkGatherer.utils.FilenameUtils.getExtension;
 
 public class ClsAlgoritmika extends ClsPreset{
@@ -49,7 +50,7 @@ public class ClsAlgoritmika extends ClsPreset{
         if(!hasComment) {
             newContent = genComment();
         } else {
-            LogPanel.logln("MEGJEGYZÉS: Van már komment a " + origName + " -> automatikus komment nem lesz hozzáadva!");
+            LogPanel.logln("MEGJEGYZÉS: Van már komment a " + origName + " -> automatikus komment nem lesz hozzáadva!", HWG_LOG_INSTANCE);
         }
 
         int exerciseNum = -1;
@@ -66,11 +67,11 @@ public class ClsAlgoritmika extends ClsPreset{
             if(strExAsNotCommCpp(fileContent, "ifstream") && !strExAsNotCommCpp(fileContent, inFileInputText))
             {
                 LogPanel.logln("VIGYÁZAT: A " + origName + " fileban talált az 'ifstream', de nem talált a '"
-                        + inFileInputText + "'! Ellenőrizd hogy a projekt megfelel-e a házi kritériumainak.");
+                        + inFileInputText + "'! Ellenőrizd hogy a projekt megfelel-e a házi kritériumainak.", HWG_LOG_INSTANCE);
             }
             if(strExAsNotCommCpp(fileContent, "ofstream") && !strExAsNotCommCpp(fileContent, inFileOutputText)) {
                 LogPanel.logln("VIGYÁZAT: A " + origName + " fileban talált 'ifstream', de nem talált '"
-                        + inFileOutputText + "'! Ellenőrizd hogy a projekt megfelel-e a házi kritériumainak.");
+                        + inFileOutputText + "'! Ellenőrizd hogy a projekt megfelel-e a házi kritériumainak.", HWG_LOG_INSTANCE);
             }
         }
 
@@ -204,7 +205,7 @@ public class ClsAlgoritmika extends ClsPreset{
                 if(!found) throw new Exception("a file hibásan van elnevezve");
             } catch (Exception ex) {
                 // if all renaming attempts fail warn the user and write file name as exerciseStr
-                LogPanel.logln("VIGYÁZAT: Erre a filera nem talált a feladat szám: " + origPath);
+                LogPanel.logln("VIGYÁZAT: Erre a filera nem talált a feladat szám: " + origPath, HWG_LOG_INSTANCE);
                 exerciseStr = origName.substring(0, origName.lastIndexOf('.'));
             }
         }

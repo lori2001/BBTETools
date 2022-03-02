@@ -77,9 +77,22 @@ public class Cell {
 
             centerTextSize = getTextSize(g2d, centerFont, centerText, lineGap);
 
+            Rectangle2D.Double adjustDrawCell =
+                    new Rectangle2D.Double(drawCell.x, drawCell.y, drawCell.width, drawCell.height);
+
+            // move the center up if only south text
+            if(southText != null && topLeftText == null) {
+                adjustDrawCell.height -= southTextSize.y;
+            }
+            // move the center down if only north text
+            else if(southText == null && topLeftText != null) {
+                adjustDrawCell.y += topLeftTextSize.y;
+                adjustDrawCell.height -= topLeftTextSize.y;
+            }
+
             this.centerTextLoc = new Point2D.Double(
-                    drawCell.x + drawCell.width / 2  - centerTextSize.x / 2,
-                    drawCell.y + drawCell.height / 2 - centerTextSize.y / 2
+                    adjustDrawCell.x + drawCell.width / 2  - centerTextSize.x / 2,
+                    adjustDrawCell.y + drawCell.height / 2 - centerTextSize.y / 2
             );
         }
     }
