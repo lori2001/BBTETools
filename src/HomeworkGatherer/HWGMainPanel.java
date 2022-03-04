@@ -64,8 +64,8 @@ public class HWGMainPanel extends JPanel {
         // displays clsPresetDesc and Logs in a TabbedPane
         InfoPanel infoPanel = new InfoPanel();
         infoPanel.setBounds(12, 210, 655, 210);
-        infoPanel.addTab(clsPresetDesc, "Info", "Információkat mutat arról hogy a jelenleg kiválasztott tantárgy mit csinál.");
-        infoPanel.addTab(LogPanel.getScrollableTextArea(HWG_LOG_INSTANCE), "Logs", "A generálási folyamatrol ír ki hasznos infókat");
+        infoPanel.addTab(clsPresetDesc, "Infók", "Információkat mutat arról hogy a jelenleg kiválasztott tantárgy mit csinál.");
+        infoPanel.addTab(LogPanel.getScrollableTextArea(HWG_LOG_INSTANCE), "Üzenetek", "A generálási folyamatrol ír ki hasznos infókat");
         add(infoPanel);
         LogPanel.addListener(new LogsListener() {
             @Override

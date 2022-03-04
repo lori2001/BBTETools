@@ -76,8 +76,8 @@ public class ClsOOP extends ClsPreset {
     protected JLabel genLeftDesc() {
         return new JLabel(
                 "<html>" +
-                        "<h3>filenév:</h3>" +
-                        "<p>n.cpp-> " + genFileNamePrefix() + "n.cpp<br>" +
+                        "<h3>file név:</h3>" +
+                        "<p>nev.cpp-> " + genFileNamePrefix() + "nev.cpp<br>" +
                         "<h3>komment: </h3>" +
                         "<p>"  + genComment(studData.name, studData.group, true) + "</p>" +
                         "</html>"
@@ -88,9 +88,10 @@ public class ClsOOP extends ClsPreset {
     protected JLabel genRightDesc() {
         return new JLabel(
                 "<html><ul>" +
-                        "<li><h4>felismert kiterjesztések:<br>" +
+                        "<li><h4>feldolgozandó kiterjesztések:<br>" +
                         Arrays.deepToString(validExtensions) + "</h4></li>" +
-                        "<li><h4>kimenet: " + getParentZipName() + ".zip file ahol minden folder egy feladat</h4></li>" +
+                        "<li><h4>kimenet: " + getParentZipName() + ".zip file ahol minden folder egy feladatnak" +
+                        " felel meg</h4></li>" +
                         "</ul></html>"
         );
     }

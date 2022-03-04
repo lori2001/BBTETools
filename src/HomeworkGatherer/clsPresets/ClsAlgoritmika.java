@@ -95,7 +95,7 @@ public class ClsAlgoritmika extends ClsPreset{
     protected JLabel genLeftDesc() {
         return new JLabel(
         "<html>" +
-                "<h3>filenév:</h3>" +
+                "<h3>file név:</h3>" +
                 "<p>n.cpp ->" + genFileNamePrefix() + "n.cpp</p>" +
                 "<h3>komment: </h3>" +
                 "<p>"  + genComment(studData.name, studData.group, "n", true) + "</p>" +
@@ -107,10 +107,11 @@ public class ClsAlgoritmika extends ClsPreset{
     protected JLabel genRightDesc() {
         return new JLabel(
         "<html><ul>" +
-                "<li><h4>felismert kiterjesztések:<br>" +
+                "<li><h4>feldolgozandó kiterjesztések:<br>" +
                 Arrays.deepToString(validExtensions) + "</h4></li>" +
                 "<li><h4>kimenet: fileok a<br>megadott folderbe</h4></li>" +
-                "<li><h4>bemenet/kimenet \".txt\" ellenőrzés</h4></li>" +
+                "<li><h4>ellenõrzi, hogy a bemenet/kimenet a kritériumnak megfelelõ fileokba történik-e" +
+                "<br>(pl. bemenet06.txt)</h4></li>" +
             "</ul></html>"
         );
     }

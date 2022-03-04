@@ -37,7 +37,7 @@ public class AppFrame extends JFrame {
         setLocationRelativeTo(null);
 
         HWGMainPanel homeworkGathererPanel = new HWGMainPanel(this, APP_SIZE);
-        SGMainPanel scheduleGeneratorPanel = new SGMainPanel(this, APP_SIZE);
+        SGMainPanel scheduleGeneratorPanel = new SGMainPanel(this, APP_SIZE, Settings.getStudData().group);
 
         InfoPanel infoPanel = new InfoPanel();
         infoPanel.setBounds(0, 0, APP_SIZE.x, APP_SIZE.y); // TODO: Change

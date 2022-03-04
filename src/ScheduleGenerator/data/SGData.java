@@ -1,6 +1,6 @@
 package ScheduleGenerator.data;
 
-import ScheduleGenerator.models.Major;
+import ScheduleGenerator.records.Major;
 
 import java.awt.*;
 import java.time.LocalDateTime;
@@ -19,6 +19,8 @@ public class SGData {
         put("Sisteme de gestiune a bazelor de date", "Adatbázisok");
         put("Mecanica teoretica", "Mechanika");
         put("Programare orientata obiect", "OOP");
+        put("Inteligenta artificiala", "Mest. int.");
+        put("Programare Web", "Webprog.");
     }
     };
 
@@ -101,6 +103,10 @@ public class SGData {
         return calendarYear + "-" + calendarSemester;
     }
 
+    public static String getLinkPrefix() {
+        return "https://www.cs.ubbcluj.ro/files/orar/" + YEAR_AND_SEM + "/";
+    }
+
     public static final String[] STUD_YEAR_OPTIONS = new String[]{"1", "2", "3"};
 
     public static class Colors {
@@ -114,16 +120,22 @@ public class SGData {
                 new Color(233, 127, 36)
         };
         public static final Color[] CLASS_COLORS = new Color[]{
-                new Color(0,166,81),
+                new Color(0, 166, 81),
                 new Color(46,49, 146),
-                new Color(237,28,36),
-                new Color(0,174, 239),
-                new Color(102,45,145),
                 new Color(233,127,36),
-                new Color(236,0,140),
-                new Color(122,204,200),
-                new Color(253,198,137),
+                new Color(237,28,36),
+                new Color(17, 138, 178),
+                new Color(239, 71, 111),
+                new Color(252,68,15),
+                new Color(67, 188 ,205),
+                new Color(136,132,255),
                 new Color(117,76,36),
+                new Color(234,122,244),
+                new Color(238, 169, 10),
+                new Color(142,74,73),
+                new Color(9, 103, 32),
+                new Color(164,14,76),
+                new Color(215, 36, 131)
         };
     }
 }

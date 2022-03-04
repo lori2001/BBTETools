@@ -1,4 +1,4 @@
-package ScheduleGenerator.models;
+package ScheduleGenerator.records;
 
 public record Major(String code, String name, String lang) {
 

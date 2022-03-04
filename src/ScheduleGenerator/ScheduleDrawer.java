@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 
 import static ScheduleGenerator.data.SGData.DAYS_OF_WEEK_HU;
@@ -109,7 +110,7 @@ public class ScheduleDrawer extends JComponent {
                         cellCoords.width = cell.rect.width * xOffs - (cellMargin.x * 2);
                         cellCoords.height = cell.rect.height * yOffs - (cellMargin.y * 2);
 
-                        cell.calcTextsPosAndScale(cellCoords, g2d, textMargin);
+                        cell.calcTextsPosAndScale(cellCoords, textMargin, scale, g2d);
 
                         drawCell(cellCoords, cell);
                     }
@@ -141,53 +142,31 @@ public class ScheduleDrawer extends JComponent {
 
         // Define rendering hint, font name, font style and font size
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setPaint(SGData.Colors.FONT_COLOR);
 
-        if(cell.getCenterFont() != null && cell.getCenterText() != null) {
-            g2d.setFont(cell.getCenterFont());
-
-            int x = (int) (cell.getCenterTextLoc().x + cell.getCenterTextSize().x / 2);
-            int y = (int) cell.getCenterTextLoc().y;
-
-            for (String line : cell.getCenterText().split("\n")) {
-                Point2D.Double size = Cell.getTextSize(g2d, cell.getCenterFont(), line, cell.getLineGap());
-                y += size.y;
-                g2d.drawString(line, (int) (x - size.x / 2), y);
-            }
-
-            /*Rectangle2D.Double fontSizeDebug =
-                    new Rectangle2D.Double(
-                            cell.getCenterTextLoc().x, cell.getCenterTextLoc().y,
-                            cell.getCenterTextSize().x, cell.getCenterTextSize().y);
-            drawRect(fontSizeDebug, new Color(0,0,0,100));*/
+        if(cell.getCenterDrwText().shouldBeDrawn()) {
+            cell.getCenterDrwText().draw(g2d);
         }
 
-        if(cell.getSouthFont() != null && cell.getSouthText() != null) {
-            g2d.setFont(cell.getSouthFont());
-
-            double southBgHeight = cell.getSouthTextSize().y + textMargin.x * 2;
+        if(cell.getBottomDrwText().shouldBeDrawn()) {
+            double southBgHeight = cell.getBottomDrwText().getSize().y + textMargin.x * 2;
             Rectangle2D.Double southBg = new Rectangle2D.Double(
                     rect.x, rect.y + rect.height - southBgHeight,
                     rect.width, southBgHeight
             );
             drawRect(southBg, SGData.Colors.TEXT_BG_COLOR);
 
-            g2d.setPaint(SGData.Colors.FONT_COLOR);
-            g2d.drawString(cell.getSouthText(), (int)cell.getSouthTextLoc().x, (int)cell.getSouthTextLoc().y);
+            cell.getBottomDrwText().draw(g2d);
         }
 
-        if(cell.getTopLeftFont() != null && cell.getTopLeftText() != null) {
-            g2d.setFont(cell.getTopLeftFont());
-
+        if(cell.getTopLeftDrwText().shouldBeDrawn()) {
             Rectangle2D.Double topLeftBg = new Rectangle2D.Double(
                     rect.x, rect.y,
-                    cell.getTopLeftTextSize().x + textMargin.x * 2,
-                    cell.getTopLeftTextSize().y + textMargin.y * 2
+                    cell.getTopLeftDrwText().getSize().x + textMargin.x * 2,
+                    cell.getTopLeftDrwText().getSize().y + textMargin.y * 2
             );
             drawRect(topLeftBg, SGData.Colors.TEXT_BG_COLOR);
 
-            g2d.setPaint(SGData.Colors.FONT_COLOR);
-            g2d.drawString(cell.getTopLeftText(), (int)cell.getTopLeftTextLoc().x, (int)cell.getTopLeftTextLoc().y);
+            cell.getTopLeftDrwText().draw(g2d);
         }
     }
 
@@ -195,15 +174,17 @@ public class ScheduleDrawer extends JComponent {
         ArrayList<Cell> cells = new ArrayList<>();
 
         // top left content
+        System.out.println(topLeftCText);
         Cell topLeftCell = new Cell(new Rectangle(0, 0, 1, 1),
-                SGData.Colors.BASE_COLOR, topLeftCText, null, null, scale, 2 * scale.x);
+                SGData.Colors.BASE_COLOR, topLeftCText, null, null, 2.5 * scale.x);
+        topLeftCell.setFontStyle(font);
         cells.add(topLeftCell);
 
         // days
         for(int i = 1; i <= DAYS_OF_WEEK_HU.length; i++) {
             Rectangle t = new Rectangle(0, i * 2 - 1, 1, 2);
 
-            Cell cell = new Cell(t, SGData.Colors.BASE_COLOR, DAYS_OF_WEEK_HU[i - 1], null, null, scale, 0);
+            Cell cell = new Cell(t, SGData.Colors.BASE_COLOR, DAYS_OF_WEEK_HU[i - 1], null, null, 0);
             cell.setCenterFontSize(font, (float) (this.scale.x * 9F));
 
             cells.add(cell);
@@ -213,7 +194,7 @@ public class ScheduleDrawer extends JComponent {
         for(int i = 1; i <= intervals.size(); i++) {
             Rectangle t = new Rectangle(i, 0, 1, 1);
             String displayInterval = TimeFormatter.localTimeArrToDisplayFormat(intervals.get(i - 1));
-            Cell cell = new Cell(t, SGData.Colors.BASE_COLOR, displayInterval, null, null, scale, 2 * scale.x);
+            Cell cell = new Cell(t, SGData.Colors.BASE_COLOR, displayInterval, null, null, 2.5 * scale.x);
             cell.setCenterFontSize(font, (float) (this.scale.x * 5F));
 
             cells.add(cell);
@@ -221,6 +202,15 @@ public class ScheduleDrawer extends JComponent {
 
         // courses
         for(var course : courses) {
+            // course properties
+            String courseName = course.getSubjectAlias();
+            String courseSouthInfo = course.getTypeInHu().getAbbreviation();
+            String courseNorthInfo;
+            if(course.getFreqInHu() != null) {
+                courseNorthInfo = course.getHall() + "  (" + course.getFreqInHu() + ")";
+            } else {
+                courseNorthInfo = course.getHall();
+            }
 
             // cell coordinates
             int startX = 0;
@@ -230,41 +220,34 @@ public class ScheduleDrawer extends JComponent {
                 if(intervals.get(i)[0].equals(courseIntArr[0])) startX = i + 1;
                 if(intervals.get(i)[1].equals(courseIntArr[1])) endX = i + 2;
             }
-            int dayIndex = course.getDayIndex();
+            int dayIndex = course.getDayIndexInRO_DAYS();
             int width = endX - startX;
-
             Rectangle cellCoords = new Rectangle(startX, dayIndex * 2 + 1, width, 2);
 
-            /*Optional<Cell> celOnSameRect = cells.stream().
-                    filter(p -> p.rect == cellCoords).
-                    findFirst();
-
-            if(celOnSameRect.isPresent()){
-                celOnSameRect.get().rect.height = 1;
-                cellCoords.y += 1;
+            // solve cells on same positions
+            if(course.isDuplicate()) {
+                if(course.getFreqAsNum() == 2) cellCoords.y += 1;
                 cellCoords.height = 1;
-            }*/
+                courseSouthInfo = null;
+                courseNorthInfo += "  " + course.getTypeInHu().getFirstLetter();
+            }
 
-            // course name and frequency
-            String courseFreq = course.getFreq();
-            String courseName = course.getCourseAlias();
-            String courseHall =  course.getHall();
-            if(courseFreq != null) {
-               // courseName += "\n(" + courseFreq + ")";
-                courseHall +=  " (" + courseFreq + ")";
+            // double check for cells on same position
+            Optional<Cell> cellOnSamePos = cells.stream().
+                    filter(cell -> Objects.equals(cell.rect, cellCoords)).
+                    findFirst();
+            if(cellOnSamePos.isPresent()) {
+                cellOnSamePos.get().rect.height = 1;
+                cellCoords.height = 1;
+                cellCoords.y += 1;
             }
 
             Cell clsDrw = new Cell(
-                    cellCoords,
-                    course.getHuType().getCol(),
-                    courseName,
-                    course.getHuType().getStr(),
-                    courseHall,
-                    scale,
-                    0
+                    cellCoords, course.getSubjectColor(), courseName,
+                    courseSouthInfo, courseNorthInfo, 0
             );
 
-            clsDrw.setSouthFontSize(font, (float) (this.scale.x * 5F));
+            clsDrw.setBottomFontSize(font, (float) (this.scale.x * 5F));
             clsDrw.setTopLeftFontSize(font, (float) (this.scale.x * 3.5F));
 
             cells.add(clsDrw);
