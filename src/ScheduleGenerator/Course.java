@@ -10,6 +10,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Course {
+    enum HEADER_CONTENT {
+        DAY,
+        INTERVAL,
+        FREQ,
+        HALL,
+        SUBGROUP,
+        TYPE,
+        COURSE_NAME,
+        TEACHER
+    }
     public static final String[] HEADERS = new String[]{
             "Ziua",
             "Orele",
@@ -21,37 +31,27 @@ public class Course {
             "Cadrul didactic",
     };
 
-    private final String day;
-    private final String interval;
-    private final String freq;
-    private final String hall;
-    private final String subgroup;
-    private final String type;
-    private final String courseName;
-    private final String teacher;
-
+    private final ArrayList<String> content = new ArrayList<>();
     private final String formattedSubgroup; // subgroup as [1, 2, ... n, group]
     private boolean isDuplicate;
 
     private static final HashMap<String, SubjectProperties> subjectProperties = new HashMap<>();
+    public static SubjectProperties[] getSubjectProperties() {
+        return subjectProperties.values().toArray(new SubjectProperties[0]);
+    }
 
     public Course(HashMap<String, String> contentMap, String group) {
-        day = contentMap.get(HEADERS[0]);
-        interval = contentMap.get(HEADERS[1]);
-        freq = contentMap.get(HEADERS[2]);
-        hall = contentMap.get(HEADERS[3]);
-        subgroup = contentMap.get(HEADERS[4]);
-        type = contentMap.get(HEADERS[5]);
-        courseName = contentMap.get(HEADERS[6]);
-        teacher = contentMap.get(HEADERS[7]);
+        for(int i=0; i < HEADERS.length; i++) {
+            content.add(contentMap.get(HEADERS[0]));
+        }
 
-        if(!subjectProperties.containsKey(courseName)) {
-            subjectProperties.put(courseName,
-                    new SubjectProperties(courseName, SubjectProperties.getUnusedColor(SGData.Colors.CLASS_COLORS), group)
+        if(!subjectProperties.containsKey(getContent(HEADER_CONTENT.COURSE_NAME))) {
+            subjectProperties.put(getContent(HEADER_CONTENT.COURSE_NAME),
+                    new SubjectProperties(getContent(HEADER_CONTENT.COURSE_NAME), SubjectProperties.getUnusedColor(SGData.Colors.CLASS_COLORS), group)
             );
         }
 
-        formattedSubgroup = formatSubGroup(subgroup, group);
+        formattedSubgroup = formatSubGroup(getContent(HEADER_CONTENT.SUBGROUP), group);
     }
 
     public static String formatSubGroup(String nonFormattedSubGr, String group) {
@@ -73,7 +73,7 @@ public class Course {
     }
 
     public boolean isPartOfSubgroup(String formattedSubGr) {
-        if(formattedSubgroup == null || formattedSubgroup.equals(subjectProperties.get(courseName).getGroup()))
+        if(formattedSubgroup == null || formattedSubgroup.equals(subjectProperties.get(getContent(HEADER_CONTENT.COURSE_NAME)).getGroup()))
             return true;
         return formattedSubGr.equals(formattedSubgroup);
     }
@@ -93,26 +93,19 @@ public class Course {
         add("Vineri");
     }};
 
-    public String getDay() {
-        return day;
-    }
     public int getDayIndexInRO_DAYS() {
-        return RO_DAYS.indexOf(day);
-    }
-
-    public String getInterval() {
-        return interval;
+        return RO_DAYS.indexOf(getContent(HEADER_CONTENT.DAY));
     }
 
     public LocalTime[] getIntervalAsLocalTimeArr() {
-        return TimeFormatter.convertToLocalTimeArr(interval);
+        return TimeFormatter.convertToLocalTimeArr(getContent(HEADER_CONTENT.INTERVAL));
     }
 
     public int getFreqAsNum() {
-        if(freq.equals("")) return -1;
+        if(getContent(HEADER_CONTENT.FREQ).equals("")) return -1;
 
         for(int i = 0; i <= 9; i++) {
-            if(freq.contains(Integer.toString(i))) {
+            if(getContent(HEADER_CONTENT.FREQ).contains(Integer.toString(i))) {
                 return i;
             }
         }
@@ -121,28 +114,12 @@ public class Course {
     }
 
     public String getFreqInHu() {
-        if(freq.equals("")) return null;
+        if(getContent(HEADER_CONTENT.FREQ).equals("")) return null;
 
         int freqNum = getFreqAsNum();
-        if(freqNum == -1) return freq;
+        if(freqNum == -1) return getContent(HEADER_CONTENT.FREQ);
 
         return freqNum + ". hét";
-    }
-
-    public String getFreq() {
-        return freq;
-    }
-
-    public String getHall() {
-        return hall;
-    }
-
-    public String getSubgroup() {
-        return subgroup;
-    }
-
-    public String getType() {
-        return type;
     }
 
     private static final Map<String, CourseType> RO_TO_HU_TYPES = new HashMap<>() {{
@@ -152,28 +129,28 @@ public class Course {
     }};
 
     public CourseType getTypeInHu() {
-        return RO_TO_HU_TYPES.get(type);
+        return RO_TO_HU_TYPES.get(getContent(HEADER_CONTENT.TYPE));
     }
 
     public String getSubjectAlias() {
-        return subjectProperties.get(courseName).getAlias();
+        return subjectProperties.get(getContent(HEADER_CONTENT.COURSE_NAME)).getAlias();
     }
 
     public Color getSubjectColor() {
-        return subjectProperties.get(courseName).getColor();
+        return subjectProperties.get(getContent(HEADER_CONTENT.COURSE_NAME)).getColor();
     }
 
-    public String getSubjectGroup() { return subjectProperties.get(courseName).getGroup(); }
-
-    public String getTeacher() {
-        return teacher;
+    public String getContent(HEADER_CONTENT at) {
+        return content.get(at.ordinal());
     }
+
+    public String getSubjectGroup() { return subjectProperties.get(getContent(HEADER_CONTENT.COURSE_NAME)).getGroup(); }
 
     // for debugging
-    void printInfo() {
+   /* void printInfo() {
         System.out.print(
             day + " " + interval + " " + freq + " " + hall + " " + subgroup + " " + type + " " + courseName + " " + teacher
                 + " " + isDuplicate + "\n"
         );
-    }
+    }*/
 }

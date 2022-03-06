@@ -16,7 +16,6 @@ public class SGMainPanel extends JPanel {
     public static final int SG_LOG_INSTANCE = LogPanel.createNewInstance();
 
     private final Parser parser;
-    private ArrayList<Course> activeCourses;
 
     private final ScheduleDrawer scheduleDrawer =
             new ScheduleDrawer(
@@ -28,7 +27,7 @@ public class SGMainPanel extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        scheduleDrawer.paintComponent(g);
+        // scheduleDrawer.paintComponent(g);
     }
 
     public SGMainPanel(JFrame appFrame, Point appSize, String defaultGroup) {
@@ -58,6 +57,9 @@ public class SGMainPanel extends JPanel {
         infoPanel.setPreferredSize(new Dimension(400,200));
         infoPanel.addTab(LogPanel.getScrollableTextArea(SG_LOG_INSTANCE), "Logs", "A generálási folyamatrol ír ki hasznos infókat");
         // add(infoPanel);
+
+        SubjectsList addableSubjects = new SubjectsList(parser.getCourses());
+        add(addableSubjects);
 
         JButton generateSG = new JButton("Generálás");
         generateSG.addActionListener(e -> repaint());

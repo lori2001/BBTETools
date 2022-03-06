@@ -207,9 +207,9 @@ public class ScheduleDrawer extends JComponent {
             String courseSouthInfo = course.getTypeInHu().getAbbreviation();
             String courseNorthInfo;
             if(course.getFreqInHu() != null) {
-                courseNorthInfo = course.getHall() + "  (" + course.getFreqInHu() + ")";
+                courseNorthInfo = course.getContent(Course.HEADER_CONTENT.HALL) + "  (" + course.getFreqInHu() + ")";
             } else {
-                courseNorthInfo = course.getHall();
+                courseNorthInfo = course.getContent(Course.HEADER_CONTENT.HALL) ;
             }
 
             // cell coordinates

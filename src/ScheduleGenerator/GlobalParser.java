@@ -25,8 +25,8 @@ public class GlobalParser {
 
         int courseOnSameTimeIndex = -1;
         for(int j=0; j < courses.size(); j++) {
-            if(courses.get(j).getInterval().contains(courseToAdd.getInterval()) &&
-                    courses.get(j).getDay().contains(courseToAdd.getDay())) {
+            if(courses.get(j).getContent(Course.HEADER_CONTENT.INTERVAL).contains(courseToAdd.getContent(Course.HEADER_CONTENT.INTERVAL)) &&
+                    courses.get(j).getContent(Course.HEADER_CONTENT.DAY).contains(courseToAdd.getContent(Course.HEADER_CONTENT.DAY))) {
                 courseOnSameTimeIndex = j;
                 break;
             }
