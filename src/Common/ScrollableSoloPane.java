@@ -1,20 +1,18 @@
-package HomeworkGatherer;
+package Common;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import java.awt.GridLayout;
 
-public class InfoPanel extends JPanel {
+public class ScrollableSoloPane extends JPanel {
     private final JTabbedPane tabbedPane = new JTabbedPane();
 
-    public InfoPanel() {
+    public ScrollableSoloPane() {
         super(new GridLayout(1, 1));
 
-        //Add the tabbed pane to this panel.
         add(tabbedPane);
 
-        //The following line enables to use scrolling tabs.
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
     }
 

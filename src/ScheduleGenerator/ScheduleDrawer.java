@@ -36,11 +36,10 @@ public class ScheduleDrawer extends JComponent {
     private ArrayList<Course> courses;
     private String topLeftCText;
 
-    ScheduleDrawer(Point2D.Double pos, Point2D.Double scale, ArrayList<LocalTime[]> intervals) {
-        this.scale = scale;
-
+    ScheduleDrawer(Point2D.Double pos, Point2D.Double size, ArrayList<LocalTime[]> intervals) {
         this.pos = pos;
-        this.size = new Point2D.Double(scale.x * A4InMM.x, scale.y * A4InMM.y);
+        this.size = size;
+        this.scale = new Point2D.Double(size.x / A4InMM.x, size.y / A4InMM.y);
         setSize(new Dimension((int) size.x, (int) size.y));
 
         try {
@@ -174,7 +173,6 @@ public class ScheduleDrawer extends JComponent {
         ArrayList<Cell> cells = new ArrayList<>();
 
         // top left content
-        System.out.println(topLeftCText);
         Cell topLeftCell = new Cell(new Rectangle(0, 0, 1, 1),
                 SGData.Colors.BASE_COLOR, topLeftCText, null, null, 2.5 * scale.x);
         topLeftCell.setFontStyle(font);

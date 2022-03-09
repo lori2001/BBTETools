@@ -1,5 +1,7 @@
 package HomeworkGatherer;
 
+import Common.InfoButton;
+import Common.ScrollableSoloPane;
 import Common.logging.LogPanel;
 import Common.logging.LogsListener;
 import Common.settings.Setting;
@@ -16,34 +18,33 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
-
 public class HWGMainPanel extends JPanel {
-    StudInfo studInfo;
-    FileInput inputFile;
-    FileInput outputFile;
-    ClsPresetPicker clsPresetPicker;
+    private final StudInfo studInfo;
+    private final FileInput inputFile;
+    private final FileInput outputFile;
+    private final ClsPresetPicker clsPresetPicker;
 
     public static final int HWG_LOG_INSTANCE = LogPanel.createNewInstance();
 
-    public HWGMainPanel(JFrame appFrame, Point appSize) {
+    public HWGMainPanel(JFrame appFrame, Point panelSize) {
         setLayout(null);
-        setBounds(0,0, appSize.x, appSize.y);
+        setBounds(0,0, panelSize.x, panelSize.y);
 
         inputFile = new FileInput("Bemenet:",
                 new Point(12, 15 ),
-                new Point(appSize.x - 50, 40),
+                new Point(panelSize.x - 50, 40),
                 Settings.getFileContent(Setting.InputFolder)
         );
         add(inputFile);
 
         outputFile = new FileInput("Kimenet:",
                 new Point(12, 75 ),
-                new Point(appSize.x - 50, 40),
+                new Point(panelSize.x - 50, 40),
                 Settings.getFileContent(Setting.OutputFolder)
         );
         add(outputFile);
 
-        studInfo = new StudInfo(new Point(15, 145), new Point(appSize.x - 50, 50));
+        studInfo = new StudInfo(new Point(15, 145), new Point(panelSize.x - 50, 50));
         add(studInfo);
 
         // choose the uni class for which to target homework gathering on
@@ -62,15 +63,15 @@ public class HWGMainPanel extends JPanel {
         add(clsPresetDesc);
 
         // displays clsPresetDesc and Logs in a TabbedPane
-        InfoPanel infoPanel = new InfoPanel();
-        infoPanel.setBounds(12, 210, 655, 210);
-        infoPanel.addTab(clsPresetDesc, "Infók", "Információkat mutat arról hogy a jelenleg kiválasztott tantárgy mit csinál.");
-        infoPanel.addTab(LogPanel.getScrollableTextArea(HWG_LOG_INSTANCE), "Üzenetek", "A generálási folyamatrol ír ki hasznos infókat");
-        add(infoPanel);
+        ScrollableSoloPane scrollableSoloPane = new ScrollableSoloPane();
+        scrollableSoloPane.setBounds(12, 210, 655, 210);
+        scrollableSoloPane.addTab(clsPresetDesc, "Infók", "Információkat mutat, arról hogy a jelenleg kiválasztott tantárgy mit csinál.");
+        scrollableSoloPane.addTab(LogPanel.getScrollableTextArea(HWG_LOG_INSTANCE), "Üzenetek", "A generálási folyamatról ír ki hasznos infókat");
+        add(scrollableSoloPane);
         LogPanel.addListener(new LogsListener() {
             @Override
             public void logsCleared() {
-                infoPanel.setSelectedIndex(1);
+                scrollableSoloPane.setSelectedIndex(1);
             }
 
             @Override
@@ -88,15 +89,38 @@ public class HWGMainPanel extends JPanel {
         });
 
         LoadingPrompt loadingPrompt = new LoadingPrompt(
-                new Point( appSize.x - 80, 440),
+                new Point( panelSize.x - 80, 440),
                 new Point(45, 45)
         );
         add(loadingPrompt);
 
-        AppInfoButton appInfoButton =
-                new AppInfoButton(new Point(395, 440), new Point(35, 35));
-        appInfoButton.toggleInfoFrameOnClick(appFrame);
-        add(appInfoButton);
+        String HWGInfo = "<html><center><h1>App Információ</h1></center>" +
+                "<p>Ez az app a házi begyüjtésének unalmas folyamatát<br>" +
+                "automatizálja. Kézzel elnevezni és bekomentelni<br>" +
+                "minden házit időigényes és könnyen elrontható,<br>" +
+                "s elnevezési hiba esetén néhány tantárgyból a <br>" +
+                "diák a teljes pontszámát elveszítheti.</p>" +
+                "<center><h2>Hogyan használható?</h2></center>" +
+                "<p>Készítsd el az összes algoritmika házid egy<br>" +
+                "folderbe vagy annak bármely alfolderébe és nevezd<br>" +
+                "el \"alpont.cpp\"-nek. Például 1.cpp,2.cpp stb.<br>" +
+                "Töltsd ki az appet az adataiddal illetve a pirossal<br>" +
+                "megjelölt mezőre írd be hogy hányas labort akarsz<br>" +
+                "generálni. Végül pedig állítsd be bemenetnek a<br>" +
+                "házis foldert, illetve kimenetnek bármely elérhető<br>" +
+                "mappát, és kattints a \"Begyüjtés\" gombra</p>" +
+                "<center><h2>Hogyan működik?</h2></center>" +
+                "<p>A program bejárja a bemenetként adott foldert és<br>" +
+                "annak minden alfolderét. Megkeresi a megfelelő<br>" +
+                "filetípust(például algoritmikából a \".cpp\") és<br>" +
+                "az appbe beírt infóknak megfelelően kimásolja az<br>" +
+                "összes filet, majd megfelelően átnevezi,<br>" +
+                "bekommenteli és (egyes tantárgyakból)<br>" +
+                "a tartalmát is ellenőrzi.</p>" +
+                "</html>";
+        InfoButton infoButton =
+                new InfoButton(new Point(395, 440), new Point(35, 35), appFrame, HWGInfo);
+        add(infoButton);
 
         JButton gatherHw = new JButton("Házi Begyüjtése");
         gatherHw.setBounds( 180, 440, 200, 35);

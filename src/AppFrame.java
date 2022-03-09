@@ -1,7 +1,7 @@
 import Common.AppVersionHandler;
 import Common.settings.Settings;
 import HomeworkGatherer.HWGMainPanel;
-import HomeworkGatherer.InfoPanel;
+import Common.ScrollableSoloPane;
 import Common.logging.LogPanel;
 import ScheduleGenerator.SGMainPanel;
 
@@ -18,6 +18,7 @@ import static ScheduleGenerator.SGMainPanel.SG_LOG_INSTANCE;
 public class AppFrame extends JFrame {
     public static final Point APP_SIZE = new Point(700, 555);
     public static final Point APP_INIT_POS = new Point(100, 100);
+    final int headerSize = 38;
 
     private final JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -36,14 +37,15 @@ public class AppFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        HWGMainPanel homeworkGathererPanel = new HWGMainPanel(this, APP_SIZE);
-        SGMainPanel scheduleGeneratorPanel = new SGMainPanel(this, APP_SIZE, Settings.getStudData().group);
+        Point panelSize = new Point(APP_SIZE.x, APP_SIZE.y - headerSize);
+        HWGMainPanel homeworkGathererPanel = new HWGMainPanel(this, panelSize);
+        SGMainPanel scheduleGeneratorPanel = new SGMainPanel(this, panelSize, Settings.getStudData().group);
 
-        InfoPanel infoPanel = new InfoPanel();
-        infoPanel.setBounds(0, 0, APP_SIZE.x, APP_SIZE.y); // TODO: Change
-        infoPanel.addTab(scheduleGeneratorPanel, "Órarend generáló", "Kigenerál egy személyes órarendet html-ben vagy nyomtatható formában");
-        infoPanel.addTab(homeworkGathererPanel, "Házi begyüjtõ", "Begyüjti, majd megfelelõen elnevezi, kommenteli és ellenõrzi a házikat");
-        add(infoPanel);
+        ScrollableSoloPane scrollableSoloPane = new ScrollableSoloPane();
+        scrollableSoloPane.setBounds(0, 0, APP_SIZE.x, panelSize.y); // TODO: Change
+        scrollableSoloPane.addTab(scheduleGeneratorPanel, "Órarend generáló (BETA)", "Kigenerál egy személyes órarendet html-ben vagy nyomtatható formában");
+        scrollableSoloPane.addTab(homeworkGathererPanel, "Házi begyüjtõ", "Begyüjti, majd megfelelõen elnevezi, kommenteli és ellenõrzi a házikat");
+        add(scrollableSoloPane);
 
         // load app icon
         try {

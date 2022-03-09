@@ -1,5 +1,6 @@
 package ScheduleGenerator;
 
+import Common.InfoButton;
 import Common.logging.LogPanel;
 import ScheduleGenerator.data.SGData;
 import ScheduleGenerator.records.Major;
@@ -27,9 +28,8 @@ public class ControlPanel  extends JPanel {
     private final JComboBox<String> subGroupSelector = new JComboBox<>();
     private final DefaultComboBoxModel<String> subGroupModel = new DefaultComboBoxModel<>();
 
-    public ControlPanel(Point pos, Point size, Major initMajor, String initGroup, String initStudYear, String initSubGroup) {
-        setLayout(new GridLayout(2, 4, 10, 0));
-        setBounds(pos.x, pos.y, size.x, size.y);
+    public ControlPanel(Major initMajor, String initGroup, String initStudYear, String initSubGroup) {
+        setLayout(new GridLayout(2, 5, 10, 0));
 
         JLabel languageL = new JLabel("Nyelv:");
         JLabel majorL = new JLabel("Szak:");

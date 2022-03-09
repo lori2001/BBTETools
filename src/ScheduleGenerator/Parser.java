@@ -61,8 +61,6 @@ public class Parser {
             String url = getLinkPrefix() + "tabelar/" + major.getCode() + studYear + ".html";
             Document doc = Jsoup.connect(url).get();
 
-            System.out.println(url);
-
             Elements groupElements = doc.select("h1");
             int tableI = -1; // -1 because there's a "bonus" header
             boolean found = false;
@@ -104,7 +102,11 @@ public class Parser {
 
                     if(courseToAdd.isPartOfSubgroup(subGroup) || subGroup.equals("nincs")) {
                         if(solveDuplicates(courseToAdd, courses)) {
-                            courses.add(courseToAdd);
+                            if(!courseToAdd.getContent(Course.HEADER_CONTENT.COURSE_NAME).equals("Functii reale") &&
+                                    !courseToAdd.getContent(Course.HEADER_CONTENT.COURSE_NAME).equals("Limba engleza (2)")
+                            ) {
+                                courses.add(courseToAdd);
+                            }
                         }
                     }
                 }

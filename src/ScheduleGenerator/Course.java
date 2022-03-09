@@ -6,6 +6,7 @@ import ScheduleGenerator.records.CourseType;
 import java.awt.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,9 +41,21 @@ public class Course {
         return subjectProperties.values().toArray(new SubjectProperties[0]);
     }
 
+    public Course(String[] contentStr, String group) {
+        content.addAll(Arrays.asList(contentStr).subList(0, HEADERS.length));
+
+        if(!subjectProperties.containsKey(getContent(HEADER_CONTENT.COURSE_NAME))) {
+            subjectProperties.put(getContent(HEADER_CONTENT.COURSE_NAME),
+                    new SubjectProperties(getContent(HEADER_CONTENT.COURSE_NAME), SubjectProperties.getUnusedColor(SGData.Colors.CLASS_COLORS), group)
+            );
+        }
+
+        formattedSubgroup = formatSubGroup(getContent(HEADER_CONTENT.SUBGROUP), group);
+    }
+
     public Course(HashMap<String, String> contentMap, String group) {
-        for(int i=0; i < HEADERS.length; i++) {
-            content.add(contentMap.get(HEADERS[0]));
+        for (String header : HEADERS) {
+            content.add(contentMap.get(header));
         }
 
         if(!subjectProperties.containsKey(getContent(HEADER_CONTENT.COURSE_NAME))) {
@@ -142,6 +155,10 @@ public class Course {
 
     public String getContent(HEADER_CONTENT at) {
         return content.get(at.ordinal());
+    }
+
+    public ArrayList<String> getContentList() {
+        return content;
     }
 
     public String getSubjectGroup() { return subjectProperties.get(getContent(HEADER_CONTENT.COURSE_NAME)).getGroup(); }
