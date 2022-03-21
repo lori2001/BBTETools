@@ -94,29 +94,29 @@ public class HWGMainPanel extends JPanel {
         );
         add(loadingPrompt);
 
-        String HWGInfo = "<html><center><h1>App Információ</h1></center>" +
+        String HWGInfo = "<html><center><h1>Házi Begyüjtõ Infók</h1></center>" +
                 "<p>Ez az app a házi begyüjtésének unalmas folyamatát<br>" +
                 "automatizálja. Kézzel elnevezni és bekomentelni<br>" +
                 "minden házit időigényes és könnyen elrontható,<br>" +
                 "s elnevezési hiba esetén néhány tantárgyból a <br>" +
                 "diák a teljes pontszámát elveszítheti.</p>" +
-                "<center><h2>Hogyan használható?</h2></center>" +
-                "<p>Készítsd el az összes algoritmika házid egy<br>" +
-                "folderbe vagy annak bármely alfolderébe és nevezd<br>" +
+                "<center><h2>Hogyan használhatod?</h2></center>" +
+                "<p>Készítsd el az (algoritmika) házid összes alpontját egy<br>" +
+                "folderbe (vagy annak bármely alfolderébe) és nevezd<br>" +
                 "el \"alpont.cpp\"-nek. Például 1.cpp,2.cpp stb.<br>" +
-                "Töltsd ki az appet az adataiddal illetve a pirossal<br>" +
+                "Töltsd ki az appet az adataiddal illetve a kékkel<br>" +
                 "megjelölt mezőre írd be hogy hányas labort akarsz<br>" +
-                "generálni. Végül pedig állítsd be bemenetnek a<br>" +
-                "házis foldert, illetve kimenetnek bármely elérhető<br>" +
-                "mappát, és kattints a \"Begyüjtés\" gombra</p>" +
+                "generálni. Végûl pedig az appben válaszd ki <br>" +
+                "bemenetnek a házis foldert, illetve kimenetnek<br>" +
+                "bármely mappát, és kattints a \"Begyüjtés\" gombra</p>" +
                 "<center><h2>Hogyan működik?</h2></center>" +
                 "<p>A program bejárja a bemenetként adott foldert és<br>" +
                 "annak minden alfolderét. Megkeresi a megfelelő<br>" +
-                "filetípust(például algoritmikából a \".cpp\") és<br>" +
+                "file típust (például algoritmikából a \".cpp\") és<br>" +
                 "az appbe beírt infóknak megfelelően kimásolja az<br>" +
                 "összes filet, majd megfelelően átnevezi,<br>" +
                 "bekommenteli és (egyes tantárgyakból)<br>" +
-                "a tartalmát is ellenőrzi.</p>" +
+                "plusz ellenõrzéseket is végrehajt.</p>" +
                 "</html>";
         InfoButton infoButton =
                 new InfoButton(new Point(395, 440), new Point(35, 35), appFrame, HWGInfo);

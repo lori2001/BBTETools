@@ -16,21 +16,16 @@ public class CoursesList implements TableModelListener {
     Object[][] tableData;
     JTable table;
     JScrollPane scrollPane;
+    Rectangle bounds;
 
     public CoursesList(ArrayList<Course> courses, Rectangle bounds) {
+        this.bounds = bounds;
         setData(courses);
-        table = new JTable(tableData, columnNames);
-        table.getModel().addTableModelListener(this);
-
-        table.setFillsViewportHeight(true);
-        scrollPane = new JScrollPane(table);
-
-        scrollPane.setBounds(bounds);
     }
 
     public void setData(ArrayList<Course> courses) {
-        if(tableData == null)  // TODO
-         tableData = new Object[courses.size()][Course.HEADERS.length];
+        tableData = new Object[courses.size()][Course.HEADERS.length];
+
         for(int i=0; i < courses.size(); i++){
             tableData[i] = courses.get(i).getContentList().toArray();
         }
@@ -39,6 +34,13 @@ public class CoursesList implements TableModelListener {
             AbstractTableModel dm = (AbstractTableModel)table.getModel();
             dm.fireTableDataChanged();
         }
+
+        table = new JTable(tableData, columnNames);
+        table.getModel().addTableModelListener(this);
+        table.setFillsViewportHeight(true);
+
+        scrollPane = new JScrollPane(table);
+        scrollPane.setBounds(bounds);
     }
 
     public JScrollPane getScrollPane() {
@@ -47,12 +49,12 @@ public class CoursesList implements TableModelListener {
 
     @Override
     public void tableChanged(TableModelEvent e) {
-        int row = e.getFirstRow();
+        /*int row = e.getFirstRow();
         int column = e.getColumn();
         TableModel model = (TableModel)e.getSource();
         String columnName = model.getColumnName(column);
         Object data = model.getValueAt(row, column);
 
-        System.out.println(row + " " + data + " " + column);
+        System.out.println(row + " " + data + " " + column);*/
     }
 }

@@ -42,29 +42,27 @@ public class SGMainPanel extends JPanel {
         topPanel.setBounds(50,0,panelSize.x - 120,55);
         ControlPanel controlPanel = new ControlPanel(parser.getMajor(), parser.getGroup(), parser.getStudYear(), parser.getSubGroup());
         topPanel.add(controlPanel);
-        String HWGInfo = "<html><center><h1>App Információ</h1></center>" +
-                "<p>Ez az app a házi begyüjtésének unalmas folyamatát<br>" +
-                "automatizálja. Kézzel elnevezni és bekomentelni<br>" +
-                "minden házit időigényes és könnyen elrontható,<br>" +
-                "s elnevezési hiba esetén néhány tantárgyból a <br>" +
-                "diák a teljes pontszámát elveszítheti.</p>" +
+        String HWGInfo = "<html><center><h1>Órarend Generáló Infók</h1></center>" +
+                "<p>Ez az app egy nyomtatható heti órarendet<br>" +
+                "generál. Az egyetemi órarend nem esztétikus,<br>" +
+                "nem nyomtatható és nem igazán szabható személyre<br>" +
+                "sem. Az itt generált órarendek viszont igen.</p>" +
                 "<center><h2>Hogyan használható?</h2></center>" +
-                "<p>Készítsd el az összes algoritmika házid egy<br>" +
-                "folderbe vagy annak bármely alfolderébe és nevezd<br>" +
-                "el \"alpont.cpp\"-nek. Például 1.cpp,2.cpp stb.<br>" +
-                "Töltsd ki az appet az adataiddal illetve a pirossal<br>" +
-                "megjelölt mezőre írd be hogy hányas labort akarsz<br>" +
-                "generálni. Végül pedig állítsd be bemenetnek a<br>" +
-                "házis foldert, illetve kimenetnek bármely elérhető<br>" +
-                "mappát, és kattints a \"Begyüjtés\" gombra</p>" +
+                "<p>Válaszd ki a szakot majd a tantárgyakat<br>" +
+                "amiket bele szeretnél tenni az órarendedbe.<br>" +
+                "Az app generál neked egy órarendet a kíválasztott<br>" +
+                "tantárgyakkal<br>" +
+                "Ha az automatikus verzió nem jó, esetleg nem felel<br>" +
+                "meg a valóságnak, állíthatod egyenként is bármely óra<br>" +
+                "attribútumát.<br></p>" +
                 "<center><h2>Hogyan működik?</h2></center>" +
-                "<p>A program bejárja a bemenetként adott foldert és<br>" +
-                "annak minden alfolderét. Megkeresi a megfelelő<br>" +
-                "filetípust(például algoritmikából a \".cpp\") és<br>" +
-                "az appbe beírt infóknak megfelelően kimásolja az<br>" +
-                "összes filet, majd megfelelően átnevezi,<br>" +
-                "bekommenteli és (egyes tantárgyakból)<br>" +
-                "a tartalmát is ellenőrzi.</p>" +
+                "<p>Az app bejárja a netten található órarendet<br>" +
+                "és elemzi azt. Innen építi vissza a személyre<br>" +
+                "szabott verziót. A megfelelõ mûködéshez kell<br>" +
+                "internet kapcsolat. Ha nincs nett, csak manuálisan<br>" +
+                "lehet új órákat hozzáadni az órarendhez.<br>" +
+                "Appen belül minden változtatás lementõdik az<br>" +
+                "órarend exportálásakor." +
                 "</html>";
         InfoButton infoButton =
                 new InfoButton(new Point(0, 0), new Point(35, 35), appFrame, HWGInfo);
