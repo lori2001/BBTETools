@@ -1,4 +1,4 @@
-package ScheduleGenerator;
+package ScheduleGenerator.graphics;
 
 import ScheduleGenerator.data.SGData;
 import ScheduleGenerator.utils.StringProcessor;
@@ -111,7 +111,7 @@ public class DrawableText {
         return new Point2D.Double(width, height);
     }
 
-    void draw(Graphics2D g2d)  {
+    public void draw(Graphics2D g2d)  {
         Point2D.Double cLinePos = new Point2D.Double (pos.x + size.x / 2, pos.y);
 
         g2d.setFont(font);

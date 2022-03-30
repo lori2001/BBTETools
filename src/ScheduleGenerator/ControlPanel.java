@@ -37,6 +37,7 @@ public class ControlPanel  extends JPanel {
         JLabel groupL = new JLabel("Csoport:");
         JLabel subGroupL = new JLabel("Alcsoport:");
 
+
         add(languageL);
         add(majorL);
         add(yearL);

@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Course {
-    enum HEADER_CONTENT {
+    public enum HEADER_CONTENT {
         DAY,
         INTERVAL,
         FREQ,
