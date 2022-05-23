@@ -2,9 +2,12 @@ package ScheduleGenerator;
 
 import Common.InfoButton;
 import Common.logging.LogPanel;
+import ScheduleGenerator.graphics.ScheduleDrawer;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -15,7 +18,7 @@ public class SGMainPanel extends JPanel {
     public static final int SG_LOG_INSTANCE = LogPanel.createNewInstance();
 
     private final Parser parser;
-    private final CoursesList coursesList;
+    private final SubjectsTable subjectsTable;
 
     private final ScheduleDrawer scheduleDrawer;
     @Override
@@ -69,18 +72,24 @@ public class SGMainPanel extends JPanel {
         topPanel.add(infoButton);
         add(topPanel);
 
-        coursesList = new CoursesList(parser.getCourses(), new Rectangle(10,60, 660, 205));
-        add(coursesList.getScrollPane());
+        subjectsTable = new SubjectsTable(parser.getCourses(), new Rectangle(10,60, 660, 205));
+        add(subjectsTable.getScrollPane());
 
         controlPanel.addActionListener(e -> {
             String selGroup = controlPanel.getSelectedGroup();
             String selSubGroup = controlPanel.getSelectedSubGroup();
             if(selGroup != null && selSubGroup != null) {
                 parser.reparseCourses(selGroup, selSubGroup);
+                subjectsTable.setData(parser.getCourses());
                 scheduleDrawer.setSpecificProps(parser.getTopLeftContent(), parser.getCourses());
-                coursesList.setData(parser.getCourses());
                 repaint();
             }
+        });
+
+        subjectsTable.addTableModelListener(e -> {
+            if(!subjectsTable.settingDataIsInProgress())
+            scheduleDrawer.setSpecificProps(parser.getTopLeftContent(), subjectsTable.getCourses());
+            repaint();
         });
 
         // displays clsPresetDesc and Logs in a TabbedPane

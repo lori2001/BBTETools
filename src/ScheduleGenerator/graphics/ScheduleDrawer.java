@@ -1,5 +1,7 @@
-package ScheduleGenerator;
+package ScheduleGenerator.graphics;
 
+import ScheduleGenerator.Course;
+import ScheduleGenerator.TimeFormatter;
 import ScheduleGenerator.data.SGData;
 
 import javax.swing.*;
@@ -36,7 +38,7 @@ public class ScheduleDrawer extends JComponent {
     private ArrayList<Course> courses;
     private String topLeftCText;
 
-    ScheduleDrawer(Point2D.Double pos, Point2D.Double size, ArrayList<LocalTime[]> intervals) {
+    public ScheduleDrawer(Point2D.Double pos, Point2D.Double size, ArrayList<LocalTime[]> intervals) {
         this.pos = pos;
         this.size = size;
         this.scale = new Point2D.Double(size.x / A4InMM.x, size.y / A4InMM.y);
