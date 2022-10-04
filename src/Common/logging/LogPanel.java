@@ -3,7 +3,6 @@ package Common.logging;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,16 +12,16 @@ public class LogPanel {
     private static final ArrayList<JScrollPane> scrollInstances = new ArrayList<>();
     private static final ArrayList<ArrayList<LogsListener>> listenersArr = new ArrayList<>();
     private static final ArrayList<Boolean> noLogs = new ArrayList<>();
+    private static final ArrayList<String> noLogsMsgs = new ArrayList<>();
 
     private static MutableAttributeSet defaultTextAttributes;
-    private static final String NO_LOGS_MSG = "Nincs üzenet. Begyüjtéshez kattincs a \"Házi Begyüjtése\" gombra!";
     private static final HashMap<String, Color> SEVERITIES = new HashMap<>() {{
         put("HIBA:", new Color(196, 33, 33));
         put("VIGYÁZAT:", new Color(232, 87, 17));
         put("MEGJEGYZÉS:", new Color(76, 195, 161));
     }};
 
-    public static int createNewInstance() {
+    public static int createNewInstance(String noLogsMsg) {
         JTextPane newPane = new JTextPane();
         Color fG = new Color(230, 230, 230);
         Color bG = new Color(30, 30, 30);
@@ -49,6 +48,7 @@ public class LogPanel {
         scrollInstances.add(newScroll);
         listenersArr.add(newListeners);
         noLogs.add(false);
+        noLogsMsgs.add(noLogsMsg);
 
         int instance = textPaneInstances.size() - 1;
         clearLogs(instance); // text: No logs
@@ -146,7 +146,7 @@ public class LogPanel {
     }
     public static void clearLogs(int instance) {
         try {
-            textPaneInstances.get(instance).setText(NO_LOGS_MSG);
+            textPaneInstances.get(instance).setText(noLogsMsgs.get(instance));
             noLogs.set(instance, true);
         } catch (IndexOutOfBoundsException e) {
             System.out.println("CODE ERROR: Failed to clear log instance " + instance);

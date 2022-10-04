@@ -24,7 +24,7 @@ public class HWGMainPanel extends JPanel {
     private final FileInput outputFile;
     private final ClsPresetPicker clsPresetPicker;
 
-    public static final int HWG_LOG_INSTANCE = LogPanel.createNewInstance();
+    public static final int HWG_LOG_INSTANCE = LogPanel.createNewInstance("Nincs üzenet. Begyüjtéshez kattincs a \"Házi Begyüjtése\" gombra!");
 
     public HWGMainPanel(JFrame appFrame, Point panelSize) {
         setLayout(null);
@@ -49,7 +49,7 @@ public class HWGMainPanel extends JPanel {
 
         // choose the uni class for which to target homework gathering on
         clsPresetPicker = new ClsPresetPicker(
-                        new Point(12, 440),
+                        new Point(12, getHeight() - 70),
                         new Point(150, 35),
                         Settings.getFileContent(Setting.ClsPreset)
         );
@@ -64,7 +64,7 @@ public class HWGMainPanel extends JPanel {
 
         // displays clsPresetDesc and Logs in a TabbedPane
         ScrollableSoloPane scrollableSoloPane = new ScrollableSoloPane();
-        scrollableSoloPane.setBounds(12, 210, 655, 210);
+        scrollableSoloPane.setBounds(12, 210, getWidth() - 45, getHeight() - 300);
         scrollableSoloPane.addTab(clsPresetDesc, "Infók", "Információkat mutat, arról hogy a jelenleg kiválasztott tantárgy mit csinál.");
         scrollableSoloPane.addTab(LogPanel.getScrollableTextArea(HWG_LOG_INSTANCE), "Üzenetek", "A generálási folyamatról ír ki hasznos infókat");
         add(scrollableSoloPane);
@@ -89,7 +89,7 @@ public class HWGMainPanel extends JPanel {
         });
 
         LoadingPrompt loadingPrompt = new LoadingPrompt(
-                new Point( panelSize.x - 80, 440),
+                new Point( panelSize.x - 80, getHeight() - 70),
                 new Point(45, 45)
         );
         add(loadingPrompt);
@@ -119,11 +119,11 @@ public class HWGMainPanel extends JPanel {
                 "plusz ellenõrzéseket is végrehajt.</p>" +
                 "</html>";
         InfoButton infoButton =
-                new InfoButton(new Point(395, 440), new Point(35, 35), appFrame, HWGInfo);
+                new InfoButton(new Point(395, getHeight() - 70), new Point(35, 35), appFrame, HWGInfo);
         add(infoButton);
 
         JButton gatherHw = new JButton("Házi Begyüjtése");
-        gatherHw.setBounds( 180, 440, 200, 35);
+        gatherHw.setBounds( 180, getHeight() - 70, 200, 35);
         add(gatherHw);
         DirectoryProcessor directoryProcesser = new DirectoryProcessor();
         gatherHw.addActionListener(e -> new Thread(){

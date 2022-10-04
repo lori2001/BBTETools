@@ -172,6 +172,7 @@ public class ScheduleDrawer extends JComponent {
     }
 
     private ArrayList<Cell> generateCells(ArrayList<Course> courses) {
+        System.out.println("generate cells");
         ArrayList<Cell> cells = new ArrayList<>();
 
         // top left content
@@ -257,7 +258,7 @@ public class ScheduleDrawer extends JComponent {
     }
 
     public ScheduleDrawer getHighResVersion() {
-        ScheduleDrawer tmp = new ScheduleDrawer(new Point2D.Double(0,0), new Point2D.Double(10, 10), intervals);
+        ScheduleDrawer tmp = new ScheduleDrawer(new Point2D.Double(0,0), new Point2D.Double(3508, 2480), intervals);
         tmp.setSpecificProps(topLeftCText, courses);
         return tmp;
     }

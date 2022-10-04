@@ -1,13 +1,12 @@
 package ScheduleGenerator;
 
 import Common.InfoButton;
+import Common.ScrollableSoloPane;
 import Common.logging.LogPanel;
 import ScheduleGenerator.graphics.ScheduleDrawer;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -15,17 +14,12 @@ import java.io.File;
 import java.util.Arrays;
 
 public class SGMainPanel extends JPanel {
-    public static final int SG_LOG_INSTANCE = LogPanel.createNewInstance();
+    public static final int SG_LOG_INSTANCE = LogPanel.createNewInstance("Nincs üzenet. Építsd fel az órarended a táblázatban, majd töltsd le a \"Letöltés\" gombbal");
 
     private final Parser parser;
     private final SubjectsTable subjectsTable;
 
     private final ScheduleDrawer scheduleDrawer;
-    @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        scheduleDrawer.paintComponent(g);
-    }
 
     public SGMainPanel(JFrame appFrame, Point panelSize, String defaultGroup) {
         setLayout(null);
@@ -33,16 +27,20 @@ public class SGMainPanel extends JPanel {
 
         parser = new Parser(defaultGroup, "1");
 
+        ScrollableSoloPane scrollableSoloPane = new ScrollableSoloPane();
+        scrollableSoloPane.setBounds(5, 60, getWidth() - 29, 450);
+
         scheduleDrawer =
                 new ScheduleDrawer(
-                        new Point2D.Double(5, panelSize.y - 240),
-                        new Point2D.Double(297, 210),
+                        new Point2D.Double((double)scrollableSoloPane.getWidth() / 2 - 594.0 / 2, 0),
+                        new Point2D.Double(594, 420),
                         GlobalParser.getHourIntervals()
                 );
         scheduleDrawer.setSpecificProps(parser.getTopLeftContent(), parser.getCourses());
+        scrollableSoloPane.addTab(scheduleDrawer, "Elônézet", "Csökkentett minõségû elõnézet a kimeneti órarendrõl.");
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 25 ,0));
-        topPanel.setBounds(50,0,panelSize.x - 120,55);
+        topPanel.setBounds(50,0,getWidth() - 120,55);
         ControlPanel controlPanel = new ControlPanel(parser.getMajor(), parser.getGroup(), parser.getStudYear(), parser.getSubGroup());
         topPanel.add(controlPanel);
         String HWGInfo = "<html><center><h1>Órarend Generáló Infók</h1></center>" +
@@ -70,10 +68,8 @@ public class SGMainPanel extends JPanel {
         InfoButton infoButton =
                 new InfoButton(new Point(0, 0), new Point(35, 35), appFrame, HWGInfo);
         topPanel.add(infoButton);
-        add(topPanel);
 
         subjectsTable = new SubjectsTable(parser.getCourses(), new Rectangle(10,60, 660, 205));
-        add(subjectsTable.getScrollPane());
 
         controlPanel.addActionListener(e -> {
             String selGroup = controlPanel.getSelectedGroup();
@@ -87,26 +83,22 @@ public class SGMainPanel extends JPanel {
         });
 
         subjectsTable.addTableModelListener(e -> {
-            if(!subjectsTable.settingDataIsInProgress())
-            scheduleDrawer.setSpecificProps(parser.getTopLeftContent(), subjectsTable.getCourses());
+            if(!subjectsTable.settingDataIsInProgress()) scheduleDrawer.setSpecificProps(parser.getTopLeftContent(), subjectsTable.getCourses());
             repaint();
         });
+        scrollableSoloPane.addTab(subjectsTable.getScrollPane(), "Táblázat", "A felvett órák változtatható táblázata/");
 
         // displays clsPresetDesc and Logs in a TabbedPane
-        JPanel scrollableSoloPane = new JPanel();
-        scrollableSoloPane.setBounds(310, panelSize.y - 245, 360, 215);
-        LogPanel.getScrollableTextArea(SG_LOG_INSTANCE).setPreferredSize(new Dimension(360, 210));
-        scrollableSoloPane.add(LogPanel.getScrollableTextArea(SG_LOG_INSTANCE));
+        JPanel logPanel = new JPanel();
+        logPanel.setBounds(275, panelSize.y - 150, 550, 120);
+        LogPanel.getScrollableTextArea(SG_LOG_INSTANCE).setPreferredSize(new Dimension(550, 120));
+        logPanel.add(LogPanel.getScrollableTextArea(SG_LOG_INSTANCE));
         // scrollableSoloPane.addTab(LogPanel.getScrollableTextArea(SG_LOG_INSTANCE), "Üzenetek", "A generálási folyamatról ír ki hasznos infókat");
-        add(scrollableSoloPane);
 
         JButton downloadSchedule = new JButton("Letöltés");
-        downloadSchedule.setBounds(212, panelSize.y - 65, 80, 25);
-        downloadSchedule.setBackground(new Color(255,255,255, 0));
-        downloadSchedule.setOpaque(false);
+        downloadSchedule.setBounds(5, getHeight() - 57, 150, 25);
         downloadSchedule.addActionListener(e -> repaint());
 
-        add(downloadSchedule);
         downloadSchedule.addActionListener(e -> {
             try {
                 saveSchedule();
@@ -114,6 +106,11 @@ public class SGMainPanel extends JPanel {
                 LogPanel.logln(Arrays.toString(ex.getStackTrace()), SG_LOG_INSTANCE);
             }
         });
+
+        add(logPanel);
+        add(scrollableSoloPane);
+        add(topPanel);
+        add(downloadSchedule);
 
         setVisible(true);
     }

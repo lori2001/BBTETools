@@ -1,6 +1,5 @@
 package ScheduleGenerator;
 
-import Common.InfoButton;
 import Common.logging.LogPanel;
 import ScheduleGenerator.data.SGData;
 import ScheduleGenerator.records.Major;
@@ -36,7 +35,6 @@ public class ControlPanel  extends JPanel {
         JLabel yearL = new JLabel("Év:");
         JLabel groupL = new JLabel("Csoport:");
         JLabel subGroupL = new JLabel("Alcsoport:");
-
 
         add(languageL);
         add(majorL);
