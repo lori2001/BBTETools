@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static ScheduleGenerator.SGMainPanel.SG_LOG_INSTANCE;
-import static java.lang.Math.min;
 
 public class SubjectsTable {
 
@@ -33,11 +32,13 @@ public class SubjectsTable {
     }
 
     public void setData(ArrayList<Course> courses) {
-        settingDataInProgress = true;
-        tableModel.setRowCount(0);
-        this.rows = courses;
-        this.rows.forEach(row -> tableModel.addRow(row.getContentList().toArray()));
-        settingDataInProgress = false;
+        if(courses != null) {
+            settingDataInProgress = true;
+            tableModel.setRowCount(0);
+            this.rows = courses;
+            this.rows.forEach(row -> tableModel.addRow(row.getContentList().toArray()));
+            settingDataInProgress = false;
+        }
     }
 
     public JScrollPane getScrollPane() {

@@ -2,7 +2,7 @@ package HomeworkGatherer;
 
 import Common.logging.LogPanel;
 import Common.models.StudData;
-import Common.settings.Settings;
+import Common.settings.HWGSettings;
 import HomeworkGatherer.utils.DocumentChanged;
 
 import javax.swing.*;
@@ -35,7 +35,7 @@ public class StudInfo extends JPanel {
 
         DEFAULT_BORDER = hwNum.getBorder();
 
-        StudData sd = Settings.getStudData();
+        StudData sd = HWGSettings.getStudData();
         hwNum.setText(sd.hwNum);
         name.setText(sd.name);
         groupNum.setText(sd.group);

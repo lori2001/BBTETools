@@ -21,11 +21,37 @@ public class SGMainPanel extends JPanel {
 
     private final ScheduleDrawer scheduleDrawer;
 
+    private static final String HWGInfo =
+            "<html><center><h1>Órarend Generáló Infók</h1></center>" +
+            "<p>Ez az app egy nyomtatható heti órarendet<br>" +
+            "generál. Az egyetemi órarend nem esztétikus,<br>" +
+            "nem nyomtatható és nem igazán szabható személyre<br>" +
+            "sem. Az itt generált órarendek viszont igen.</p>" +
+            "<center><h2>Hogyan használható?</h2></center>" +
+            "<p>Válaszd ki a szakot majd a tantárgyakat<br>" +
+            "amiket bele szeretnél tenni az órarendedbe.<br>" +
+            "Az app generál neked egy órarendet a kíválasztott<br>" +
+            "tantárgyakkal<br>" +
+            "Ha az automatikus verzió nem jó, esetleg nem felel<br>" +
+            "meg a valóságnak, állíthatod egyenként is bármely óra<br>" +
+            "attribútumát.<br></p>" +
+            "<center><h2>Hogyan működik?</h2></center>" +
+            "<p>Az app bejárja a netten található órarendet<br>" +
+            "és elemzi azt. Innen építi vissza a személyre<br>" +
+            "szabott verziót. A megfelelõ mûködéshez kell<br>" +
+            "internet kapcsolat. Ha nincs nett, csak manuálisan<br>" +
+            "lehet új órákat hozzáadni az órarendhez.<br>" +
+            "Appen belül minden változtatás lementõdik az<br>" +
+            "órarend exportálásakor." +
+            "</html>";
+
     public SGMainPanel(JFrame appFrame, Point panelSize, String defaultGroup) {
         setLayout(null);
         setBounds(0,0, panelSize.x, panelSize.y);
 
-        parser = new Parser(defaultGroup, "1");
+        final String defaultSubgroup = "1";
+        System.out.println("Default group/subgroup " + defaultGroup + " " + defaultSubgroup);
+        parser = new Parser(defaultGroup, defaultSubgroup);
 
         ScrollableSoloPane scrollableSoloPane = new ScrollableSoloPane();
         scrollableSoloPane.setBounds(5, 60, getWidth() - 29, 450);
@@ -37,34 +63,13 @@ public class SGMainPanel extends JPanel {
                         GlobalParser.getHourIntervals()
                 );
         scheduleDrawer.setSpecificProps(parser.getTopLeftContent(), parser.getCourses());
-        scrollableSoloPane.addTab(scheduleDrawer, "Elônézet", "Csökkentett minõségû elõnézet a kimeneti órarendrõl.");
+        scrollableSoloPane.addTab(scheduleDrawer, "Elônézet", "Csökkentett felbontású elõnézet a kimeneti órarendrõl.");
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 25 ,0));
         topPanel.setBounds(50,0,getWidth() - 120,55);
         ControlPanel controlPanel = new ControlPanel(parser.getMajor(), parser.getGroup(), parser.getStudYear(), parser.getSubGroup());
         topPanel.add(controlPanel);
-        String HWGInfo = "<html><center><h1>Órarend Generáló Infók</h1></center>" +
-                "<p>Ez az app egy nyomtatható heti órarendet<br>" +
-                "generál. Az egyetemi órarend nem esztétikus,<br>" +
-                "nem nyomtatható és nem igazán szabható személyre<br>" +
-                "sem. Az itt generált órarendek viszont igen.</p>" +
-                "<center><h2>Hogyan használható?</h2></center>" +
-                "<p>Válaszd ki a szakot majd a tantárgyakat<br>" +
-                "amiket bele szeretnél tenni az órarendedbe.<br>" +
-                "Az app generál neked egy órarendet a kíválasztott<br>" +
-                "tantárgyakkal<br>" +
-                "Ha az automatikus verzió nem jó, esetleg nem felel<br>" +
-                "meg a valóságnak, állíthatod egyenként is bármely óra<br>" +
-                "attribútumát.<br></p>" +
-                "<center><h2>Hogyan működik?</h2></center>" +
-                "<p>Az app bejárja a netten található órarendet<br>" +
-                "és elemzi azt. Innen építi vissza a személyre<br>" +
-                "szabott verziót. A megfelelõ mûködéshez kell<br>" +
-                "internet kapcsolat. Ha nincs nett, csak manuálisan<br>" +
-                "lehet új órákat hozzáadni az órarendhez.<br>" +
-                "Appen belül minden változtatás lementõdik az<br>" +
-                "órarend exportálásakor." +
-                "</html>";
+
         InfoButton infoButton =
                 new InfoButton(new Point(0, 0), new Point(35, 35), appFrame, HWGInfo);
         topPanel.add(infoButton);

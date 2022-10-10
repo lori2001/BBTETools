@@ -1,6 +1,6 @@
 package Common.settings;
 
-public enum Setting {
+public enum HWGSetting {
     HwNum,
     Name,
     GroupNum,

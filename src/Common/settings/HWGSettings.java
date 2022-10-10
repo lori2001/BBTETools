@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 import static HomeworkGatherer.HWGMainPanel.HWG_LOG_INSTANCE;
 
-public class Settings {
+public class HWGSettings {
 
     private static final String[] DEFAULTS = new String[] {
             "1",
@@ -25,7 +25,7 @@ public class Settings {
     };
 
     private static final String settingsFile = "assets/settings.txt";
-    private static final String[] fileContent = new String[Setting.SIZE.ordinal()];
+    private static final String[] fileContent = new String[HWGSetting.SIZE.ordinal()];
 
     public static void readFromFile() {
         // read input file
@@ -71,34 +71,34 @@ public class Settings {
     }
 
     public static void saveToFile(StudData studData, String inputFold, String outputFold, String clsString) {
-        fileContent[Setting.HwNum.ordinal()] = studData.hwNum;
-        fileContent[Setting.Name.ordinal()] = studData.name;
-        fileContent[Setting.GroupNum.ordinal()] = studData.group;
-        fileContent[Setting.StudId.ordinal()] = studData.idStr;
-        fileContent[Setting.InputFolder.ordinal()] = inputFold;
-        fileContent[Setting.OutputFolder.ordinal()] = outputFold;
-        fileContent[Setting.ClsPreset.ordinal()] = clsString;
+        fileContent[HWGSetting.HwNum.ordinal()] = studData.hwNum;
+        fileContent[HWGSetting.Name.ordinal()] = studData.name;
+        fileContent[HWGSetting.GroupNum.ordinal()] = studData.group;
+        fileContent[HWGSetting.StudId.ordinal()] = studData.idStr;
+        fileContent[HWGSetting.InputFolder.ordinal()] = inputFold;
+        fileContent[HWGSetting.OutputFolder.ordinal()] = outputFold;
+        fileContent[HWGSetting.ClsPreset.ordinal()] = clsString;
 
         save();
     }
 
-    public static String getFileContent(Setting setting) {
-        return fileContent[setting.ordinal()];
+    public static String getFileContent(HWGSetting HWGSetting) {
+        return fileContent[HWGSetting.ordinal()];
     }
 
-    public static void setFileContent(Setting setting, String val) {
-        fileContent[setting.ordinal()] = val;
+    public static void setFileContent(HWGSetting HWGSetting, String val) {
+        fileContent[HWGSetting.ordinal()] = val;
     }
 
-    public static String getDefault(Setting setting) {
-        return DEFAULTS[setting.ordinal()];
+    public static String getDefault(HWGSetting HWGSetting) {
+        return DEFAULTS[HWGSetting.ordinal()];
     }
 
     public static StudData getStudData() {
         return new StudData(
-                fileContent[Setting.HwNum.ordinal()],
-                fileContent[Setting.Name.ordinal()],
-                fileContent[Setting.GroupNum.ordinal()],
-                fileContent[Setting.StudId.ordinal()]);
+                fileContent[HWGSetting.HwNum.ordinal()],
+                fileContent[HWGSetting.Name.ordinal()],
+                fileContent[HWGSetting.GroupNum.ordinal()],
+                fileContent[HWGSetting.StudId.ordinal()]);
     }
 }

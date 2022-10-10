@@ -19,7 +19,7 @@ import static ScheduleGenerator.data.SGData.getLinkPrefix;
 public class GlobalParser {
     private static ArrayList<LocalTime[]> hourIntervals = null;
 
-    // returns true if give course has to be added to the array, false otherwise
+    // returns true if given course has to be added to the array, false otherwise
     public static boolean solveDuplicates(Course courseToAdd, ArrayList<Course> courses) {
         boolean shouldBeAdded = true;
 
@@ -94,8 +94,8 @@ public class GlobalParser {
                 i++;
             }
         } catch (Exception e) {
-            LogPanel.logln("HIBA: Az óra-intervallumok leolvasása az internetrõl nem sikerült! "
-                    + Arrays.toString(e.getStackTrace()), SG_LOG_INSTANCE);
+            e.printStackTrace();
+            LogPanel.logln("HIBA: Az óra-intervallumok leolvasása az internetrõl nem sikerült! ", SG_LOG_INSTANCE);
         }
 
         return hourIntervals;

@@ -1,5 +1,5 @@
-import Common.AppVersionHandler;
-import Common.settings.Settings;
+import Common.VersionHandler;
+import Common.settings.HWGSettings;
 import HomeworkGatherer.HWGMainPanel;
 import Common.ScrollableSoloPane;
 import Common.logging.LogPanel;
@@ -14,7 +14,6 @@ import java.io.File;
 
 public class AppFrame extends JFrame {
     public static final Point APP_SIZE = new Point(850, 700);
-    public static final Point APP_INIT_POS = new Point(100, 100);
     final int headerSize = 38;
 
     public static void main (String[] args) {
@@ -22,25 +21,15 @@ public class AppFrame extends JFrame {
     }
 
     public AppFrame() {
-        super("BBTETools " + AppVersionHandler.VERSION);
+        super("BBTETools " + VersionHandler.VERSION);
 
-        Settings.readFromFile();
+        HWGSettings.readFromFile();
 
         setResizable(false);
-        setLayout(null);
-        setBounds(APP_INIT_POS.x, APP_INIT_POS.y, APP_SIZE.x, APP_SIZE.y);
+        setBounds(-1000, 100, APP_SIZE.x, APP_SIZE.y);
+
+        // setLocationRelativeTo(null); // Sets app position on center of the screen
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-
-        Point panelSize = new Point(APP_SIZE.x, APP_SIZE.y - headerSize);
-        HWGMainPanel homeworkGathererPanel = new HWGMainPanel(this, panelSize);
-        SGMainPanel scheduleGeneratorPanel = new SGMainPanel(this, panelSize, Settings.getStudData().group);
-
-        ScrollableSoloPane scrollableSoloPane = new ScrollableSoloPane();
-        scrollableSoloPane.setBounds(0, 0, APP_SIZE.x, panelSize.y); // TODO: Change
-        scrollableSoloPane.addTab(scheduleGeneratorPanel, "Órarend generáló (BETA)", "Kigenerál egy személyes órarendet html-ben vagy nyomtatható formában");
-        scrollableSoloPane.addTab(homeworkGathererPanel, "Házi begyüjtõ", "Begyüjti, majd megfelelõen elnevezi, kommenteli és ellenõrzi a házikat");
-        add(scrollableSoloPane);
 
         // load app icon
         try {
@@ -51,18 +40,28 @@ public class AppFrame extends JFrame {
             LogPanel.loglnAll("MEGJEGYZÉS: az icon.png file nem található!");
         }
 
+        VersionHandler versionHandler = new VersionHandler(this); // Checks version and displays prompt to update if new app version is available
+
+        Point panelSize = new Point(APP_SIZE.x, APP_SIZE.y - headerSize);
+        HWGMainPanel homeworkGathererPanel = new HWGMainPanel(this, panelSize);
+        SGMainPanel scheduleGeneratorPanel = new SGMainPanel(this, panelSize, HWGSettings.getStudData().group);
+
+        ScrollableSoloPane scrollableSoloPane = new ScrollableSoloPane();
+        scrollableSoloPane.addTab(scheduleGeneratorPanel, "Órarend generáló (BETA)", "Kigenerál egy személyes órarendet html-ben vagy nyomtatható formában");
+        scrollableSoloPane.addTab(homeworkGathererPanel, "Házi begyüjtõ", "Begyüjti, majd megfelelõen elnevezi, kommenteli és ellenõrzi a házikat");
+        add(scrollableSoloPane);
+
         // save Common.settings when closing window
         addWindowListener(new WindowAdapter() {
               @Override
               public void windowClosing(WindowEvent e) {
                   super.windowClosing(e);
-                  homeworkGathererPanel.saveSettingsToFile();
+                  homeworkGathererPanel.saveHWGSettingsToFile();
               }
           }
         );
 
         setVisible(true);
-
-        new AppVersionHandler(this);
+        versionHandler.showUpdatePromptIfActive();
     }
 }

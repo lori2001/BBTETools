@@ -79,6 +79,8 @@ public class ScheduleDrawer extends JComponent {
     }
 
     private void drawTable(Point2D.Double tPos, Point2D.Double tSize, ArrayList<Cell> cells) {
+        if(cells == null) return;
+
         Point2D.Double absPos = new Point2D.Double(pos.x, pos.y); // , tSize = new Vec(size.x, size.y);
 
         // convert MM to px
@@ -172,7 +174,9 @@ public class ScheduleDrawer extends JComponent {
     }
 
     private ArrayList<Cell> generateCells(ArrayList<Course> courses) {
-        System.out.println("generate cells");
+        System.out.println("generate cells " + (courses == null));
+        if(courses == null) return null;
+
         ArrayList<Cell> cells = new ArrayList<>();
 
         // top left content

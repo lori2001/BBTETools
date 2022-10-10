@@ -12,15 +12,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import static HomeworkGatherer.HWGMainPanel.HWG_LOG_INSTANCE;
-import static ScheduleGenerator.SGMainPanel.SG_LOG_INSTANCE;
-
-public class AppVersionHandler {
+public class VersionHandler {
 
     public static final String VERSION = "v.2.3.0";
     JFrame updatePrompt;
 
-    public AppVersionHandler(JFrame parentFrame) {
+    public VersionHandler(JFrame parentFrame) {
         try {
             URL u = new URL("https://github.com/lori2001/BBTETools/releases/latest");
             HttpURLConnection hr = (HttpURLConnection) u.openConnection();
@@ -29,8 +26,8 @@ public class AppVersionHandler {
                 String lastVersion = githubUrl.substring(githubUrl.lastIndexOf("/") + 1);
 
                 if (!githubUrl.contains(VERSION)) {
-                    // display update prompt
-                    displayUpdatePrompt(parentFrame, VERSION, lastVersion);
+                    // prompt user to update
+                    createUpdatePrompt(parentFrame, VERSION, lastVersion);
                 }
             } else throw new Exception();
         } catch (Exception e) {
@@ -38,7 +35,7 @@ public class AppVersionHandler {
         }
     }
 
-    public void displayUpdatePrompt(JFrame parentFrame, String currentVer, String newestVer) {
+    public void createUpdatePrompt(JFrame parentFrame, String currentVer, String newestVer) {
         updatePrompt = new JFrame("Frissités!");
 
         int width = 350;
@@ -86,7 +83,11 @@ public class AppVersionHandler {
 
         });
         updatePrompt.add(link);
+    }
 
-        updatePrompt.setVisible(true);
+    public void showUpdatePromptIfActive() {
+        if(updatePrompt != null) {
+            updatePrompt.setVisible(true);
+        }
     }
 }
