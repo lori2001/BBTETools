@@ -35,9 +35,16 @@ public class SubjectsTable {
         if(courses != null) {
             settingDataInProgress = true;
             tableModel.setRowCount(0);
+
             this.rows = courses;
+            System.out.println("COMPARE");
+            courses.forEach(System.out::println);
+
             this.rows.forEach(row -> tableModel.addRow(row.getContentList().toArray()));
             settingDataInProgress = false;
+
+            System.out.println("COMPARE2: ");
+            this.rows.forEach(System.out::println);
         }
     }
 
@@ -55,7 +62,7 @@ public class SubjectsTable {
                 rows.add(new Course(stringArray, "621"));
             });
         } else {
-            LogPanel.logln("VIGYÁZAT: A táblázat órákká való generálása", SG_LOG_INSTANCE);
+            LogPanel.logln("VIGYÁZAT: A táblázat órákká való generálása sikertelen", SG_LOG_INSTANCE);
         }
 
         return rows;

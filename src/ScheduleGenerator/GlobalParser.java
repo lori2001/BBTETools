@@ -20,7 +20,9 @@ public class GlobalParser {
     private static ArrayList<LocalTime[]> hourIntervals = null;
 
     // returns true if given course has to be added to the array, false otherwise
-    public static boolean solveDuplicates(Course courseToAdd, ArrayList<Course> courses) {
+    public static boolean markDuplicates(Course courseToAdd, ArrayList<Course> courses) {
+        System.out.println("mark duplicate call");
+
         boolean shouldBeAdded = true;
 
         int courseOnSameTimeIndex = -1;

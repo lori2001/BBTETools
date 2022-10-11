@@ -1,5 +1,6 @@
 package ScheduleGenerator.graphics;
 
+import Common.logging.LogPanel;
 import ScheduleGenerator.Course;
 import ScheduleGenerator.TimeFormatter;
 import ScheduleGenerator.data.SGData;
@@ -15,7 +16,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 
+import static ScheduleGenerator.SGMainPanel.SG_LOG_INSTANCE;
 import static ScheduleGenerator.data.SGData.DAYS_OF_WEEK_HU;
+import static java.awt.Font.PLAIN;
 
 public class ScheduleDrawer extends JComponent {
     private final Point2D.Double textMargin;
@@ -46,8 +49,10 @@ public class ScheduleDrawer extends JComponent {
 
         try {
             font = Font.createFont(Font.TRUETYPE_FONT, new File("assets/fonts/Eras-Bold-ITC.ttf")).deriveFont(10F);
-        } catch (IOException|FontFormatException e) {
+        } catch (Exception e) {
+            font = new Font(Font.SANS_SERIF, PLAIN, 14);
             e.printStackTrace();
+            LogPanel.logln("VIGYÁZAT: Sikertelen volt az órarend fontjának beolvasása. Beépített szövegtípus lesz használva helyette. Az órarend generáláshoz erõsen ajánlott az újratelepítés.", SG_LOG_INSTANCE);
         }
 
         if(intervals != null)
@@ -60,9 +65,10 @@ public class ScheduleDrawer extends JComponent {
         cellMargin = new Point2D.Double(0.5 * scale.x,0.5  * scale.y); // milimeters
     }
 
-    public  void setSpecificProps(String topLeftCText, ArrayList<Course> courses) {
+    public  void repaintWithNewProps(String topLeftCText, ArrayList<Course> courses) {
         this.topLeftCText = topLeftCText;
         this.courses = courses;
+        repaint();
     }
 
     public void paintComponent(Graphics g) {
@@ -174,8 +180,10 @@ public class ScheduleDrawer extends JComponent {
     }
 
     private ArrayList<Cell> generateCells(ArrayList<Course> courses) {
-        System.out.println("generate cells " + (courses == null));
         if(courses == null) return null;
+
+        System.out.println("GENERATE CELLS");
+        courses.forEach(System.out::println);
 
         ArrayList<Cell> cells = new ArrayList<>();
 
@@ -232,6 +240,7 @@ public class ScheduleDrawer extends JComponent {
             // solve cells on same positions
             if(course.isDuplicate()) {
                 if(course.getFreqAsNum() == 2) cellCoords.y += 1;
+
                 cellCoords.height = 1;
                 courseSouthInfo = null;
                 courseNorthInfo += "  " + course.getTypeInHu().getFirstLetter();
@@ -263,7 +272,7 @@ public class ScheduleDrawer extends JComponent {
 
     public ScheduleDrawer getHighResVersion() {
         ScheduleDrawer tmp = new ScheduleDrawer(new Point2D.Double(0,0), new Point2D.Double(3508, 2480), intervals);
-        tmp.setSpecificProps(topLeftCText, courses);
+        tmp.repaintWithNewProps(topLeftCText, courses);
         return tmp;
     }
 }

@@ -164,10 +164,7 @@ public class Course {
     public String getSubjectGroup() { return subjectProperties.get(getContent(HEADER_CONTENT.COURSE_NAME)).getGroup(); }
 
     // for debugging
-   /* void printInfo() {
-        System.out.print(
-            day + " " + interval + " " + freq + " " + hall + " " + subgroup + " " + type + " " + courseName + " " + teacher
-                + " " + isDuplicate + "\n"
-        );
-    }*/
+    public String toString() {
+        return String.join(",", content) + ", is Duplicate:" + isDuplicate;
+    }
 }

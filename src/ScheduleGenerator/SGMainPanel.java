@@ -62,7 +62,9 @@ public class SGMainPanel extends JPanel {
                         new Point2D.Double(594, 420),
                         GlobalParser.getHourIntervals()
                 );
-        scheduleDrawer.setSpecificProps(parser.getTopLeftContent(), parser.getCourses());
+        subjectsTable = new SubjectsTable(parser.getCourses(), new Rectangle(10,60, 660, 205));
+
+        scheduleDrawer.repaintWithNewProps(parser.getTopLeftContent(), subjectsTable.getCourses());
         scrollableSoloPane.addTab(scheduleDrawer, "Elônézet", "Csökkentett felbontású elõnézet a kimeneti órarendrõl.");
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 25 ,0));
@@ -70,28 +72,23 @@ public class SGMainPanel extends JPanel {
         ControlPanel controlPanel = new ControlPanel(parser.getMajor(), parser.getGroup(), parser.getStudYear(), parser.getSubGroup());
         topPanel.add(controlPanel);
 
-        InfoButton infoButton =
-                new InfoButton(new Point(0, 0), new Point(35, 35), appFrame, HWGInfo);
-        topPanel.add(infoButton);
-
-        subjectsTable = new SubjectsTable(parser.getCourses(), new Rectangle(10,60, 660, 205));
-
-        controlPanel.addActionListener(e -> {
+        /*controlPanel.addActionListener(e -> {
             String selGroup = controlPanel.getSelectedGroup();
             String selSubGroup = controlPanel.getSelectedSubGroup();
             if(selGroup != null && selSubGroup != null) {
                 parser.reparseCourses(selGroup, selSubGroup);
                 subjectsTable.setData(parser.getCourses());
-                scheduleDrawer.setSpecificProps(parser.getTopLeftContent(), parser.getCourses());
-                repaint();
+                scheduleDrawer.repaintWithNewProps(parser.getTopLeftContent(), subjectsTable.getCourses());
+            }
+        });*/
+
+        /*subjectsTable.addTableModelListener(e -> {
+            if(!subjectsTable.settingDataIsInProgress()) {
+                System.out.println("REPAINT HEREEEE");
+                scheduleDrawer.repaintWithNewProps(parser.getTopLeftContent(), subjectsTable.getCourses());
             }
         });
-
-        subjectsTable.addTableModelListener(e -> {
-            if(!subjectsTable.settingDataIsInProgress()) scheduleDrawer.setSpecificProps(parser.getTopLeftContent(), subjectsTable.getCourses());
-            repaint();
-        });
-        scrollableSoloPane.addTab(subjectsTable.getScrollPane(), "Táblázat", "A felvett órák változtatható táblázata/");
+        scrollableSoloPane.addTab(subjectsTable.getScrollPane(), "Táblázat", "A felvett órák változtatható táblázata/");*/
 
         // displays clsPresetDesc and Logs in a TabbedPane
         JPanel logPanel = new JPanel();
@@ -111,6 +108,10 @@ public class SGMainPanel extends JPanel {
                 LogPanel.logln(Arrays.toString(ex.getStackTrace()), SG_LOG_INSTANCE);
             }
         });
+
+        InfoButton infoButton =
+                new InfoButton(new Point(0, 0), new Point(35, 35), appFrame, HWGInfo);
+        topPanel.add(infoButton);
 
         add(logPanel);
         add(scrollableSoloPane);

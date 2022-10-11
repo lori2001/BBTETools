@@ -12,7 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 
-import static ScheduleGenerator.GlobalParser.solveDuplicates;
+import static ScheduleGenerator.GlobalParser.markDuplicates;
 import static ScheduleGenerator.SGMainPanel.SG_LOG_INSTANCE;
 import static ScheduleGenerator.data.SGData.*;
 
@@ -45,6 +45,7 @@ public class Parser {
     }
 
     public void reparseCourses(String group, String subGroup) {
+        System.out.println("REPARSE COURSES");
         if((this.group.equals(group) && this.subGroup.equals(subGroup)) || parsingFailed) return;
 
         this.group = group;
@@ -57,7 +58,6 @@ public class Parser {
         try {
             Thread internetConn = new Thread(
                     () -> {
-                        System.out.print("Connecting to internet");
                         try{
                             courses = genCourses();
                             connectionPrompt.setVisible(false);
@@ -72,9 +72,8 @@ public class Parser {
             internetConn.start();
             while(internetConn.isAlive()){
                 Thread.sleep(1000); // 1 second
-                System.out.print(".");
+                // TODO: Some kind of loding notifier
             }
-            System.out.println(".");
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
@@ -96,13 +95,7 @@ public class Parser {
         return group + "\n" + subGroup;
     }
 
-    private ArrayList<Course> genCourses() throws Exception {
-        String[] headers = null;
-        ArrayList<Course> courses = new ArrayList<>();
-
-        String url = getLinkPrefix() + "tabelar/" + major.getCode() + studYear + ".html";
-        Document doc = Jsoup.connect(url).get();
-
+    private int findTableIndexForGroup(Document doc, String group) {
         Elements groupElements = doc.select("h1");
         int tableI = -1; // -1 because there's a "bonus" header
         boolean found = false;
@@ -113,12 +106,28 @@ public class Parser {
             }
             tableI++;
         }
+        return found ? tableI : -1;
+    }
 
-        if(!found)
-            LogPanel.logln("HIBA: A kiválasztott csoport(" + group + ") nem talált a " +  url + " linken!" , SG_LOG_INSTANCE);
+    private ArrayList<Course> genCourses() throws Exception {
+        System.out.println("GENERATE COURSES FOR: " + major.getCode() + studYear + " " + group + " " + subGroup);
+
+        String[] headers = null;
+        ArrayList<Course> courses = new ArrayList<>();
+
+        String url = getLinkPrefix() + "tabelar/" + major.getCode() + studYear + ".html";
+        Document doc = Jsoup.connect(url).get();
+
+        int tableI = findTableIndexForGroup(doc, group);
+        if(tableI == -1) {
+            throw new Exception("A kiválasztott csoport(" + group + ") nem talált a " +  url + " linken!");
+        }
+        System.out.println("LEFUTE");
 
         Element table = doc.select("table").get(tableI);
-        if(table == null) throw new Exception("Az " + url + " en levõ adatokat sikertelen volt értelmezni!");
+        if(table == null) {
+            throw new Exception("Az " + url + " en levõ adatokat sikertelen volt értelmezni!");
+        }
 
         Elements tableRows = table.select("tr");
 
@@ -143,12 +152,8 @@ public class Parser {
                 Course courseToAdd = new Course(contentMap, group);
 
                 if(courseToAdd.isPartOfSubgroup(subGroup) || subGroup.equals("nincs")) {
-                    if(solveDuplicates(courseToAdd, courses)) {
-                        if(!courseToAdd.getContent(Course.HEADER_CONTENT.COURSE_NAME).equals("Functii reale") &&
-                                !courseToAdd.getContent(Course.HEADER_CONTENT.COURSE_NAME).equals("Limba engleza (2)")
-                        ) {
+                    if(markDuplicates(courseToAdd, courses)) {
                             courses.add(courseToAdd);
-                        }
                     }
                 }
             }
