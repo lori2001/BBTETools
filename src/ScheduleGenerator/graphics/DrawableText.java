@@ -15,7 +15,7 @@ public class DrawableText {
     private Font font = null;
     private Point2D.Double pos = new Point2D.Double(0, 0);
     private Point2D.Double size = new Point2D.Double(0, 0);
-    private double lineGap = 0;
+    private double lineGap = 0; // space between lines of text
     private boolean fontSizeIsSet = false;
 
     public DrawableText(){}

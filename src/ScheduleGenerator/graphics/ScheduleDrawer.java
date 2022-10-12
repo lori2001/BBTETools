@@ -21,9 +21,6 @@ import static ScheduleGenerator.data.SGData.DAYS_OF_WEEK_HU;
 import static java.awt.Font.PLAIN;
 
 public class ScheduleDrawer extends JComponent {
-    private final Point2D.Double textMargin;
-    private final Point2D.Double cellMargin;
-
     private final Point2D.Double A4InMM = new Point2D.Double(297, 210);
     private final Point2D.Double border = new Point2D.Double(2, 2); // mm
     private final Point2D.Double pos;
@@ -58,12 +55,13 @@ public class ScheduleDrawer extends JComponent {
             LogPanel.logln("VIGYÁZAT: Sikertelen volt az órarend fontjának beolvasása. Beépített szövegtípus lesz használva helyette. Az órarend generáláshoz erõsen ajánlott az újratelepítés.", SG_LOG_INSTANCE);
         }
 
-        textMargin = new Point2D.Double(2.5 * scale.x, 2.5 * scale.y);
-        cellMargin = new Point2D.Double(0.5 * scale.x, 0.5  * scale.y); // milimeters
+        Cell.scale = scale;
+        Cell.padding = new Point2D.Double(2.5 * scale.x, 2.5 * scale.y);
+        Cell.margin = new Point2D.Double(0.5 * scale.x, 0.5  * scale.y); // milimeters
     }
 
-    public  void repaintWithNewProps(ArrayList<LocalTime[]> intervals, ArrayList<Course> courses, String group, String subGroup) {
-        this.intervals = Parser.getHourIntervals();
+    public void repaintWithNewProps(ArrayList<LocalTime[]> intervals, ArrayList<Course> courses, String group, String subGroup) {
+        this.intervals = intervals;
         this.courses = courses;
         this.group = group;
         this.subGroup = subGroup;
@@ -80,7 +78,7 @@ public class ScheduleDrawer extends JComponent {
         g2d.setFont(font);
 
         // background color
-        drawRect(new Rectangle2D.Double(pos.x, pos.y, size.x, size.y), SGData.Colors.BACKGROUND_COLOR);
+        Rect.draw(g2d, new Rectangle2D.Double(pos.x, pos.y, size.x, size.y), SGData.Colors.BACKGROUND_COLOR);
 
         ArrayList<Cell> cells = generateCells(courses);
 
@@ -114,24 +112,23 @@ public class ScheduleDrawer extends JComponent {
             for(int y = 0; y < rows; y++) {
                 // calculate cell (x,y,w,h) considering margins and the whole table's position
                 Rectangle2D.Double slotRect = new Rectangle2D.Double(
-                        absPos.x + (x * offset.x) + cellMargin.x,
-                        absPos.y + (y * offset.y) + cellMargin.y,
-                        offset.x - (cellMargin.x * 2),
-                        offset.y - (cellMargin.y * 2)
+                        absPos.x + (x * offset.x) + Cell.margin.x,
+                        absPos.y + (y * offset.y) + Cell.margin.y,
+                        offset.x - (Cell.margin.x * 2),
+                        offset.y - (Cell.margin.y * 2)
                 );
 
                 boolean inAnyCell = false;
                 for(Cell cell : cells) {
                     // if there is a cell marked on the current slot
                     if(cell.indexRect.x == x && cell.indexRect.y == y) {
-                        // make cell take up as much space needed as specified in rect
-                        cell.actualRect = new Rectangle2D.Double(
-                                slotRect.x, slotRect.y, cell.indexRect.width * slotRect.width, cell.indexRect.height * slotRect.height);
-
-                        // adjust text to fit on cell
-                        cell.calcTextsPosAndScale(textMargin, scale, g2d);
-
-                        drawCell(cell);
+                        // set the actual size of cell based on calculations
+                        cell.setActualRect(new Rectangle2D.Double(
+                            slotRect.x, slotRect.y,
+                            cell.indexRect.width * slotRect.width,
+                            cell.indexRect.height * slotRect.height)
+                        );
+                        cell.drawCell(g2d);
                     }
 
                     // check whether given grid coordinate is part of any defined cell
@@ -143,47 +140,9 @@ public class ScheduleDrawer extends JComponent {
 
                 // draw small white squares on parts where there are no cells overlapping
                 if(!inAnyCell) {
-                    drawRect(slotRect, Color.WHITE);
+                    Rect.draw(g2d, slotRect, Color.WHITE);
                 }
             }
-        }
-    }
-
-    private void drawRect(Rectangle2D.Double rect, Color color) {
-        g2d.setColor(color);
-        g2d.fill(rect);
-    }
-
-    private void drawCell(Cell cell) {
-        drawRect(cell.actualRect, cell.getColor());
-
-        // Define rendering hint, font name, font style and font size
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        if(cell.getCenterDrwText().shouldBeDrawn()) {
-            cell.getCenterDrwText().draw(g2d);
-        }
-
-        if(cell.getBottomDrwText().shouldBeDrawn()) {
-            double southBgHeight = cell.getBottomDrwText().getSize().y + textMargin.x * 2;
-            Rectangle2D.Double southBg = new Rectangle2D.Double(
-                    cell.actualRect.x, cell.actualRect.y + cell.actualRect.height - southBgHeight,
-                    cell.actualRect.width, southBgHeight
-            );
-            drawRect(southBg, SGData.Colors.TEXT_BG_COLOR);
-
-            cell.getBottomDrwText().draw(g2d);
-        }
-
-        if(cell.getTopLeftDrwText().shouldBeDrawn()) {
-            Rectangle2D.Double topLeftBg = new Rectangle2D.Double(
-                    cell.actualRect.x, cell.actualRect.y,
-                    cell.getTopLeftDrwText().getSize().x + textMargin.x * 2,
-                    cell.getTopLeftDrwText().getSize().y + textMargin.y * 2
-            );
-            drawRect(topLeftBg, SGData.Colors.TEXT_BG_COLOR);
-
-            cell.getTopLeftDrwText().draw(g2d);
         }
     }
 
@@ -221,20 +180,8 @@ public class ScheduleDrawer extends JComponent {
             cells.add(cell);
         }
 
-        // TODO: mark duplicates and assign colors
-
         // courses
         for(Course course : courses) {
-            // course properties
-            String courseName = course.getSubjectAlias();
-            String bottomText = course.getTypeInHu().getAbbreviation();
-            String topLeftText;
-            if(course.getFreqInHu() != null) {
-                topLeftText = course.getContent(Course.HEADER_CONTENT.HALL) + "  (" + course.getFreqInHu() + ")";
-            } else {
-                topLeftText = course.getContent(Course.HEADER_CONTENT.HALL) ;
-            }
-
             // cell coordinates
             int startX = 0;
             int endX = 0;
@@ -245,34 +192,25 @@ public class ScheduleDrawer extends JComponent {
             }
             int dayIndex = course.getDayIndexInRO_DAYS();
             int width = endX - startX;
-            Rectangle cellCoords = new Rectangle(startX, dayIndex * 2 + 1, width, 2);
+            Rectangle indexRect = new Rectangle(startX, dayIndex * 2 + 1, width, 2);
 
             // search for duplicates
             Optional<Cell> cellOnSamePos = cells.stream().
-                    filter(cell -> Objects.equals(cell.indexRect, cellCoords)).
+                    filter(cell -> Objects.equals(cell.indexRect, indexRect)).
                     findFirst();
             if(cellOnSamePos.isPresent()) {
-                cellCoords.height = 1;
+                indexRect.height = 1;
                 cellOnSamePos.get().indexRect.height = 1;
 
                 if(course.getFreqAsNum() == 2) {
-                    cellCoords.y += 1;
+                    indexRect.y += 1;
                 } else {
                     cellOnSamePos.get().indexRect.y += 1;
                 }
 
-                bottomText = null;
-                topLeftText += "  " + course.getTypeInHu().getFirstLetter();
-                cellOnSamePos.get().getBottomDrwText().setText(null);
-                cellOnSamePos.get().getTopLeftDrwText().setText(
-                        cellOnSamePos.get().getTopLeftDrwText().getText() + " ER " + course.getTypeInHu().getFirstLetter()
-                );
+                cellOnSamePos.get().evaluateStringsBasedOnSpace();
             }
-
-            Cell clsDrw = new Cell(
-                    cellCoords, SGData.Colors.SUBJECT_COLORS[0], courseName,
-                    bottomText, topLeftText, 0
-            );
+            Cell clsDrw = new Cell(course, indexRect, 0);
 
             clsDrw.setBottomFontSize(font, (float) (this.scale.x * 5F));
             clsDrw.setTopLeftFontSize(font, (float) (this.scale.x * 3.5F));
