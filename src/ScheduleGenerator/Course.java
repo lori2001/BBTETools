@@ -7,7 +7,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 
 public class Course {
     public enum HEADER_CONTENT {
@@ -34,20 +33,8 @@ public class Course {
     private final ArrayList<String> content = new ArrayList<>();
     private final String formattedSubgroup; // subgroup as [1, 2, ... n, group]
 
-    private static final HashMap<String, Subject> subject = new HashMap<>();
-    public static Subject[] getSubject() {
-        return subject.values().toArray(new Subject[0]);
-    }
-
     public Course(String[] contentStr, String group) {
         content.addAll(Arrays.asList(contentStr).subList(0, HEADERS.length));
-
-        if(!subject.containsKey(getContent(HEADER_CONTENT.COURSE_NAME))) {
-            subject.put(getContent(HEADER_CONTENT.COURSE_NAME),
-                    new Subject(getContent(HEADER_CONTENT.COURSE_NAME), Subject.getUnusedColor(SGData.Colors.SUBJECT_COLORS), group)
-            );
-        }
-
         formattedSubgroup = formatSubGroup(getContent(HEADER_CONTENT.SUBGROUP), group);
     }
 
@@ -55,13 +42,6 @@ public class Course {
         for (String header : HEADERS) {
             content.add(contentMap.get(header));
         }
-
-        if(!subject.containsKey(getContent(HEADER_CONTENT.COURSE_NAME))) {
-            subject.put(getContent(HEADER_CONTENT.COURSE_NAME),
-                    new Subject(getContent(HEADER_CONTENT.COURSE_NAME), Subject.getUnusedColor(SGData.Colors.SUBJECT_COLORS), group)
-            );
-        }
-
         formattedSubgroup = formatSubGroup(getContent(HEADER_CONTENT.SUBGROUP), group);
     }
 
@@ -84,7 +64,7 @@ public class Course {
     }
 
     public boolean isPartOfSubgroup(String formattedSubGr) {
-        if(formattedSubgroup == null || formattedSubgroup.equals(subject.get(getContent(HEADER_CONTENT.COURSE_NAME)).getGroup()))
+        if(formattedSubgroup == null)
             return true;
         return formattedSubGr.equals(formattedSubgroup);
     }
@@ -126,18 +106,13 @@ public class Course {
         return freqNum + ". hét";
     }
 
-    private static final Map<String, CourseType> RO_TO_HU_TYPES = new HashMap<>() {{
-        put("Curs", new CourseType("Kurzus", "Kurz." ,"K", SGData.Colors.COURSE_TYPE_COLORS[0]));
-        put("Seminar", new CourseType("Szeminárium", "Szem." , "SZ", SGData.Colors.COURSE_TYPE_COLORS[1]));
-        put("Laborator", new CourseType("Labor", "Lab." , "L", SGData.Colors.COURSE_TYPE_COLORS[2]));
-    }};
 
     public CourseType getTypeInHu() {
-        return RO_TO_HU_TYPES.get(getContent(HEADER_CONTENT.TYPE));
+        return SGData.RO_TO_HU_TYPES.get(getContent(HEADER_CONTENT.TYPE));
     }
 
     public String getSubjectAlias() {
-        return subject.get(getContent(HEADER_CONTENT.COURSE_NAME)).getAlias();
+        return Subject.getAlias(getContent(HEADER_CONTENT.COURSE_NAME));
     }
 
     public String getContent(HEADER_CONTENT at) {
@@ -147,8 +122,6 @@ public class Course {
     public ArrayList<String> getContentList() {
         return content;
     }
-
-    public String getSubjectGroup() { return subject.get(getContent(HEADER_CONTENT.COURSE_NAME)).getGroup(); }
 
     // for debugging
     public String toString() {

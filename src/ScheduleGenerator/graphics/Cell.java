@@ -7,9 +7,6 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-
 public class Cell {
     public static Point2D.Double padding; // makes sure text leaves this padding to the cell's border
     public static Point2D.Double margin;
@@ -21,18 +18,19 @@ public class Cell {
         this.actualRect = actualRect;
     }
 
-    private Color color;
+    private final Color color;
+
     private Course course = null;
 
     private final DrawableText centerDrwText = new DrawableText();
     private final DrawableText bottomDrwText = new DrawableText();
     private final DrawableText topLeftDrwText = new DrawableText();
 
-    public Cell(Course course, Rectangle indexRect, double lineGap)
+    public Cell(Course course, Rectangle indexRect, Color color, double lineGap)
     {
         this.course = course;
         this.indexRect = indexRect;
-        this.color = SGData.Colors.SUBJECT_COLORS[0];
+        this.color = color;
 
         evaluateStringsBasedOnSpace();
 
@@ -157,14 +155,6 @@ public class Cell {
         bottomDrwText.setFont(font);
     }
 
-    public DrawableText getBottomDrwText() {
-        return bottomDrwText;
-    }
-
-    public DrawableText getTopLeftDrwText() {
-        return topLeftDrwText;
-    }
-
     public void setCenterFontSize(Font font, float fontSize) {
         centerDrwText.setFontSize(font, fontSize);
     }
@@ -177,15 +167,11 @@ public class Cell {
         topLeftDrwText.setFontSize(font, fontSize);
     }
 
-    public Color getColor() {
-        return color;
-    }
-
     public void drawCell(Graphics2D g2d) {
         calcTextsPosAndScale(g2d);
 
         // draw underlying rect
-        Rect.draw(g2d, actualRect, getColor());
+        Rect.draw(g2d, actualRect, color);
 
         // Define rendering hint, font name, font style and font size
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

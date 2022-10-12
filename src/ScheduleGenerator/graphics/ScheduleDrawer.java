@@ -2,7 +2,6 @@ package ScheduleGenerator.graphics;
 
 import Common.logging.LogPanel;
 import ScheduleGenerator.Course;
-import ScheduleGenerator.Parser;
 import ScheduleGenerator.TimeFormatter;
 import ScheduleGenerator.data.SGData;
 
@@ -13,6 +12,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -28,7 +28,7 @@ public class ScheduleDrawer extends JComponent {
     private final Point2D.Double scale;
 
     private Graphics2D g2d = null;
-    private Font font = null;
+    private Font font;
 
     private int cols; // 15 = 1 + 14
     private int rows; // 11 = 1 + (5 * 2)
@@ -40,6 +40,7 @@ public class ScheduleDrawer extends JComponent {
     private String subGroup;
 
     private final boolean colorAfterSubjects = true; // if false -- colors after type(Course, Seminar)
+    private static final HashMap<String, Color> subjectColor = new HashMap<>();
 
     public ScheduleDrawer(Point2D.Double pos, Point2D.Double size) {
         this.pos = pos;
@@ -181,6 +182,7 @@ public class ScheduleDrawer extends JComponent {
         }
 
         // courses
+        int subjectColorIndex = 0;
         for(Course course : courses) {
             // cell coordinates
             int startX = 0;
@@ -210,7 +212,23 @@ public class ScheduleDrawer extends JComponent {
 
                 cellOnSamePos.get().evaluateStringsBasedOnSpace();
             }
-            Cell clsDrw = new Cell(course, indexRect, 0);
+
+            Color courseCol = course.getTypeInHu().getCol();
+
+            if(colorAfterSubjects) {
+                if(!subjectColor.containsKey(course.getContent(Course.HEADER_CONTENT.COURSE_NAME))) {
+                    subjectColor.put(course.getContent(Course.HEADER_CONTENT.COURSE_NAME), SGData.Colors.SUBJECT_COLORS[subjectColorIndex]);
+                    subjectColorIndex++;
+                }
+                courseCol = subjectColor.get(course.getContent(Course.HEADER_CONTENT.COURSE_NAME));
+            }
+
+            if(subjectColorIndex >= SGData.Colors.SUBJECT_COLORS.length - 1) {
+                LogPanel.logln("VIGYÁZAT: Kifogytak a tantárgy-színek. Újra lesznek használva.", SG_LOG_INSTANCE);
+                subjectColorIndex = 0;
+            }
+
+            Cell clsDrw = new Cell(course, indexRect, courseCol,0);
 
             clsDrw.setBottomFontSize(font, (float) (this.scale.x * 5F));
             clsDrw.setTopLeftFontSize(font, (float) (this.scale.x * 3.5F));

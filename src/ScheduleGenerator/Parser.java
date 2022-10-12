@@ -9,8 +9,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import javax.swing.*;
-import java.awt.*;
 import java.text.NumberFormat;
 import java.time.LocalTime;
 import java.util.*;
@@ -20,41 +18,6 @@ import static ScheduleGenerator.SGMainPanel.SG_LOG_INSTANCE;
 import static ScheduleGenerator.data.SGData.*;
 
 public class Parser {
-
-    // returns true if given course has to be added to the array, false otherwise
-    /*public static boolean markDuplicates(Course courseToAdd, ArrayList<Course> courses) {
-        // TODO: LEFT HERE SOLVE THIS SHOULD BE IN GRAPHICS PART
-        boolean shouldBeAdded = true;
-
-        int courseOnSameTimeIndex = -1;
-        for (int j = 0; j < courses.size(); j++) {
-            if (courses.get(j).getContent(Course.HEADER_CONTENT.INTERVAL).contains(courseToAdd.getContent(Course.HEADER_CONTENT.INTERVAL)) &&
-                    courses.get(j).getContent(Course.HEADER_CONTENT.DAY).contains(courseToAdd.getContent(Course.HEADER_CONTENT.DAY))) {
-                courseOnSameTimeIndex = j;
-                break;
-            }
-        }
-
-        if (courseOnSameTimeIndex != -1) {
-            String groupOfCourseToAdd = courseToAdd.getSubjectGroup();
-            String subGroupOfCourseToAdd = courseToAdd.getFormattedSubgroup();
-            String groupOfDuplicate = courses.get(courseOnSameTimeIndex).getSubjectGroup();
-            String subGroupOfDuplicate = courses.get(courseOnSameTimeIndex).getFormattedSubgroup();
-
-            if (subGroupOfCourseToAdd == null && Objects.equals(subGroupOfDuplicate, groupOfDuplicate)) {
-                shouldBeAdded = false;
-            } else if (subGroupOfDuplicate == null && Objects.equals(subGroupOfCourseToAdd, groupOfCourseToAdd)) {
-                courses.set(courseOnSameTimeIndex, courseToAdd);
-                shouldBeAdded = false;
-            } else {
-                courses.get(courseOnSameTimeIndex).setDuplicate(true);
-                courseToAdd.setDuplicate(true);
-            }
-        }
-
-        return shouldBeAdded;
-    }*/
-
     public static ArrayList<LocalTime[]> getHourIntervals() {
         ArrayList<LocalTime[]> hourIntervals = new ArrayList<>();
         String url = getLinkPrefix() + "grafic/IM1.html";
@@ -265,9 +228,7 @@ public class Parser {
                 Course courseToAdd = new Course(contentMap, group);
 
                 if(courseToAdd.isPartOfSubgroup(subGroup) || subGroup.equals("nincs")) {
-                    //if(markDuplicates(courseToAdd, courses)) {
-                            courses.add(courseToAdd);
-                    //}
+                    courses.add(courseToAdd);
                 }
             }
 

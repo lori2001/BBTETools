@@ -1,5 +1,6 @@
 package ScheduleGenerator.data;
 
+import ScheduleGenerator.records.CourseType;
 import ScheduleGenerator.records.Major;
 
 import java.awt.*;
@@ -36,18 +37,30 @@ public class SGData {
                     "</html>";
 
     public static final HashMap<String, String> SUBJECT_NAME_ALIAS_MAP = new HashMap<>() {{
-        put("Sisteme de operare", "Linux");
-        put("Limba engleza (2)", "Angol");
-        put("Analiza numerica", "Num. Analizis");
-        put("Probabilitati", "Val. szám.");
-        put("Didactica specialitatii", "Pedagógia");
-        put("Sisteme de gestiune a bazelor de date", "Adatbázisok");
-        put("Mecanica teoretica", "Mechanika");
-        put("Programare orientata obiect", "OOP");
-        put("Inteligenta artificiala", "Mest. int.");
-        put("Programare Web", "Webprog.");
-    }
+            put("Sisteme de operare", "Linux");
+            put("Limba engleza (2)", "Angol");
+            put("Analiza numerica", "Num. Analizis");
+            put("Probabilitati", "Val. szám.");
+            put("Didactica specialitatii", "Pedagógia1");
+            put("Sisteme de gestiune a bazelor de date", "Adatbázisok");
+            put("Mecanica teoretica", "Mechanika");
+            put("Programare orientata obiect", "OOP");
+            put("Inteligenta artificiala", "Mest. int.");
+            put("Programare Web", "Webprog.");
+            put("Arhitectura sistemelor de calcul", "AC");
+            put("Metode avansate de programare", "Java");
+            put("Ecuatii diferentiale", "Közdiff");
+            put("Geometrie 3 (Geometria diferentiala a curbelor si suprafetelor)", "Geo3");
+            put("Analiza matematica 3 (Calcul integral in R^n)", "Analízis 3");
+            put("Teoria si metodologia instruirii. Teoria si metodologia evaluarii", "Pedagógia2");
+        }
     };
+
+    public static final Map<String, CourseType> RO_TO_HU_TYPES = new HashMap<>() {{
+        put("Curs", new CourseType("Kurzus", "Kurz." ,"K", SGData.Colors.COURSE_TYPE_COLORS[0]));
+        put("Seminar", new CourseType("Szeminárium", "Szem." , "SZ", SGData.Colors.COURSE_TYPE_COLORS[1]));
+        put("Laborator", new CourseType("Labor", "Lab." , "L", SGData.Colors.COURSE_TYPE_COLORS[2]));
+    }};
 
     public static final String[] DAYS_OF_WEEK_HU = { "Hé", "Ke", "Sze", "Csü", "Pé" };
 
