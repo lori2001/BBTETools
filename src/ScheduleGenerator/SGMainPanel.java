@@ -59,8 +59,8 @@ public class SGMainPanel extends JPanel {
 
         subjectsTable = new SubjectsTable(scrollableSoloPane.getBounds());
 
-        scrollableSoloPane.addTab(subjectsTable, "Táblázat", "A felvett órák változtatható táblázata/");
         scrollableSoloPane.addTab(scheduleDrawer, "Elônézet", "Csökkentett felbontású elõnézet a kimeneti órarendrõl.");
+        scrollableSoloPane.addTab(subjectsTable, "Táblázat", "A felvett órák változtatható táblázata/");
 
         subjectsTable.addTableModelListener(e -> {
             if(!subjectsTable.settingDataIsInProgress()) {
@@ -93,24 +93,6 @@ public class SGMainPanel extends JPanel {
         add(downloadSchedule);
 
         setVisible(true);
-
-
-        /*controlPanel.addActionListener(e -> {
-            String selGroup = controlPanel.getSelectedGroup();
-            String selSubGroup = controlPanel.getSelectedSubGroup();
-            if(selGroup != null && selSubGroup != null) {
-                parser.reparseCourses(selGroup, selSubGroup);
-                scheduleDrawer.repaintWithNewProps(parser.getTopLeftContent(), subjectsTable.getCourses());
-            }
-        });*/
-
-        /*
-
-        // displays clsPresetDesc and Logs in a TabbedPane
-
-        // scrollableSoloPane.addTab(LogPanel.getScrollableTextArea(SG_LOG_INSTANCE), "Üzenetek", "A generálási folyamatról ír ki hasznos infókat");
-
-        setVisible(true);*/
     }
 
     public void saveSchedule() throws Exception {

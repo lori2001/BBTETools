@@ -8,9 +8,10 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 public class Cell {
-    public static Point2D.Double padding; // makes sure text leaves this padding to the cell's border
-    public static Point2D.Double margin;
-    public static Point2D.Double scale;
+    private Point2D.Double padding; // makes sure text leaves this padding to the cell's border
+    private Point2D.Double margin;
+    private Point2D.Double scale;
+
     public Rectangle indexRect; // index-based rectangle
 
     private Rectangle2D.Double actualRect; // actual pixel-based rectangle
@@ -26,11 +27,14 @@ public class Cell {
     private final DrawableText bottomDrwText = new DrawableText();
     private final DrawableText topLeftDrwText = new DrawableText();
 
-    public Cell(Course course, Rectangle indexRect, Color color, double lineGap)
+    public Cell(Course course, Rectangle indexRect, Color color, double lineGap, Point2D.Double margin, Point2D.Double padding, Point2D.Double scale)
     {
         this.course = course;
         this.indexRect = indexRect;
         this.color = color;
+        this.margin = margin;
+        this.padding = padding;
+        this.scale = scale;
 
         evaluateStringsBasedOnSpace();
 
@@ -38,10 +42,13 @@ public class Cell {
         bottomDrwText.setLineGap(lineGap);
         topLeftDrwText.setLineGap(lineGap);
     }
-    public Cell(Rectangle indexRect, Color col, String centerText, String bottomText, String topLeftText, double lineGap)
+    public Cell(Rectangle indexRect, Color col, String centerText, String bottomText, String topLeftText, double lineGap, Point2D.Double margin, Point2D.Double padding, Point2D.Double scale)
     {
         this.indexRect = indexRect;
         this.color = col;
+        this.margin = margin;
+        this.padding = padding;
+        this.scale = scale;
 
         centerDrwText.setText(centerText);
         bottomDrwText.setText(bottomText);
@@ -70,16 +77,16 @@ public class Cell {
         }
     }
 
-    private static float getMaxFontSizeForScale()  {
+    private float getMaxFontSizeForScale()  {
         return (float) (7.5f * scale.x); // 7.5
     }
 
     private void calcTextsPosAndScale(Graphics2D g2d) {
         Rectangle2D.Double container = new Rectangle2D.Double(
-                actualRect.x + Cell.padding.x,
-                actualRect.y + Cell.padding.y,
-                actualRect.width - Cell.padding.x * 2,
-                actualRect.height - Cell.padding.y * 2
+                actualRect.x + padding.x,
+                actualRect.y + padding.y,
+                actualRect.width - padding.x * 2,
+                actualRect.height - padding.y * 2
         );
 
         if(bottomDrwText.getText() != null) {
@@ -129,7 +136,7 @@ public class Cell {
             }
             // move the center down if only topLeft text
             else if(bottomDrwText.getText() == null && topLeftDrwText.getText() != null) {
-                double offset = topLeftDrwText.getSize().y + Cell.padding.y * 2;
+                double offset = topLeftDrwText.getSize().y + padding.y * 2;
 
                 adjustedContainer.y += offset;
                 adjustedContainer.height -= offset;
@@ -181,7 +188,7 @@ public class Cell {
         }
 
         if(bottomDrwText.shouldBeDrawn()) {
-            double southBgHeight = bottomDrwText.getSize().y + Cell.padding.x * 2;
+            double southBgHeight = bottomDrwText.getSize().y + padding.x * 2;
             Rectangle2D.Double southBg = new Rectangle2D.Double(
                     actualRect.x, actualRect.y + actualRect.height - southBgHeight,
                     actualRect.width, southBgHeight
@@ -194,8 +201,8 @@ public class Cell {
         if(topLeftDrwText.shouldBeDrawn()) {
             Rectangle2D.Double topLeftBg = new Rectangle2D.Double(
                     actualRect.x, actualRect.y,
-                    topLeftDrwText.getSize().x + Cell.padding.x * 2,
-                    topLeftDrwText.getSize().y + Cell.padding.y * 2
+                    topLeftDrwText.getSize().x + padding.x * 2,
+                    topLeftDrwText.getSize().y + padding.y * 2
             );
             Rect.draw(g2d, topLeftBg, SGData.Colors.TEXT_BG_COLOR);
 

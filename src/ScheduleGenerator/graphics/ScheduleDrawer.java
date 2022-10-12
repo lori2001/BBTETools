@@ -40,7 +40,10 @@ public class ScheduleDrawer extends JComponent {
     private String subGroup;
 
     private final boolean colorAfterSubjects = true; // if false -- colors after type(Course, Seminar)
-    private static final HashMap<String, Color> subjectColor = new HashMap<>();
+    private final HashMap<String, Color> subjectColor = new HashMap<>();
+
+    private final Point2D.Double cellPadding; // makes sure text leaves this padding to the cell's border
+    private final Point2D.Double cellMargin;
 
     public ScheduleDrawer(Point2D.Double pos, Point2D.Double size) {
         this.pos = pos;
@@ -56,9 +59,8 @@ public class ScheduleDrawer extends JComponent {
             LogPanel.logln("VIGYÁZAT: Sikertelen volt az órarend fontjának beolvasása. Beépített szövegtípus lesz használva helyette. Az órarend generáláshoz erõsen ajánlott az újratelepítés.", SG_LOG_INSTANCE);
         }
 
-        Cell.scale = scale;
-        Cell.padding = new Point2D.Double(2.5 * scale.x, 2.5 * scale.y);
-        Cell.margin = new Point2D.Double(0.5 * scale.x, 0.5  * scale.y); // milimeters
+        cellPadding = new Point2D.Double(2.5 * scale.x, 2.5 * scale.y);
+        cellMargin = new Point2D.Double(0.5 * scale.x, 0.5  * scale.y); // milimeters
     }
 
     public void repaintWithNewProps(ArrayList<LocalTime[]> intervals, ArrayList<Course> courses, String group, String subGroup) {
@@ -113,10 +115,10 @@ public class ScheduleDrawer extends JComponent {
             for(int y = 0; y < rows; y++) {
                 // calculate cell (x,y,w,h) considering margins and the whole table's position
                 Rectangle2D.Double slotRect = new Rectangle2D.Double(
-                        absPos.x + (x * offset.x) + Cell.margin.x,
-                        absPos.y + (y * offset.y) + Cell.margin.y,
-                        offset.x - (Cell.margin.x * 2),
-                        offset.y - (Cell.margin.y * 2)
+                        absPos.x + (x * offset.x) + cellMargin.x,
+                        absPos.y + (y * offset.y) + cellMargin.y,
+                        offset.x - (cellMargin.x * 2),
+                        offset.y - (cellMargin.y * 2)
                 );
 
                 boolean inAnyCell = false;
@@ -157,7 +159,7 @@ public class ScheduleDrawer extends JComponent {
 
         // top left content
         Cell topLeftCell = new Cell(new Rectangle(0, 0, 1, 1),
-                SGData.Colors.BASE_COLOR, getTopLeftContent(), null, null, 2.5 * scale.x);
+                SGData.Colors.BASE_COLOR, getTopLeftContent(), null, null, 2.5 * scale.x, cellMargin, cellPadding, scale);
         topLeftCell.setFontStyle(font);
         cells.add(topLeftCell);
 
@@ -165,7 +167,7 @@ public class ScheduleDrawer extends JComponent {
         for(int i = 1; i <= DAYS_OF_WEEK_HU.length; i++) {
             Rectangle t = new Rectangle(0, i * 2 - 1, 1, 2);
 
-            Cell cell = new Cell(t, SGData.Colors.BASE_COLOR, DAYS_OF_WEEK_HU[i - 1], null, null, 0);
+            Cell cell = new Cell(t, SGData.Colors.BASE_COLOR, DAYS_OF_WEEK_HU[i - 1], null, null, 0, cellMargin, cellPadding, scale);
             cell.setCenterFontSize(font, (float) (this.scale.x * 9F));
 
             cells.add(cell);
@@ -175,7 +177,7 @@ public class ScheduleDrawer extends JComponent {
         for(int i = 1; i <= intervals.size(); i++) {
             Rectangle t = new Rectangle(i, 0, 1, 1);
             String displayInterval = TimeFormatter.localTimeArrToDisplayFormat(intervals.get(i - 1));
-            Cell cell = new Cell(t, SGData.Colors.BASE_COLOR, displayInterval, null, null, 2.5 * scale.x);
+            Cell cell = new Cell(t, SGData.Colors.BASE_COLOR, displayInterval, null, null, 2.5 * scale.x, cellMargin, cellPadding, scale);
             cell.setCenterFontSize(font, (float) (this.scale.x * 5F));
 
             cells.add(cell);
@@ -228,7 +230,7 @@ public class ScheduleDrawer extends JComponent {
                 subjectColorIndex = 0;
             }
 
-            Cell clsDrw = new Cell(course, indexRect, courseCol,0);
+            Cell clsDrw = new Cell(course, indexRect, courseCol, 0, cellMargin, cellPadding, scale);
 
             clsDrw.setBottomFontSize(font, (float) (this.scale.x * 5F));
             clsDrw.setTopLeftFontSize(font, (float) (this.scale.x * 3.5F));
