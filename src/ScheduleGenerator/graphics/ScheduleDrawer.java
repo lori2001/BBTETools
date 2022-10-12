@@ -2,6 +2,7 @@ package ScheduleGenerator.graphics;
 
 import Common.logging.LogPanel;
 import ScheduleGenerator.Course;
+import ScheduleGenerator.Parser;
 import ScheduleGenerator.TimeFormatter;
 import ScheduleGenerator.data.SGData;
 
@@ -33,19 +34,22 @@ public class ScheduleDrawer extends JComponent {
     private Graphics2D g2d = null;
     private Font font = null;
 
-    private final int cols; // 15 = 1 + 14
-    private final int rows; // 11 = 1 + (5 * 2)
+    private int cols; // 15 = 1 + 14
+    private int rows; // 11 = 1 + (5 * 2)
+
+    // repaint specific elements
     private ArrayList<LocalTime[]> intervals;
-
-    // specific elements
     private ArrayList<Course> courses;
-    private String topLeftCText;
+    private String group;
+    private String subGroup;
 
-    public ScheduleDrawer(Point2D.Double pos, Point2D.Double size, ArrayList<LocalTime[]> intervals) {
+    private final boolean colorAfterSubjects = true; // if false -- colors after type(Course, Seminar)
+
+    public ScheduleDrawer(Point2D.Double pos, Point2D.Double size) {
         this.pos = pos;
         this.size = size;
         this.scale = new Point2D.Double(size.x / A4InMM.x, size.y / A4InMM.y);
-        setSize(new Dimension((int) size.x, (int) size.y));
+        setSize(new Dimension((int) size.x, (int) size.y)); // set size of actual element
 
         try {
             font = Font.createFont(Font.TRUETYPE_FONT, new File("assets/fonts/Eras-Bold-ITC.ttf")).deriveFont(10F);
@@ -55,19 +59,19 @@ public class ScheduleDrawer extends JComponent {
             LogPanel.logln("VIGYÁZAT: Sikertelen volt az órarend fontjának beolvasása. Beépített szövegtípus lesz használva helyette. Az órarend generáláshoz erõsen ajánlott az újratelepítés.", SG_LOG_INSTANCE);
         }
 
-        if(intervals != null)
-            this.intervals = intervals;
+        textMargin = new Point2D.Double(2.5 * scale.x, 2.5 * scale.y);
+        cellMargin = new Point2D.Double(0.5 * scale.x, 0.5  * scale.y); // milimeters
+    }
+
+    public  void repaintWithNewProps(ArrayList<LocalTime[]> intervals, ArrayList<Course> courses, String group, String subGroup) {
+        this.intervals = Parser.getHourIntervals();
+        this.courses = courses;
+        this.group = group;
+        this.subGroup = subGroup;
 
         cols = 1 + this.intervals.size(); // header + num of hours
         rows = 1 + DAYS_OF_WEEK_HU.length * 2; // side + dow * 2
 
-        textMargin = new Point2D.Double(2.5 * scale.x, 2.5 * scale.y);
-        cellMargin = new Point2D.Double(0.5 * scale.x,0.5  * scale.y); // milimeters
-    }
-
-    public  void repaintWithNewProps(String topLeftCText, ArrayList<Course> courses) {
-        this.topLeftCText = topLeftCText;
-        this.courses = courses;
         repaint();
     }
 
@@ -76,7 +80,7 @@ public class ScheduleDrawer extends JComponent {
         g2d = (Graphics2D) g;
         g2d.setFont(font);
 
-        // g2d.setBackground(Colors.BACKGROUND_COLOR);
+        // background color
         drawRect(new Rectangle2D.Double(pos.x, pos.y, size.x, size.y), SGData.Colors.BACKGROUND_COLOR);
 
         ArrayList<Cell> cells = generateCells(courses);
@@ -85,9 +89,12 @@ public class ScheduleDrawer extends JComponent {
     }
 
     private void drawTable(Point2D.Double tPos, Point2D.Double tSize, ArrayList<Cell> cells) {
-        if(cells == null) return;
+        if(cells == null){
+            System.out.println("No cells defined in drawTable");
+            return;
+        }
 
-        Point2D.Double absPos = new Point2D.Double(pos.x, pos.y); // , tSize = new Vec(size.x, size.y);
+        Point2D.Double absPos = new Point2D.Double(pos.x, pos.y);
 
         // convert MM to px
         tPos.x *= scale.x;
@@ -101,42 +108,50 @@ public class ScheduleDrawer extends JComponent {
         absPos.y += border.y * scale.y + tPos.y;
 
         int xI = 0, yI, i = 0;
+        // the amount of pixel offset for each col/row
         double xOffs = tSize.x / cols;
         double yOffs = tSize.y / rows;
 
+        // go through ever possible column where (x,y) are the top left coordinates in px
         for(double x = 0; x <= tSize.x - xOffs + 1; x += xOffs) {
-            yI = 0;
+            yI = 0; // the vertical index from top to bottom
             for(double y = 0; y <= tSize.y - yOffs + 1; y += yOffs) {
 
+                // calculate cell (x,y,w,h) considering margins and the whole table's position
                 Rectangle2D.Double cellCoords = new Rectangle2D.Double(
                         absPos.x + x + cellMargin.x, absPos.y + y + cellMargin.y,
                         xOffs - (cellMargin.y * 2), yOffs - (cellMargin.y * 2));
 
                 boolean inAnyCell = false;
                 for(Cell cell : cells) {
+                    // if there is a cell marked on the current slot
                     if(cell.rect.x == xI && cell.rect.y == yI) {
-
+                        // make cell take up as much space needed as specified in rect
                         cellCoords.width = cell.rect.width * xOffs - (cellMargin.x * 2);
                         cellCoords.height = cell.rect.height * yOffs - (cellMargin.y * 2);
 
+                        // adjust text to fit on cell
                         cell.calcTextsPosAndScale(cellCoords, textMargin, scale, g2d);
 
                         drawCell(cellCoords, cell);
                     }
 
-                    if(!inAnyCell)
+                    // check whether given grid coordinate is part of any defined cell
+                    if(!inAnyCell) {
                         inAnyCell = !(xI >= cell.rect.x + cell.rect.width) && !(yI >= cell.rect.y + cell.rect.height)
-                                     && !(xI < cell.rect.x) && !(yI < cell.rect.y);
+                                && !(xI < cell.rect.x) && !(yI < cell.rect.y);
+                    }
                 }
 
+                // draw small white squares on parts where there are no cells overlapping
                 if(!inAnyCell) {
                     drawRect(cellCoords, Color.WHITE);
                 }
 
                 yI++;
-                i++;
+                i++; // the general index from left/right-top/bottom
             }
-            xI++;
+            xI++; // the horizontal index from left to right
             i++;
         }
     }
@@ -147,7 +162,7 @@ public class ScheduleDrawer extends JComponent {
     }
 
     private void drawCell(Rectangle2D.Double rect, Cell cell) {
-        drawRect(rect, cell.col);
+        drawRect(rect, cell.getColor());
 
         // Define rendering hint, font name, font style and font size
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -180,16 +195,16 @@ public class ScheduleDrawer extends JComponent {
     }
 
     private ArrayList<Cell> generateCells(ArrayList<Course> courses) {
-        if(courses == null) return null;
-
-        System.out.println("GENERATE CELLS");
-        courses.forEach(System.out::println);
+        if(courses == null)  {
+            LogPanel.logln("Could not generate cells! courses is null.", SG_LOG_INSTANCE);
+            return null;
+        }
 
         ArrayList<Cell> cells = new ArrayList<>();
 
         // top left content
         Cell topLeftCell = new Cell(new Rectangle(0, 0, 1, 1),
-                SGData.Colors.BASE_COLOR, topLeftCText, null, null, 2.5 * scale.x);
+                SGData.Colors.BASE_COLOR, getTopLeftContent(), null, null, 2.5 * scale.x);
         topLeftCell.setFontStyle(font);
         cells.add(topLeftCell);
 
@@ -213,16 +228,18 @@ public class ScheduleDrawer extends JComponent {
             cells.add(cell);
         }
 
+        // TODO: mark duplicates and assign colors
+
         // courses
-        for(var course : courses) {
+        for(Course course : courses) {
             // course properties
             String courseName = course.getSubjectAlias();
-            String courseSouthInfo = course.getTypeInHu().getAbbreviation();
-            String courseNorthInfo;
+            String bottomText = course.getTypeInHu().getAbbreviation();
+            String topLeftText;
             if(course.getFreqInHu() != null) {
-                courseNorthInfo = course.getContent(Course.HEADER_CONTENT.HALL) + "  (" + course.getFreqInHu() + ")";
+                topLeftText = course.getContent(Course.HEADER_CONTENT.HALL) + "  (" + course.getFreqInHu() + ")";
             } else {
-                courseNorthInfo = course.getContent(Course.HEADER_CONTENT.HALL) ;
+                topLeftText = course.getContent(Course.HEADER_CONTENT.HALL) ;
             }
 
             // cell coordinates
@@ -237,28 +254,31 @@ public class ScheduleDrawer extends JComponent {
             int width = endX - startX;
             Rectangle cellCoords = new Rectangle(startX, dayIndex * 2 + 1, width, 2);
 
-            // solve cells on same positions
-            if(course.isDuplicate()) {
-                if(course.getFreqAsNum() == 2) cellCoords.y += 1;
-
-                cellCoords.height = 1;
-                courseSouthInfo = null;
-                courseNorthInfo += "  " + course.getTypeInHu().getFirstLetter();
-            }
-
-            // double check for cells on same position
+            // search for duplicates
             Optional<Cell> cellOnSamePos = cells.stream().
                     filter(cell -> Objects.equals(cell.rect, cellCoords)).
                     findFirst();
             if(cellOnSamePos.isPresent()) {
-                cellOnSamePos.get().rect.height = 1;
                 cellCoords.height = 1;
-                cellCoords.y += 1;
+                cellOnSamePos.get().rect.height = 1;
+
+                if(course.getFreqAsNum() == 2) {
+                    cellCoords.y += 1;
+                } else {
+                    cellOnSamePos.get().rect.y += 1;
+                }
+
+                bottomText = null;
+                topLeftText += "  " + course.getTypeInHu().getFirstLetter();
+                cellOnSamePos.get().getBottomDrwText().setText(null);
+                cellOnSamePos.get().getTopLeftDrwText().setText(
+                        cellOnSamePos.get().getTopLeftDrwText().getText() + " ER " + course.getTypeInHu().getFirstLetter()
+                );
             }
 
             Cell clsDrw = new Cell(
-                    cellCoords, course.getSubjectColor(), courseName,
-                    courseSouthInfo, courseNorthInfo, 0
+                    cellCoords, SGData.Colors.SUBJECT_COLORS[0], courseName,
+                    bottomText, topLeftText, 0
             );
 
             clsDrw.setBottomFontSize(font, (float) (this.scale.x * 5F));
@@ -270,9 +290,17 @@ public class ScheduleDrawer extends JComponent {
         return cells;
     }
 
+    public String getTopLeftContent() {
+        if(Objects.equals(subGroup, "nincs")){
+            return group;
+        }
+
+        return group + "\n" + subGroup;
+    }
+
     public ScheduleDrawer getHighResVersion() {
-        ScheduleDrawer tmp = new ScheduleDrawer(new Point2D.Double(0,0), new Point2D.Double(3508, 2480), intervals);
-        tmp.repaintWithNewProps(topLeftCText, courses);
+        ScheduleDrawer tmp = new ScheduleDrawer(new Point2D.Double(0,0), new Point2D.Double(3508, 2480));
+        tmp.repaintWithNewProps(intervals, courses, group, subGroup);
         return tmp;
     }
 }

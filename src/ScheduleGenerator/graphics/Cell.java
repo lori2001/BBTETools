@@ -9,7 +9,7 @@ import static java.lang.Math.min;
 
 public class Cell {
     public Rectangle rect;
-    public Color col;
+    private Color color;
 
     private final DrawableText centerDrwText = new DrawableText();
     private final DrawableText bottomDrwText = new DrawableText();
@@ -18,7 +18,7 @@ public class Cell {
     public Cell(Rectangle rect, Color col, String centerText, String bottomText, String topLeftText, double lineGap)
     {
         this.rect = rect;
-        this.col = col;
+        this.color = col;
 
         centerDrwText.setText(centerText);
         bottomDrwText.setText(bottomText);
@@ -137,4 +137,7 @@ public class Cell {
         topLeftDrwText.setFontSize(font, fontSize);
     }
 
+    public Color getColor() {
+        return color;
+    }
 }

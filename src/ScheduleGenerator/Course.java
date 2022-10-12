@@ -3,7 +3,6 @@ package ScheduleGenerator;
 import ScheduleGenerator.data.SGData;
 import ScheduleGenerator.records.CourseType;
 
-import java.awt.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,19 +33,18 @@ public class Course {
 
     private final ArrayList<String> content = new ArrayList<>();
     private final String formattedSubgroup; // subgroup as [1, 2, ... n, group]
-    private boolean isDuplicate;
 
-    private static final HashMap<String, SubjectProperties> subjectProperties = new HashMap<>();
-    public static SubjectProperties[] getSubjectProperties() {
-        return subjectProperties.values().toArray(new SubjectProperties[0]);
+    private static final HashMap<String, Subject> subject = new HashMap<>();
+    public static Subject[] getSubject() {
+        return subject.values().toArray(new Subject[0]);
     }
 
     public Course(String[] contentStr, String group) {
         content.addAll(Arrays.asList(contentStr).subList(0, HEADERS.length));
 
-        if(!subjectProperties.containsKey(getContent(HEADER_CONTENT.COURSE_NAME))) {
-            subjectProperties.put(getContent(HEADER_CONTENT.COURSE_NAME),
-                    new SubjectProperties(getContent(HEADER_CONTENT.COURSE_NAME), SubjectProperties.getUnusedColor(SGData.Colors.CLASS_COLORS), group)
+        if(!subject.containsKey(getContent(HEADER_CONTENT.COURSE_NAME))) {
+            subject.put(getContent(HEADER_CONTENT.COURSE_NAME),
+                    new Subject(getContent(HEADER_CONTENT.COURSE_NAME), Subject.getUnusedColor(SGData.Colors.SUBJECT_COLORS), group)
             );
         }
 
@@ -58,9 +56,9 @@ public class Course {
             content.add(contentMap.get(header));
         }
 
-        if(!subjectProperties.containsKey(getContent(HEADER_CONTENT.COURSE_NAME))) {
-            subjectProperties.put(getContent(HEADER_CONTENT.COURSE_NAME),
-                    new SubjectProperties(getContent(HEADER_CONTENT.COURSE_NAME), SubjectProperties.getUnusedColor(SGData.Colors.CLASS_COLORS), group)
+        if(!subject.containsKey(getContent(HEADER_CONTENT.COURSE_NAME))) {
+            subject.put(getContent(HEADER_CONTENT.COURSE_NAME),
+                    new Subject(getContent(HEADER_CONTENT.COURSE_NAME), Subject.getUnusedColor(SGData.Colors.SUBJECT_COLORS), group)
             );
         }
 
@@ -86,16 +84,9 @@ public class Course {
     }
 
     public boolean isPartOfSubgroup(String formattedSubGr) {
-        if(formattedSubgroup == null || formattedSubgroup.equals(subjectProperties.get(getContent(HEADER_CONTENT.COURSE_NAME)).getGroup()))
+        if(formattedSubgroup == null || formattedSubgroup.equals(subject.get(getContent(HEADER_CONTENT.COURSE_NAME)).getGroup()))
             return true;
         return formattedSubGr.equals(formattedSubgroup);
-    }
-
-    public boolean isDuplicate() {
-        return isDuplicate;
-    }
-    public void setDuplicate(boolean duplicate) {
-        isDuplicate = duplicate;
     }
 
     private static final ArrayList<String> RO_DAYS = new ArrayList<>() {{
@@ -146,11 +137,7 @@ public class Course {
     }
 
     public String getSubjectAlias() {
-        return subjectProperties.get(getContent(HEADER_CONTENT.COURSE_NAME)).getAlias();
-    }
-
-    public Color getSubjectColor() {
-        return subjectProperties.get(getContent(HEADER_CONTENT.COURSE_NAME)).getColor();
+        return subject.get(getContent(HEADER_CONTENT.COURSE_NAME)).getAlias();
     }
 
     public String getContent(HEADER_CONTENT at) {
@@ -161,10 +148,10 @@ public class Course {
         return content;
     }
 
-    public String getSubjectGroup() { return subjectProperties.get(getContent(HEADER_CONTENT.COURSE_NAME)).getGroup(); }
+    public String getSubjectGroup() { return subject.get(getContent(HEADER_CONTENT.COURSE_NAME)).getGroup(); }
 
     // for debugging
     public String toString() {
-        return String.join(",", content) + ", is Duplicate:" + isDuplicate;
+        return String.join(",", content);
     }
 }

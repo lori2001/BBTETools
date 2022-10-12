@@ -44,7 +44,7 @@ public class AppFrame extends JFrame {
 
         Point panelSize = new Point(APP_SIZE.x, APP_SIZE.y - headerSize);
         HWGMainPanel homeworkGathererPanel = new HWGMainPanel(this, panelSize);
-        SGMainPanel scheduleGeneratorPanel = new SGMainPanel(this, panelSize, HWGSettings.getStudData().group);
+        SGMainPanel scheduleGeneratorPanel = new SGMainPanel(this, panelSize);
 
         ScrollableSoloPane scrollableSoloPane = new ScrollableSoloPane();
         scrollableSoloPane.addTab(scheduleGeneratorPanel, "Órarend generáló (BETA)", "Kigenerál egy személyes órarendet html-ben vagy nyomtatható formában");

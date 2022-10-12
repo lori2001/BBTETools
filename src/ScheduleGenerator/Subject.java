@@ -9,29 +9,24 @@ import java.util.ArrayList;
 import static ScheduleGenerator.SGMainPanel.SG_LOG_INSTANCE;
 import static ScheduleGenerator.data.SGData.SUBJECT_NAME_ALIAS_MAP;
 
-public class SubjectProperties {
-    private final Color color;
+public class Subject {
     private final String alias;
     private final String name;
     private final String group;
 
-    public SubjectProperties(String name, Color color, String group) {
+    public Subject(String name, Color color, String group) {
         if(!usedColors.contains(color)) {
             usedColors.add(color);
         }
 
         this.name = name;
-        this.color = color;
+       //  this.color = color;
         this.group = group;
         this.alias = getAlias(name);
     }
 
     public String getName() {
         return name;
-    }
-
-    public Color getColor() {
-        return color;
     }
 
     public String getAlias() {

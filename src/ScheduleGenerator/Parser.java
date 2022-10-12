@@ -3,6 +3,7 @@ package ScheduleGenerator;
 import Common.logging.LogPanel;
 import ScheduleGenerator.records.Major;
 import ScheduleGenerator.utils.Convert;
+import ScheduleGenerator.utils.StringProcessor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -10,123 +11,235 @@ import org.jsoup.select.Elements;
 
 import javax.swing.*;
 import java.awt.*;
+import java.text.NumberFormat;
+import java.time.LocalTime;
 import java.util.*;
+import java.util.List;
 
-import static ScheduleGenerator.GlobalParser.markDuplicates;
 import static ScheduleGenerator.SGMainPanel.SG_LOG_INSTANCE;
 import static ScheduleGenerator.data.SGData.*;
 
 public class Parser {
-    private Major major = null;
-    private String group = "";
-    private String studYear = null;
-    private String subGroup = "";
-    private ArrayList<Course> courses;
 
-    private boolean parsingFailed = false;
+    // returns true if given course has to be added to the array, false otherwise
+    /*public static boolean markDuplicates(Course courseToAdd, ArrayList<Course> courses) {
+        // TODO: LEFT HERE SOLVE THIS SHOULD BE IN GRAPHICS PART
+        boolean shouldBeAdded = true;
 
-    private final JFrame connectionPrompt = new JFrame("Internet kapcsolat...");
+        int courseOnSameTimeIndex = -1;
+        for (int j = 0; j < courses.size(); j++) {
+            if (courses.get(j).getContent(Course.HEADER_CONTENT.INTERVAL).contains(courseToAdd.getContent(Course.HEADER_CONTENT.INTERVAL)) &&
+                    courses.get(j).getContent(Course.HEADER_CONTENT.DAY).contains(courseToAdd.getContent(Course.HEADER_CONTENT.DAY))) {
+                courseOnSameTimeIndex = j;
+                break;
+            }
+        }
 
-    public Parser(String group, String subGroup) {
-        connectionPrompt.setBounds(0, 0, 400, 150);
-        connectionPrompt.setLocationRelativeTo(null); // Sets position on center of the screen
-        connectionPrompt.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 5));
+        if (courseOnSameTimeIndex != -1) {
+            String groupOfCourseToAdd = courseToAdd.getSubjectGroup();
+            String subGroupOfCourseToAdd = courseToAdd.getFormattedSubgroup();
+            String groupOfDuplicate = courses.get(courseOnSameTimeIndex).getSubjectGroup();
+            String subGroupOfDuplicate = courses.get(courseOnSameTimeIndex).getFormattedSubgroup();
 
-        JLabel text = new JLabel(
-                "<html><center><h1>Internet csatlakozás...</h1></center>" +
-                        "<p>Az órarend elemzése internet kapcsolattal történik.<br>" +
-                        "Ha nincs interneted, várj egy kicsit. Az app hamarosan elindul.</p>" +
-                        "</html>");
-        connectionPrompt.add(text);
+            if (subGroupOfCourseToAdd == null && Objects.equals(subGroupOfDuplicate, groupOfDuplicate)) {
+                shouldBeAdded = false;
+            } else if (subGroupOfDuplicate == null && Objects.equals(subGroupOfCourseToAdd, groupOfCourseToAdd)) {
+                courses.set(courseOnSameTimeIndex, courseToAdd);
+                shouldBeAdded = false;
+            } else {
+                courses.get(courseOnSameTimeIndex).setDuplicate(true);
+                courseToAdd.setDuplicate(true);
+            }
+        }
 
-        connectionPrompt.setVisible(true);
+        return shouldBeAdded;
+    }*/
 
-        reparseCourses(group, subGroup);
-    }
-
-    public void reparseCourses(String group, String subGroup) {
-        System.out.println("REPARSE COURSES");
-        if((this.group.equals(group) && this.subGroup.equals(subGroup)) || parsingFailed) return;
-
-        this.group = group;
-        this.subGroup = subGroup;
-        this.major = Convert.groupToMajor(group);
-        this.studYear = Convert.groupToStudYear(group);
-
-        SubjectProperties.clearUsedColors();
-
+    public static ArrayList<LocalTime[]> getHourIntervals() {
+        ArrayList<LocalTime[]> hourIntervals = new ArrayList<>();
+        String url = getLinkPrefix() + "grafic/IM1.html";
         try {
-            Thread internetConn = new Thread(
-                    () -> {
-                        try{
-                            courses = genCourses();
-                            connectionPrompt.setVisible(false);
-                        } catch (Exception e){
-                            parsingFailed = true;
-                            connectionPrompt.setVisible(false);
-                            LogPanel.logln("VIGYÁZAT: Sikertelen volt a tantárgyak beszerzése! ", SG_LOG_INSTANCE);
-                            LogPanel.logln("MEGJEGYZÉS: A manuális órarendkészítési funkciók attól még mûködnek." + e, SG_LOG_INSTANCE);
+            Document doc = Jsoup.connect(url).get();
+            Elements table = doc.select("tr");
+
+            int i = 0;
+
+            ArrayList<String> duplicateChecker = new ArrayList<>();
+            for (Element t : table) {
+                if (i >= 3) {
+                    List<String> thElements = t.select("th").eachText();
+                    String intervalStr = null;
+
+                    for (String thElement : thElements) {
+                        intervalStr = thElement;
+                        try {
+                            NumberFormat.getInstance().parse(intervalStr).intValue();
+                            break;
+                        } catch (Exception ignore) {
                         }
                     }
-            );
-            internetConn.start();
-            while(internetConn.isAlive()){
-                Thread.sleep(1000); // 1 second
-                // TODO: Some kind of loding notifier
+
+                    if (intervalStr != null && intervalStr.contains("-")) {
+                        // if intervals start repeating stop searching more
+                        if (duplicateChecker.contains(intervalStr)) break;
+
+                        LocalTime[] interval = TimeFormatter.convertToLocalTimeArr(intervalStr);
+
+                        duplicateChecker.add(intervalStr);
+                        hourIntervals.add(interval);
+                    }
+                }
+                i++;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.exit(1);
+            LogPanel.logln("HIBA: Az óra-intervallumok leolvasása az internetrõl nem sikerült! ", SG_LOG_INSTANCE);
         }
+
+        return hourIntervals;
     }
 
-    public String getTopLeftContent() {
-        /*if(major.getCode() != null && studYear != null && getCalendarSemester() != -1) {
-            return major.getCode() + "\n" + studYear + "." + getCalendarSemester();
-        } else {
-            LogPanel.logln("HIBA: A tanuló évfolyamának meghatározásakor", SG_LOG_INSTANCE);
-        }
-        return null;*/
-
-        if(Objects.equals(subGroup, "nincs")){
-            return group;
+    public static ArrayList<String> genGroupsFor(String lang, String major, String studYear) {
+        Integer majorNum = -1;
+        for (Map.Entry<Integer, Major> set : MAJORS.entrySet()) {
+            if (Objects.equals(set.getValue().getName(), major) && Objects.equals(set.getValue().getLang(), lang)) {
+                majorNum = set.getKey();
+            }
         }
 
-        return group + "\n" + subGroup;
+        if (majorNum == -1) {
+            LogPanel.logln("HIBA: A kiválasztott adatok alapján sikertelen volt kialakítani egy csoportot", SG_LOG_INSTANCE);
+            return null;
+        }
+
+        ArrayList<String> groups = new ArrayList<>();
+        try {
+            String url = getLinkPrefix() + "tabelar/" + MAJORS.get(majorNum).getCode() + studYear + ".html";
+            Document doc = Jsoup.connect(url).get();
+
+            Elements groupElements = doc.select("h1");
+            for (int i = 1; i < groupElements.size(); i++) {
+                groups.add(StringProcessor.findFirstInt(groupElements.get(i).text()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogPanel.logln("HIBA: A csoportokat nem sikerült beszerezni! ", SG_LOG_INSTANCE);
+            return null;
+        }
+
+        return groups;
     }
 
-    private int findTableIndexForGroup(Document doc, String group) {
+    public static ArrayList<String> genSubGroupsFor(String lang, String major, String studYear, String group) {
+        ArrayList<String> subGroups = new ArrayList<>();
+
+        Integer majorNum = -1;
+        for (Map.Entry<Integer, Major> set : MAJORS.entrySet()) {
+            if (Objects.equals(set.getValue().getName(), major) && Objects.equals(set.getValue().getLang(), lang)) {
+                majorNum = set.getKey();
+            }
+        }
+        if (majorNum == -1) {
+            LogPanel.logln("HIBA: A kiválasztott adatok alapján sikertelen volt kialakítani egy alcsoportot", SG_LOG_INSTANCE);
+        }
+
+        String url = getLinkPrefix() + "tabelar/" + MAJORS.get(majorNum).getCode() + studYear + ".html";
+        Document doc;
+        try {
+            doc = Jsoup.connect(url).get();
+        } catch (Exception e) {
+            LogPanel.logln("VIGYÁZAT: Sikertelen volt a tantárgyak beszerzése! " + e, SG_LOG_INSTANCE);
+            return null;
+        }
+
         Elements groupElements = doc.select("h1");
         int tableI = -1; // -1 because there's a "bonus" header
         boolean found = false;
-        for(String gr : groupElements.eachText()) {
-            if(gr.contains(group)) {
+        for (String gr : groupElements.eachText()) {
+            if (gr.contains(group)) {
                 found = true;
                 break;
             }
             tableI++;
         }
-        return found ? tableI : -1;
-    }
+        if (!found) {
+            LogPanel.logln("HIBA: A kiválasztott csoport(" + group + ") nem talált a " + url + " linken!", SG_LOG_INSTANCE);
+        }
 
-    private ArrayList<Course> genCourses() throws Exception {
-        System.out.println("GENERATE COURSES FOR: " + major.getCode() + studYear + " " + group + " " + subGroup);
+        Element table = doc.select("table").get(tableI);
+        if (table == null) {
+            LogPanel.logln("Az " + url + " en levõ adatokat sikertelen volt értelmezni!", SG_LOG_INSTANCE);
+            return null;
+        }
 
         String[] headers = null;
+        Elements tableRows = table.select("tr");
+        int i = 0;
+
+        for (Element tableRow : tableRows) {
+            if (i == 0) {
+                Elements hdrs = tableRow.select("th");
+
+                headers = new String[hdrs.size()];
+                for (int j = 0; j < hdrs.size(); j++) {
+                    headers[j] = hdrs.get(j).text();
+                }
+            } else {
+                Elements courseContent = tableRow.select("td");
+
+                for (int j = 0; j < courseContent.size(); j++) {
+                    if (headers[j].equals(Course.HEADERS[4])) {
+                        // "Formatia"'s data
+                        String content = courseContent.get(j).text();
+                        int subgroupSplitIndex = content.indexOf('/');
+                        if (subgroupSplitIndex != -1) {
+                            String sG = content.substring(subgroupSplitIndex + 1);
+                            if (!subGroups.contains(sG)) subGroups.add(sG);
+                        }
+                    }
+                }
+            }
+
+            i++;
+        }
+
+        if (subGroups.size() == 0) {
+            // LogPanel.logln("MEGJEGYZÉS: Nincs alcsoport!", SG_LOG_INSTANCE);
+            subGroups.add("nincs");
+        }
+
+        return subGroups;
+    }
+
+    public static ArrayList<Course> genCourses(String group, String subGroup) {
+        System.out.println("GENERATE COURSES FOR: " + group + " " + subGroup);
         ArrayList<Course> courses = new ArrayList<>();
 
+        Major major = Convert.groupToMajor(group);
+        String studYear = Convert.groupToStudYear(group);
+
+        String[] headers = null;
         String url = getLinkPrefix() + "tabelar/" + major.getCode() + studYear + ".html";
-        Document doc = Jsoup.connect(url).get();
+
+        Document doc;
+        try {
+            doc = Jsoup.connect(url).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogPanel.logln("Sikertelen kapcsolódás az " + url + " linkhez!", SG_LOG_INSTANCE);
+            return null;
+        }
 
         int tableI = findTableIndexForGroup(doc, group);
         if(tableI == -1) {
-            throw new Exception("A kiválasztott csoport(" + group + ") nem talált a " +  url + " linken!");
+            LogPanel.logln("A kiválasztott csoport(" + group + ") nem talált a " +  url + " linken!", SG_LOG_INSTANCE);
+            return null;
         }
-        System.out.println("LEFUTE");
 
         Element table = doc.select("table").get(tableI);
         if(table == null) {
-            throw new Exception("Az " + url + " en levõ adatokat sikertelen volt értelmezni!");
+            LogPanel.logln("Az " + url + " en levõ adatokat sikertelen volt értelmezni!", SG_LOG_INSTANCE);
+            return null;
         }
 
         Elements tableRows = table.select("tr");
@@ -152,9 +265,9 @@ public class Parser {
                 Course courseToAdd = new Course(contentMap, group);
 
                 if(courseToAdd.isPartOfSubgroup(subGroup) || subGroup.equals("nincs")) {
-                    if(markDuplicates(courseToAdd, courses)) {
+                    //if(markDuplicates(courseToAdd, courses)) {
                             courses.add(courseToAdd);
-                    }
+                    //}
                 }
             }
 
@@ -164,23 +277,17 @@ public class Parser {
         return courses;
     }
 
-    public Major getMajor() {
-        return major;
-    }
-    public String getGroup() {
-        return group;
-    }
-    public String getStudYear() {
-        return studYear;
-    }
-    public String getSubGroup() {
-        return subGroup;
-    }
-    public ArrayList<Course> getCourses() {
-        return courses;
-    }
-
-    public boolean isParsingFailed() {
-        return parsingFailed;
+    public static int findTableIndexForGroup(Document doc, String group) {
+        Elements groupElements = doc.select("h1");
+        int tableI = -1; // -1 because there's a "bonus" header
+        boolean found = false;
+        for(String gr : groupElements.eachText()) {
+            if(gr.contains(group)) {
+                found = true;
+                break;
+            }
+            tableI++;
+        }
+        return found ? tableI : -1;
     }
 }

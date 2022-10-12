@@ -10,6 +10,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SGData {
+
+    public static final String HWGInfo =
+            "<html><center><h1>Órarend Generáló Infók</h1></center>" +
+                    "<p>Ez az app egy nyomtatható heti órarendet<br>" +
+                    "generál. Az egyetemi órarend nem esztétikus,<br>" +
+                    "nem nyomtatható és nem igazán szabható személyre<br>" +
+                    "sem. Az itt generált órarendek viszont igen.</p>" +
+                    "<center><h2>Hogyan használható?</h2></center>" +
+                    "<p>Válaszd ki a szakot majd a tantárgyakat<br>" +
+                    "amiket bele szeretnél tenni az órarendedbe.<br>" +
+                    "Az app generál neked egy órarendet a kíválasztott<br>" +
+                    "tantárgyakkal<br>" +
+                    "Ha az automatikus verzió nem jó, esetleg nem felel<br>" +
+                    "meg a valóságnak, állíthatod egyenként is bármely óra<br>" +
+                    "attribútumát.<br></p>" +
+                    "<center><h2>Hogyan működik?</h2></center>" +
+                    "<p>Az app bejárja a netten található órarendet<br>" +
+                    "és elemzi azt. Innen építi vissza a személyre<br>" +
+                    "szabott verziót. A megfelelõ mûködéshez kell<br>" +
+                    "internet kapcsolat. Ha nincs nett, csak manuálisan<br>" +
+                    "lehet új órákat hozzáadni az órarendhez.<br>" +
+                    "Appen belül minden változtatás lementõdik az<br>" +
+                    "órarend exportálásakor." +
+                    "</html>";
+
     public static final HashMap<String, String> SUBJECT_NAME_ALIAS_MAP = new HashMap<>() {{
         put("Sisteme de operare", "Linux");
         put("Limba engleza (2)", "Angol");
@@ -119,7 +144,7 @@ public class SGData {
                 new Color(0, 166, 81),
                 new Color(233, 127, 36)
         };
-        public static final Color[] CLASS_COLORS = new Color[]{
+        public static final Color[] SUBJECT_COLORS = new Color[]{
                 new Color(0, 166, 81),
                 new Color(46,49, 146),
                 new Color(233,127,36),
