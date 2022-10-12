@@ -35,7 +35,7 @@ public class InfoButton extends JPanel{
                     if(infoScreen == null) {
                         infoScreen = new JFrame("Infó");
 
-                        int yOffset = 10;
+                        int yOffset = 80;
                         infoScreen.setBounds(
                                 parentFrame.getX() + parentFrame.getWidth()  / 4,
                                 parentFrame.getY() + yOffset,

@@ -52,11 +52,4 @@ public class Subject {
         LogPanel.logln("MEGJEGYZÉS: Elfogytak az ajánlott színek a tantárgyakra. Ezek szürkék lesznek", SG_LOG_INSTANCE);
         return SGData.Colors.BASE_COLOR;
     }*/
-
-    public static String getAlias(String str) {
-        String ret = SUBJECT_NAME_ALIAS_MAP.get(str);
-        if(ret == null) ret = str; // if there is no alias return original name
-        return ret;
-    }
-
 }

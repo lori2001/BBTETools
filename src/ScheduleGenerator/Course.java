@@ -112,7 +112,7 @@ public class Course {
     }
 
     public String getSubjectAlias() {
-        return Subject.getAlias(getContent(HEADER_CONTENT.COURSE_NAME));
+        return SGData.getAlias(getContent(HEADER_CONTENT.COURSE_NAME));
     }
 
     public String getContent(HEADER_CONTENT at) {

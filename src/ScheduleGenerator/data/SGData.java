@@ -55,6 +55,11 @@ public class SGData {
             put("Teoria si metodologia instruirii. Teoria si metodologia evaluarii", "Pedagógia2");
         }
     };
+    public static String getAlias(String str) {
+        String ret = SUBJECT_NAME_ALIAS_MAP.get(str);
+        if(ret == null) ret = str; // if there is no alias return original name
+        return ret;
+    }
 
     public static final Map<String, CourseType> RO_TO_HU_TYPES = new HashMap<>() {{
         put("Curs", new CourseType("Kurzus", "Kurz." ,"K", SGData.Colors.COURSE_TYPE_COLORS[0]));

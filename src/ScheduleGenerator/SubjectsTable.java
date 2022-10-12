@@ -20,7 +20,7 @@ public class SubjectsTable {
     private final JScrollPane scrollPane = new JScrollPane(table);
     private boolean settingDataInProgress = false;
 
-    public SubjectsTable(ArrayList<Course> courses, Rectangle bounds) {
+    public SubjectsTable(Rectangle bounds) {
         tableModel.setColumnIdentifiers(Course.HEADERS);
         tableModel.fireTableDataChanged();
 
@@ -28,7 +28,7 @@ public class SubjectsTable {
 
         scrollPane.setBounds(bounds);
 
-        setData(courses);
+       //  setData(courses);
     }
 
     public void setData(ArrayList<Course> courses) {
@@ -37,14 +37,9 @@ public class SubjectsTable {
             tableModel.setRowCount(0);
 
             this.rows = courses;
-            System.out.println("COMPARE");
-            courses.forEach(System.out::println);
 
             this.rows.forEach(row -> tableModel.addRow(row.getContentList().toArray()));
             settingDataInProgress = false;
-
-            System.out.println("COMPARE2: ");
-            this.rows.forEach(System.out::println);
         }
     }
 
