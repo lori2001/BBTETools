@@ -11,7 +11,6 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -107,52 +106,46 @@ public class ScheduleDrawer extends JComponent {
         absPos.x += border.x * scale.x  + tPos.x;
         absPos.y += border.y * scale.y + tPos.y;
 
-        int xI = 0, yI, i = 0;
         // the amount of pixel offset for each col/row
-        double xOffs = tSize.x / cols;
-        double yOffs = tSize.y / rows;
+        Point2D.Double offset = new Point2D.Double(tSize.x / cols, tSize.y / rows);
 
-        // go through ever possible column where (x,y) are the top left coordinates in px
-        for(double x = 0; x <= tSize.x - xOffs + 1; x += xOffs) {
-            yI = 0; // the vertical index from top to bottom
-            for(double y = 0; y <= tSize.y - yOffs + 1; y += yOffs) {
-
+        // the vertical index from top to bottom
+        for(int x = 0; x < cols; x++) {
+            for(int y = 0; y < rows; y++) {
                 // calculate cell (x,y,w,h) considering margins and the whole table's position
-                Rectangle2D.Double cellCoords = new Rectangle2D.Double(
-                        absPos.x + x + cellMargin.x, absPos.y + y + cellMargin.y,
-                        xOffs - (cellMargin.y * 2), yOffs - (cellMargin.y * 2));
+                Rectangle2D.Double slotRect = new Rectangle2D.Double(
+                        absPos.x + (x * offset.x) + cellMargin.x,
+                        absPos.y + (y * offset.y) + cellMargin.y,
+                        offset.x - (cellMargin.x * 2),
+                        offset.y - (cellMargin.y * 2)
+                );
 
                 boolean inAnyCell = false;
                 for(Cell cell : cells) {
                     // if there is a cell marked on the current slot
-                    if(cell.rect.x == xI && cell.rect.y == yI) {
+                    if(cell.indexRect.x == x && cell.indexRect.y == y) {
                         // make cell take up as much space needed as specified in rect
-                        cellCoords.width = cell.rect.width * xOffs - (cellMargin.x * 2);
-                        cellCoords.height = cell.rect.height * yOffs - (cellMargin.y * 2);
+                        cell.actualRect = new Rectangle2D.Double(
+                                slotRect.x, slotRect.y, cell.indexRect.width * slotRect.width, cell.indexRect.height * slotRect.height);
 
                         // adjust text to fit on cell
-                        cell.calcTextsPosAndScale(cellCoords, textMargin, scale, g2d);
+                        cell.calcTextsPosAndScale(textMargin, scale, g2d);
 
-                        drawCell(cellCoords, cell);
+                        drawCell(cell);
                     }
 
                     // check whether given grid coordinate is part of any defined cell
                     if(!inAnyCell) {
-                        inAnyCell = !(xI >= cell.rect.x + cell.rect.width) && !(yI >= cell.rect.y + cell.rect.height)
-                                && !(xI < cell.rect.x) && !(yI < cell.rect.y);
+                        inAnyCell = !(x >= cell.indexRect.x + cell.indexRect.width) && !(y >= cell.indexRect.y + cell.indexRect.height)
+                                && !(x < cell.indexRect.x) && !(y < cell.indexRect.y);
                     }
                 }
 
                 // draw small white squares on parts where there are no cells overlapping
                 if(!inAnyCell) {
-                    drawRect(cellCoords, Color.WHITE);
+                    drawRect(slotRect, Color.WHITE);
                 }
-
-                yI++;
-                i++; // the general index from left/right-top/bottom
             }
-            xI++; // the horizontal index from left to right
-            i++;
         }
     }
 
@@ -161,8 +154,8 @@ public class ScheduleDrawer extends JComponent {
         g2d.fill(rect);
     }
 
-    private void drawCell(Rectangle2D.Double rect, Cell cell) {
-        drawRect(rect, cell.getColor());
+    private void drawCell(Cell cell) {
+        drawRect(cell.actualRect, cell.getColor());
 
         // Define rendering hint, font name, font style and font size
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -174,8 +167,8 @@ public class ScheduleDrawer extends JComponent {
         if(cell.getBottomDrwText().shouldBeDrawn()) {
             double southBgHeight = cell.getBottomDrwText().getSize().y + textMargin.x * 2;
             Rectangle2D.Double southBg = new Rectangle2D.Double(
-                    rect.x, rect.y + rect.height - southBgHeight,
-                    rect.width, southBgHeight
+                    cell.actualRect.x, cell.actualRect.y + cell.actualRect.height - southBgHeight,
+                    cell.actualRect.width, southBgHeight
             );
             drawRect(southBg, SGData.Colors.TEXT_BG_COLOR);
 
@@ -184,7 +177,7 @@ public class ScheduleDrawer extends JComponent {
 
         if(cell.getTopLeftDrwText().shouldBeDrawn()) {
             Rectangle2D.Double topLeftBg = new Rectangle2D.Double(
-                    rect.x, rect.y,
+                    cell.actualRect.x, cell.actualRect.y,
                     cell.getTopLeftDrwText().getSize().x + textMargin.x * 2,
                     cell.getTopLeftDrwText().getSize().y + textMargin.y * 2
             );
@@ -256,16 +249,16 @@ public class ScheduleDrawer extends JComponent {
 
             // search for duplicates
             Optional<Cell> cellOnSamePos = cells.stream().
-                    filter(cell -> Objects.equals(cell.rect, cellCoords)).
+                    filter(cell -> Objects.equals(cell.indexRect, cellCoords)).
                     findFirst();
             if(cellOnSamePos.isPresent()) {
                 cellCoords.height = 1;
-                cellOnSamePos.get().rect.height = 1;
+                cellOnSamePos.get().indexRect.height = 1;
 
                 if(course.getFreqAsNum() == 2) {
                     cellCoords.y += 1;
                 } else {
-                    cellOnSamePos.get().rect.y += 1;
+                    cellOnSamePos.get().indexRect.y += 1;
                 }
 
                 bottomText = null;

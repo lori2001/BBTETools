@@ -8,16 +8,18 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 public class Cell {
-    public Rectangle rect;
+    public Rectangle indexRect; // index-based rectangle
+    public Rectangle2D.Double actualRect; // actual pixel-based rectangle
+
     private Color color;
 
     private final DrawableText centerDrwText = new DrawableText();
     private final DrawableText bottomDrwText = new DrawableText();
     private final DrawableText topLeftDrwText = new DrawableText();
 
-    public Cell(Rectangle rect, Color col, String centerText, String bottomText, String topLeftText, double lineGap)
+    public Cell(Rectangle indexRect, Color col, String centerText, String bottomText, String topLeftText, double lineGap)
     {
-        this.rect = rect;
+        this.indexRect = indexRect;
         this.color = col;
 
         centerDrwText.setText(centerText);
@@ -32,12 +34,12 @@ public class Cell {
         return (float) (7.5f * scale.x); // 7.5
     }
 
-    public void calcTextsPosAndScale(Rectangle2D.Double cellCoords, Point2D.Double textMargin, Point2D.Double scale, Graphics2D g2d) {
+    public void calcTextsPosAndScale(Point2D.Double textMargin, Point2D.Double scale, Graphics2D g2d) {
         Rectangle2D.Double container = new Rectangle2D.Double(
-                cellCoords.x + textMargin.x,
-                cellCoords.y + textMargin.y,
-                cellCoords.width - textMargin.x * 2,
-                cellCoords.height - textMargin.y * 2
+                actualRect.x + textMargin.x,
+                actualRect.y + textMargin.y,
+                actualRect.width - textMargin.x * 2,
+                actualRect.height - textMargin.y * 2
         );
 
         if(bottomDrwText.getText() != null) {
