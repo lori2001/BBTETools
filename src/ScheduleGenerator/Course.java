@@ -38,6 +38,12 @@ public class Course {
         formattedSubgroup = formatSubGroup(getContent(HEADER_CONTENT.SUBGROUP), group);
     }
 
+    public Course(Course cloneFrom) {
+        content.addAll(cloneFrom.content);
+        // TODO: make better
+        formattedSubgroup = formatSubGroup(getContent(HEADER_CONTENT.SUBGROUP), "621");
+    }
+
     public Course(HashMap<String, String> contentMap, String group) {
         for (String header : HEADERS) {
             content.add(contentMap.get(header));

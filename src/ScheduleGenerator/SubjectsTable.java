@@ -11,7 +11,20 @@ import java.util.Arrays;
 
 import static ScheduleGenerator.SGMainPanel.SG_LOG_INSTANCE;
 
-public class SubjectsTable {
+public class SubjectsTable extends JPanel {
+
+    public static final String[] TABLE_HEADERS = new String[]{
+            "Ziua",
+            "Orele",
+            "Frecventa",
+            "Sala",
+            "Formatia",
+            "Tipul",
+            "Disciplina",
+            "Cadrul didactic",
+            "Törlés"
+    };
+    int DELETE_COL = 8;
 
     private ArrayList<Course> rows;
 
@@ -20,15 +33,34 @@ public class SubjectsTable {
     private final JScrollPane scrollPane = new JScrollPane(table);
     private boolean settingDataInProgress = false;
 
+    private final JButton addRow = new JButton("Új Óra");
+
     public SubjectsTable(Rectangle bounds) {
-        tableModel.setColumnIdentifiers(Course.HEADERS);
+        setLayout(null);
+
+        tableModel.setColumnIdentifiers(TABLE_HEADERS);
         tableModel.fireTableDataChanged();
 
         table.setFillsViewportHeight(true);
 
-        scrollPane.setBounds(bounds);
+        setBounds(bounds);
+        scrollPane.setBounds(0, 0, getWidth(), getHeight() - 75);
+        addRow.setBounds(0, getHeight() - 75, 100, 25);
 
-       //  setData(courses);
+        add(addRow);
+        add(scrollPane);
+
+        addRow.addActionListener(e -> {
+            this.rows.add(new Course(this.rows.get(this.rows.size() - 1)));
+            tableModel.addRow(this.rows.get(this.rows.size() - 1).getContentList().toArray());
+        });
+
+        table.getModel().addTableModelListener(e -> {
+            if(e.getColumn() == DELETE_COL && e.getFirstRow() == e.getLastRow()) {
+                this.rows.remove(e.getFirstRow());
+                tableModel.removeRow(e.getFirstRow());
+            }
+        });
     }
 
     public void setData(ArrayList<Course> courses) {
@@ -41,10 +73,6 @@ public class SubjectsTable {
             this.rows.forEach(row -> tableModel.addRow(row.getContentList().toArray()));
             settingDataInProgress = false;
         }
-    }
-
-    public JScrollPane getScrollPane() {
-        return scrollPane;
     }
 
     public ArrayList<Course> getCourses() {
@@ -70,19 +98,4 @@ public class SubjectsTable {
     public boolean settingDataIsInProgress() {
         return settingDataInProgress;
     }
-
-   /* @Override
-    public void tableChanged(TableModelEvent e) {
-
-
-        int row = e.getFirstRow();
-        int column = e.getColumn();
-        TableModel model = (TableModel)e.getSource();
-        String columnName = model.getColumnName(column);
-        Object data = model.getValueAt(row, column);
-
-        System.out.println("table: "  + tableData[row][column]);
-
-        System.out.println(row + " " + data + " " + column);
-    }*/
 }

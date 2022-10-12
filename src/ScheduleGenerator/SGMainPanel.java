@@ -56,10 +56,12 @@ public class SGMainPanel extends JPanel {
                         new Point2D.Double((double)scrollableSoloPane.getWidth() / 2 - 594.0 / 2, 0),
                         new Point2D.Double(594, 420)
                 );
+
+        subjectsTable = new SubjectsTable(scrollableSoloPane.getBounds());
+
+        scrollableSoloPane.addTab(subjectsTable, "Táblázat", "A felvett órák változtatható táblázata/");
         scrollableSoloPane.addTab(scheduleDrawer, "Elônézet", "Csökkentett felbontású elõnézet a kimeneti órarendrõl.");
 
-        subjectsTable = new SubjectsTable(new Rectangle(10,60, 660, 205));
-        scrollableSoloPane.addTab(subjectsTable.getScrollPane(), "Táblázat", "A felvett órák változtatható táblázata/");
         subjectsTable.addTableModelListener(e -> {
             if(!subjectsTable.settingDataIsInProgress()) {
                 scheduleDrawer.repaintWithNewProps(Parser.getHourIntervals(), subjectsTable.getCourses(), controlPanel.getGroup(), controlPanel.getSubGroup());
