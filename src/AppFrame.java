@@ -28,7 +28,7 @@ public class AppFrame extends JFrame {
         setResizable(false);
         setBounds(-1000, 100, APP_SIZE.x, APP_SIZE.y);
 
-        // setLocationRelativeTo(null); // Sets app position on center of the screen
+        setLocationRelativeTo(null); // Sets app position on center of the screen
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // load app icon

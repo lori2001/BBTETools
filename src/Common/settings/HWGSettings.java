@@ -18,7 +18,7 @@ public class HWGSettings {
             "1",
             "Írd ide a neved",
             "621",
-            "xyam123",
+            "xyam0123",
             "C:\\",
             "C:\\",
             Classes.Algoritmika.toString()
