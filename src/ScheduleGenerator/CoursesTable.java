@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 import static ScheduleGenerator.SGMainPanel.SG_LOG_INSTANCE;
 
-public class SubjectsTable extends JPanel {
+public class CoursesTable extends JPanel {
 
     public static final String[] TABLE_HEADERS = new String[]{
             "Ziua",
@@ -35,7 +35,7 @@ public class SubjectsTable extends JPanel {
 
     private final JButton addRow = new JButton("Új Óra");
 
-    public SubjectsTable(Rectangle bounds) {
+    public CoursesTable(Rectangle bounds) {
         setLayout(null);
 
         tableModel.setColumnIdentifiers(TABLE_HEADERS);

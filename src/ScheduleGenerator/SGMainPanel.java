@@ -9,8 +9,6 @@ import ScheduleGenerator.graphics.ScheduleDrawer;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -20,14 +18,14 @@ import java.util.Arrays;
 public class SGMainPanel extends JPanel {
     public static final int SG_LOG_INSTANCE = LogPanel.createNewInstance("Nincs üzenet. Építsd fel az órarended a táblázatban, majd töltsd le a \"Letöltés\" gombbal");
 
-    private final SubjectsTable subjectsTable;
+    private final CoursesTable coursesTable;
 
     private final ScheduleDrawer scheduleDrawer;
     private void coursesUpdate(String group, String subGroup) {
         ArrayList<Course> courses = Parser.genCourses(group, subGroup);
-        subjectsTable.setData(courses);
+        coursesTable.setData(courses);
         if(courses != null) {
-            scheduleDrawer.repaintWithNewProps(Parser.getHourIntervals(), subjectsTable.getCourses(), group, subGroup);
+            scheduleDrawer.repaintWithNewProps(Parser.getHourIntervals(), coursesTable.getCourses(), group, subGroup);
         }
     }
 
@@ -57,14 +55,14 @@ public class SGMainPanel extends JPanel {
                         new Point2D.Double(594, 420)
                 );
 
-        subjectsTable = new SubjectsTable(scrollableSoloPane.getBounds());
+        coursesTable = new CoursesTable(scrollableSoloPane.getBounds());
 
         scrollableSoloPane.addTab(scheduleDrawer, "Elônézet", "Csökkentett felbontású elõnézet a kimeneti órarendrõl.");
-        scrollableSoloPane.addTab(subjectsTable, "Táblázat", "A felvett órák változtatható táblázata/");
+        scrollableSoloPane.addTab(coursesTable, "Táblázat", "A felvett órák változtatható táblázata/");
 
-        subjectsTable.addTableModelListener(e -> {
-            if(!subjectsTable.settingDataIsInProgress()) {
-                scheduleDrawer.repaintWithNewProps(Parser.getHourIntervals(), subjectsTable.getCourses(), controlPanel.getGroup(), controlPanel.getSubGroup());
+        coursesTable.addTableModelListener(e -> {
+            if(!coursesTable.settingDataIsInProgress()) {
+                scheduleDrawer.repaintWithNewProps(Parser.getHourIntervals(), coursesTable.getCourses(), controlPanel.getGroup(), controlPanel.getSubGroup());
             }
         });
 
