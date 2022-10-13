@@ -53,7 +53,16 @@ public class SGData {
             put("Geometrie 3 (Geometria diferentiala a curbelor si suprafetelor)", "Geo3");
             put("Analiza matematica 3 (Calcul integral in R^n)", "Analízis 3");
             put("Teoria si metodologia instruirii. Teoria si metodologia evaluarii", "Pedagógia2");
-        }
+            put("Astronomie", "Astronómia");
+            put("Ecuatii cu derivate partiale", "Parcdiff");
+            put("Statistica matematica", "Statisztika");
+            put("Instruire asistata de calculator", "Pedagógia 3");
+            put("Proiect colectiv", "Csoportos Projekt");
+            put("Ingineria sistemelor soft", "Software Engineering");
+            put("Practica pedagogica in invatamantul preuniversitar obligatoriu (1)", "Peda Praktika");
+            put("Limbaje formale si tehnici de compilare", "Nyelvek/Fordítóprogramok");
+
+    }
     };
     public static String getAlias(String str) {
         String ret = SUBJECT_NAME_ALIAS_MAP.get(str);
