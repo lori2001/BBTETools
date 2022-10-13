@@ -199,20 +199,35 @@ public class ScheduleDrawer extends JComponent {
             Rectangle indexRect = new Rectangle(startX, dayIndex * 2 + 1, width, 2);
 
             // search for duplicates
-            Optional<Cell> cellOnSamePos = cells.stream().
-                    filter(cell -> Objects.equals(cell.indexRect, indexRect)).
+            Optional<Cell> courseCellOnSamePos = cells.stream().
+                    filter(cell -> {
+                        return (cell.getCourse() != null && cell.indexRect.y == indexRect.y
+                                && ((cell.indexRect.x == indexRect.x) || (indexRect.x > cell.indexRect.x && indexRect.x < cell.indexRect.x + cell.indexRect.width) ||
+                                (indexRect.x + indexRect.width > cell.indexRect.x && indexRect.x + indexRect.width < cell.indexRect.x + cell.indexRect.width))
+                        );
+                    }).
                     findFirst();
-            if(cellOnSamePos.isPresent()) {
+
+            if(courseCellOnSamePos.isPresent()) {
                 indexRect.height = 1;
-                cellOnSamePos.get().indexRect.height = 1;
+                courseCellOnSamePos.get().indexRect.height = 1;
 
                 if(course.getFreqAsNum() == 2) {
                     indexRect.y += 1;
+                    System.out.println("1");
+                }
+                else if(courseCellOnSamePos.get().getCourse().getFreqAsNum() == 2) {
+                    courseCellOnSamePos.get().indexRect.y += 1;
+                    System.out.println("2");
+                } else if (courseCellOnSamePos.get().indexRect.width >= indexRect.y) {
+                    indexRect.y += 1;
+                    System.out.println("3");
                 } else {
-                    cellOnSamePos.get().indexRect.y += 1;
+                    courseCellOnSamePos.get().indexRect.y += 1;
+                    System.out.println("4");
                 }
 
-                cellOnSamePos.get().evaluateStringsBasedOnSpace();
+                courseCellOnSamePos.get().evaluateStringsBasedOnSpace();
             }
 
             Color courseCol = course.getTypeInHu().getCol();

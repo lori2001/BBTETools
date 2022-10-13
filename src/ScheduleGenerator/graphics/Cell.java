@@ -22,6 +22,9 @@ public class Cell {
     private final Color color;
 
     private Course course = null;
+    public Course getCourse() {
+        return course;
+    }
 
     private final DrawableText centerDrwText = new DrawableText();
     private final DrawableText bottomDrwText = new DrawableText();
