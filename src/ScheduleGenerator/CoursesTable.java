@@ -33,7 +33,7 @@ public class CoursesTable extends JPanel {
     private final JScrollPane scrollPane = new JScrollPane(table);
     private boolean settingDataInProgress = false;
 
-    private final JButton addRow = new JButton("Új Óra (az elsõ órát duplázza oszt meglehet cserélni az adatait s a rajzon megjelenik :> )");
+    private final JButton addRow = new JButton("Új Óra (az első órát duplázza oszt meglehet cserélni az adatait s a rajzon megjelenik :> )");
 
     public CoursesTable(Rectangle bounds) {
         setLayout(null);

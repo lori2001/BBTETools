@@ -24,7 +24,7 @@ public class TimeFormatter {
             LocalTime endTime = convertToLocalTime(end);
 
             if(startTime != null && endTime != null && startTime.isAfter(endTime)) {
-                LogPanel.logln("HIBA: Az adott kezdõ és végsõ pontok fordítva vannak: " + startTime + " " + endTime, SG_LOG_INSTANCE);
+                LogPanel.logln("HIBA: Az adott kezdő és végső pontok fordítva vannak: " + startTime + " " + endTime, SG_LOG_INSTANCE);
                 return null;
             }
 

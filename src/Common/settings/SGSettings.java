@@ -55,7 +55,7 @@ public class SGSettings {
             prop.store(output, null);
 
         } catch (IOException e) {
-            LogPanel.logln("VIGYÁZAT: A kurzusfile mentése sikertelen. a táblázatban hozott változások elveszõdhetnek.", SG_LOG_INSTANCE);
+            LogPanel.logln("VIGYÁZAT: A kurzusfile mentése sikertelen. a táblázatban hozott változások elvesződhetnek.", SG_LOG_INSTANCE);
             e.printStackTrace();
         }
     }

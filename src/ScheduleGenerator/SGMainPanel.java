@@ -59,7 +59,7 @@ public class SGMainPanel extends JPanel {
 
         coursesTable = new CoursesTable(scrollableSoloPane.getBounds());
 
-        scrollableSoloPane.addTab(scheduleDrawer, "Elônézet", "Csökkentett felbontású elõnézet a kimeneti órarendrõl.");
+        scrollableSoloPane.addTab(scheduleDrawer, "Elônézet", "Csökkentett felbontású előnézet a kimeneti órarendről.");
         scrollableSoloPane.addTab(coursesTable, "Táblázat", "A felvett órák változtatható táblázata/");
 
         coursesTable.addTableModelListener(e -> {

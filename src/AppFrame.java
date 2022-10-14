@@ -50,7 +50,7 @@ public class AppFrame extends JFrame {
 
         ScrollableSoloPane scrollableSoloPane = new ScrollableSoloPane();
         scrollableSoloPane.addTab(scheduleGeneratorPanel, "Órarend generáló (BETA)", "Kigenerál egy személyes órarendet html-ben vagy nyomtatható formában");
-        scrollableSoloPane.addTab(homeworkGathererPanel, "Házi begyüjtõ", "Begyüjti, majd megfelelõen elnevezi, kommenteli és ellenõrzi a házikat");
+        scrollableSoloPane.addTab(homeworkGathererPanel, "Házi begyüjtő", "Begyüjti, majd megfelelően elnevezi, kommenteli és ellenőrzi a házikat");
         add(scrollableSoloPane);
 
         // save Common.settings when closing window

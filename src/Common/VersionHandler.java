@@ -31,7 +31,7 @@ public class VersionHandler {
                 }
             } else throw new Exception();
         } catch (Exception e) {
-            LogPanel.loglnAll("VIGYÁZAT: Sikertelen verzió ellenõrzés! " + e);
+            LogPanel.loglnAll("VIGYÁZAT: Sikertelen verzió ellenőrzés! " + e);
         }
     }
 

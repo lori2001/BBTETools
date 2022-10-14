@@ -66,7 +66,7 @@ public class HWGSettings {
 
             writer.close();
         } catch (IOException err2) {
-            LogPanel.logln("HIBA: A következõ file készítésekor: "  + settingsFile, HWG_LOG_INSTANCE);
+            LogPanel.logln("HIBA: A következő file készítésekor: "  + settingsFile, HWG_LOG_INSTANCE);
         }
     }
 

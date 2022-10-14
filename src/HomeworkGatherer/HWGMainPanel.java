@@ -26,7 +26,7 @@ public class HWGMainPanel extends JPanel {
 
     public static final int HWG_LOG_INSTANCE = LogPanel.createNewInstance("Nincs üzenet. Begyüjtéshez kattincs a \"Házi Begyüjtése\" gombra!");
 
-    private static final String HWGInfo = "<html><center><h1>Házi Begyüjtõ Infók</h1></center>" +
+    private static final String HWGInfo = "<html><center><h1>Házi Begyüjtő Infók</h1></center>" +
             "<p>Ez az app a házi begyüjtésének unalmas folyamatát<br>" +
             "automatizálja. Kézzel elnevezni és bekomentelni<br>" +
             "minden házit időigényes és könnyen elrontható,<br>" +
@@ -48,7 +48,7 @@ public class HWGMainPanel extends JPanel {
             "az appbe beírt infóknak megfelelően kimásolja az<br>" +
             "összes filet, majd megfelelően átnevezi,<br>" +
             "bekommenteli és (egyes tantárgyakból)<br>" +
-            "plusz ellenõrzéseket is végrehajt.</p>" +
+            "plusz ellenőrzéseket is végrehajt.</p>" +
             "</html>";
 
     public HWGMainPanel(JFrame appFrame, Point panelSize) {
@@ -180,7 +180,7 @@ public class HWGMainPanel extends JPanel {
             audioClip.open(audioStream);
             audioClip.start();
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
-            LogPanel.logln("MEGJEGYZÉS: A \"kész\" jelzõhang hang lejátszása sikertelen!", HWG_LOG_INSTANCE);
+            LogPanel.logln("MEGJEGYZÉS: A \"kész\" jelzőhang hang lejátszása sikertelen!", HWG_LOG_INSTANCE);
         }
 
         // log "good" message

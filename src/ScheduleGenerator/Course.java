@@ -76,7 +76,7 @@ public class Course {
 
     public int getDayIndexInRO_DAYS() {
         if(!SGData.RO_DAYS.contains(getContent(HEADER_CONTENT.DAY))) {
-            LogPanel.logln("HIBA: Sikertelen volt feldolgozni a következõ nap nevét: " + getContent(HEADER_CONTENT.DAY), SG_LOG_INSTANCE);
+            LogPanel.logln("HIBA: Sikertelen volt feldolgozni a következő nap nevét: " + getContent(HEADER_CONTENT.DAY), SG_LOG_INSTANCE);
         }
         return SGData.RO_DAYS.indexOf(getContent(HEADER_CONTENT.DAY));
     }
@@ -96,7 +96,7 @@ public class Course {
             }
         }
 
-        // LogPanel.logln("HIBA: Sikertelen volt feldolgozni a következõ frekvencia stringet: " + getContent(HEADER_CONTENT.FREQ), SG_LOG_INSTANCE);
+        // LogPanel.logln("HIBA: Sikertelen volt feldolgozni a következő frekvencia stringet: " + getContent(HEADER_CONTENT.FREQ), SG_LOG_INSTANCE);
         return -1;
     }
 
@@ -119,7 +119,7 @@ public class Course {
 
             return SGData.RO_TO_HU_TYPES.get(key);
         } catch (Exception e) {
-            LogPanel.logln("HIBA: Sikertelen volt feldolgozni a következõ típusnevet: " + getContent(HEADER_CONTENT.TYPE), SG_LOG_INSTANCE);
+            LogPanel.logln("HIBA: Sikertelen volt feldolgozni a következő típusnevet: " + getContent(HEADER_CONTENT.TYPE), SG_LOG_INSTANCE);
             return null;
         }
     }

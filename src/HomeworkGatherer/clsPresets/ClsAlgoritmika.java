@@ -110,7 +110,7 @@ public class ClsAlgoritmika extends ClsPreset{
                 "<li><h4>feldolgozandó kiterjesztések:<br>" +
                 Arrays.deepToString(validExtensions) + "</h4></li>" +
                 "<li><h4>kimenet: fileok a<br>megadott folderbe</h4></li>" +
-                "<li><h4>ellenõrzi, hogy a bemenet/kimenet a kritériumnak megfelelõ fileokba történik-e" +
+                "<li><h4>ellenőrzi, hogy a bemenet/kimenet a kritériumnak megfelelő fileokba történik-e" +
                 "<br>(pl. bemenet06.txt)</h4></li>" +
             "</ul></html>"
         );

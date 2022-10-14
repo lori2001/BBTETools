@@ -56,7 +56,7 @@ public class ScheduleDrawer extends JComponent {
         } catch (Exception e) {
             font = new Font(Font.SANS_SERIF, PLAIN, 14);
             e.printStackTrace();
-            LogPanel.logln("VIGYÁZAT: Sikertelen volt az órarend fontjának beolvasása. Beépített szövegtípus lesz használva helyette. Az órarend generáláshoz erõsen ajánlott az újratelepítés.", SG_LOG_INSTANCE);
+            LogPanel.logln("VIGYÁZAT: Sikertelen volt az órarend fontjának beolvasása. Beépített szövegtípus lesz használva helyette. Az órarend generáláshoz erősen ajánlott az újratelepítés.", SG_LOG_INSTANCE);
         }
 
         cellPadding = new Point2D.Double(2.5 * scale.x, 2.5 * scale.y);

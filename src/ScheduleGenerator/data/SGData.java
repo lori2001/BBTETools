@@ -29,10 +29,10 @@ public class SGData {
                     "<center><h2>Hogyan működik?</h2></center>" +
                     "<p>Az app bejárja a netten található órarendet<br>" +
                     "és elemzi azt. Innen építi vissza a személyre<br>" +
-                    "szabott verziót. A megfelelõ mûködéshez kell<br>" +
+                    "szabott verziót. A megfelelő mûködéshez kell<br>" +
                     "internet kapcsolat. Ha nincs nett, csak manuálisan<br>" +
                     "lehet új órákat hozzáadni az órarendhez.<br>" +
-                    "Appen belül minden változtatás lementõdik az<br>" +
+                    "Appen belül minden változtatás lementődik az<br>" +
                     "órarend exportálásakor." +
                     "</html>";
 

@@ -56,7 +56,7 @@ public class Parser {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            LogPanel.logln("HIBA: Az óra-intervallumok leolvasása az internetrõl nem sikerült! ", SG_LOG_INSTANCE);
+            LogPanel.logln("HIBA: Az óra-intervallumok leolvasása az internetről nem sikerült! ", SG_LOG_INSTANCE);
         }
 
         return hourIntervals;
@@ -131,7 +131,7 @@ public class Parser {
 
         Element table = doc.select("table").get(tableI);
         if (table == null) {
-            LogPanel.logln("Az " + url + " en levõ adatokat sikertelen volt értelmezni!", SG_LOG_INSTANCE);
+            LogPanel.logln("Az " + url + " en levő adatokat sikertelen volt értelmezni!", SG_LOG_INSTANCE);
             return null;
         }
 
@@ -201,7 +201,7 @@ public class Parser {
 
         Element table = doc.select("table").get(tableI);
         if(table == null) {
-            LogPanel.logln("Az " + url + " en levõ adatokat sikertelen volt értelmezni!", SG_LOG_INSTANCE);
+            LogPanel.logln("Az " + url + " en levő adatokat sikertelen volt értelmezni!", SG_LOG_INSTANCE);
             return null;
         }
 

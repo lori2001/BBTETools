@@ -18,7 +18,7 @@ public class Convert {
             int majorNum = groupNum / 100;
             major = MAJORS.get(majorNum);
 
-            if(major == null) throw new Exception("HIBA: Az órarend link feldolgozó által kapott csoport számnak megfelelõ szak nem talált!");
+            if(major == null) throw new Exception("HIBA: Az órarend link feldolgozó által kapott csoport számnak megfelelő szak nem talált!");
         }
         catch (NumberFormatException e) {
             LogPanel.logln("HIBA: A " + group + " csoportszámhoz tartozó szakot nem sikerült megtalálni!", SG_LOG_INSTANCE);
