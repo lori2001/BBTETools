@@ -27,7 +27,7 @@ public class HWGSettings {
     private static final String settingsFile = "assets/settings.txt";
     private static final String[] fileContent = new String[HWGSetting.SIZE.ordinal()];
 
-    public static void readFromFile() {
+    public static void read() {
         // read input file
         try {
             File inFile = new File(settingsFile);
@@ -86,13 +86,13 @@ public class HWGSettings {
         return fileContent[HWGSetting.ordinal()];
     }
 
-    public static void setFileContent(HWGSetting HWGSetting, String val) {
+    /*public static void setFileContent(HWGSetting HWGSetting, String val) {
         fileContent[HWGSetting.ordinal()] = val;
     }
 
     public static String getDefault(HWGSetting HWGSetting) {
         return DEFAULTS[HWGSetting.ordinal()];
-    }
+    }*/
 
     public static StudData getStudData() {
         return new StudData(

@@ -3,6 +3,7 @@ package ScheduleGenerator;
 import Common.InfoButton;
 import Common.ScrollableSoloPane;
 import Common.logging.LogPanel;
+import Common.settings.SGSettings;
 import ScheduleGenerator.data.SGData;
 import ScheduleGenerator.graphics.ScheduleDrawer;
 
@@ -12,7 +13,6 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class SGMainPanel extends JPanel {
@@ -21,10 +21,11 @@ public class SGMainPanel extends JPanel {
     private final CoursesTable coursesTable;
 
     private final ScheduleDrawer scheduleDrawer;
-    private void coursesUpdate(String group, String subGroup) {
-        ArrayList<Course> courses = Parser.genCourses(group, subGroup);
-        coursesTable.setData(courses);
-        if(courses != null) {
+
+    private void updateCoursesByControlPanel(String group, String subGroup) {
+        SGSettings.setCourses(Parser.genCourses(group, subGroup));
+        coursesTable.setData(SGSettings.getCourses());
+        if(coursesTable.getCourses() != null) {
             scheduleDrawer.repaintWithNewProps(Parser.getHourIntervals(), coursesTable.getCourses(), group, subGroup);
         }
     }
@@ -62,14 +63,23 @@ public class SGMainPanel extends JPanel {
 
         coursesTable.addTableModelListener(e -> {
             if(!coursesTable.settingDataIsInProgress()) {
-                scheduleDrawer.repaintWithNewProps(Parser.getHourIntervals(), coursesTable.getCourses(), controlPanel.getGroup(), controlPanel.getSubGroup());
+                SGSettings.setCourses(coursesTable.getCourses());
+                scheduleDrawer.repaintWithNewProps(Parser.getHourIntervals(), SGSettings.getCourses(), controlPanel.getGroup(), controlPanel.getSubGroup());
             }
         });
 
-        coursesUpdate(controlPanel.getGroup(), controlPanel.getSubGroup());
+        if(SGSettings.getCourses() != null) { // get course data from settings
+            coursesTable.setData(SGSettings.getCourses());
+            if(coursesTable.getCourses() != null) {
+                scheduleDrawer.repaintWithNewProps(Parser.getHourIntervals(), coursesTable.getCourses(), controlPanel.getGroup(), controlPanel.getSubGroup());
+            }
+        } else { // get course data from control panel
+            updateCoursesByControlPanel(controlPanel.getGroup(), controlPanel.getSubGroup());
+        }
+
         controlPanel.addActionListener(e -> {
             if(controlPanel.getGroup() != null && controlPanel.getSubGroup() != null) {
-                coursesUpdate(controlPanel.getGroup(), controlPanel.getSubGroup());
+                updateCoursesByControlPanel(controlPanel.getGroup(), controlPanel.getSubGroup());
             }
         });
 

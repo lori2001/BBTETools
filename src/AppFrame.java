@@ -1,5 +1,6 @@
 import Common.VersionHandler;
 import Common.settings.HWGSettings;
+import Common.settings.SGSettings;
 import HomeworkGatherer.HWGMainPanel;
 import Common.ScrollableSoloPane;
 import Common.logging.LogPanel;
@@ -23,7 +24,8 @@ public class AppFrame extends JFrame {
     public AppFrame() {
         super("BBTETools " + VersionHandler.VERSION);
 
-        HWGSettings.readFromFile();
+        HWGSettings.read();
+        SGSettings.read();
 
         setResizable(false);
         setBounds(-1000, 100, APP_SIZE.x, APP_SIZE.y);
@@ -57,6 +59,7 @@ public class AppFrame extends JFrame {
               public void windowClosing(WindowEvent e) {
                   super.windowClosing(e);
                   homeworkGathererPanel.saveHWGSettingsToFile();
+                  SGSettings.save();
               }
           }
         );

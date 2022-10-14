@@ -2,6 +2,7 @@ package ScheduleGenerator;
 
 import ScheduleGenerator.data.SGData;
 import ScheduleGenerator.records.CourseType;
+import com.google.gson.Gson;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -65,9 +66,9 @@ public class Course {
         }
     }
 
-    public String getFormattedSubgroup() {
+    /*public String getFormattedSubgroup() {
         return formattedSubgroup;
-    }
+    }*/
 
     public boolean isPartOfSubgroup(String formattedSubGr) {
         if(formattedSubgroup == null)
@@ -129,8 +130,9 @@ public class Course {
         return content;
     }
 
-    // for debugging
+    // for debugging return as json
     public String toString() {
-        return String.join(",", content);
+        Gson gson = new Gson();
+        return gson.toJson(this);
     }
 }
