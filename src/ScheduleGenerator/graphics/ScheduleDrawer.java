@@ -233,19 +233,21 @@ public class ScheduleDrawer extends JComponent {
             Color courseCol = course.getTypeInHu().getCol();
 
             if(!colorAfterType) {
-                if(!subjectColors.containsKey(course.getContent(Course.HEADER_CONTENT.COURSE_NAME))) {
+                if(!subjectColors.containsKey(course.getSubjectAlias())) {
+                    if(subjectColorIndex == SGData.Colors.SUBJECT_COLORS.length - 1) {
+                        LogPanel.logln("VIGYÁZAT: Kifogytak a tantárgy-színek. Újra lesznek használva.", SG_LOG_INSTANCE);
+                    }
+
                     subjectColors.put(
                             course.getSubjectAlias(),
-                            SGData.Colors.SUBJECT_COLORS[subjectColorIndex]);
+                            SGData.Colors.SUBJECT_COLORS[subjectColorIndex % SGData.Colors.SUBJECT_COLORS.length]);
+
                     subjectColorIndex++;
                 }
-                courseCol = subjectColors.get(course.getContent(Course.HEADER_CONTENT.COURSE_NAME));
+
+                courseCol = subjectColors.get(course.getSubjectAlias());
             }
 
-            if(subjectColorIndex >= SGData.Colors.SUBJECT_COLORS.length - 1) {
-                LogPanel.logln("VIGYÁZAT: Kifogytak a tantárgy-színek. Újra lesznek használva.", SG_LOG_INSTANCE);
-                subjectColorIndex = 0;
-            }
 
             Cell clsDrw = new Cell(course, indexRect, courseCol, 0, cellPadding, scale);
 
