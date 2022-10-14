@@ -234,7 +234,9 @@ public class ScheduleDrawer extends JComponent {
 
             if(!colorAfterType) {
                 if(!subjectColors.containsKey(course.getContent(Course.HEADER_CONTENT.COURSE_NAME))) {
-                    subjectColors.put(course.getContent(Course.HEADER_CONTENT.COURSE_NAME), SGData.Colors.SUBJECT_COLORS[subjectColorIndex]);
+                    subjectColors.put(
+                            course.getSubjectAlias(),
+                            SGData.Colors.SUBJECT_COLORS[subjectColorIndex]);
                     subjectColorIndex++;
                 }
                 courseCol = subjectColors.get(course.getContent(Course.HEADER_CONTENT.COURSE_NAME));
