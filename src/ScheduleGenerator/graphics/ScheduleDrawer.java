@@ -40,7 +40,6 @@ public class ScheduleDrawer extends JComponent {
     private String subGroup;
 
     private boolean colorAfterType = false; // if false -- colors after type(Course, Seminar)
-    private HashMap<String, Color> subjectColors = new HashMap<>();
 
     private final Point2D.Double cellPadding; // makes sure text leaves this padding to the cell's border
     private final Point2D.Double cellMargin;
@@ -156,7 +155,7 @@ public class ScheduleDrawer extends JComponent {
         }
 
         ArrayList<Cell> cells = new ArrayList<>();
-        subjectColors = new HashMap<>();
+        HashMap<String, Color> subjectColors = new HashMap<>();
 
         // top left content
         Cell topLeftCell = new Cell(new Rectangle(0, 0, 1, 1),
