@@ -128,8 +128,8 @@ public class ScheduleDrawer extends JComponent {
                         // set the actual size of cell based on calculations
                         cell.setActualRect(new Rectangle2D.Double(
                             slotRect.x, slotRect.y,
-                            cell.indexRect.width * slotRect.width,
-                            cell.indexRect.height * slotRect.height)
+                                (cell.indexRect.width * offset.x) - (cellMargin.x * 2),
+                                (cell.indexRect.height * offset.y) - (cellMargin.y * 2))
                         );
                         cell.drawCell(g2d);
                     }
@@ -159,7 +159,7 @@ public class ScheduleDrawer extends JComponent {
 
         // top left content
         Cell topLeftCell = new Cell(new Rectangle(0, 0, 1, 1),
-                SGData.Colors.BASE_COLOR, getTopLeftContent(), null, null, 2.5 * scale.x, cellMargin, cellPadding, scale);
+                SGData.Colors.BASE_COLOR, getTopLeftContent(), null, null, 2.5 * scale.x, cellPadding, scale);
         topLeftCell.setFontStyle(font);
         cells.add(topLeftCell);
 
@@ -167,7 +167,7 @@ public class ScheduleDrawer extends JComponent {
         for(int i = 1; i <= DAYS_OF_WEEK_HU.length; i++) {
             Rectangle t = new Rectangle(0, i * 2 - 1, 1, 2);
 
-            Cell cell = new Cell(t, SGData.Colors.BASE_COLOR, DAYS_OF_WEEK_HU[i - 1], null, null, 0, cellMargin, cellPadding, scale);
+            Cell cell = new Cell(t, SGData.Colors.BASE_COLOR, DAYS_OF_WEEK_HU[i - 1], null, null, 0, cellPadding, scale);
             cell.setCenterFontSize(font, (float) (this.scale.x * 9F));
 
             cells.add(cell);
@@ -177,7 +177,7 @@ public class ScheduleDrawer extends JComponent {
         for(int i = 1; i <= intervals.size(); i++) {
             Rectangle t = new Rectangle(i, 0, 1, 1);
             String displayInterval = TimeFormatter.localTimeArrToDisplayFormat(intervals.get(i - 1));
-            Cell cell = new Cell(t, SGData.Colors.BASE_COLOR, displayInterval, null, null, 2.5 * scale.x, cellMargin, cellPadding, scale);
+            Cell cell = new Cell(t, SGData.Colors.BASE_COLOR, displayInterval, null, null, 2.5 * scale.x, cellPadding, scale);
             cell.setCenterFontSize(font, (float) (this.scale.x * 5F));
 
             cells.add(cell);
@@ -200,12 +200,7 @@ public class ScheduleDrawer extends JComponent {
 
             // search for duplicates
             Optional<Cell> courseCellOnSamePos = cells.stream().
-                    filter(cell -> {
-                        return (cell.getCourse() != null && cell.indexRect.y == indexRect.y
-                                && ((cell.indexRect.x == indexRect.x) || (indexRect.x > cell.indexRect.x && indexRect.x < cell.indexRect.x + cell.indexRect.width) ||
-                                (indexRect.x + indexRect.width > cell.indexRect.x && indexRect.x + indexRect.width < cell.indexRect.x + cell.indexRect.width))
-                        );
-                    }).
+                    filter(cell -> cell.isCourseCell() && cell.isOverlapping(indexRect)).
                     findFirst();
 
             if(courseCellOnSamePos.isPresent()) {
@@ -214,17 +209,13 @@ public class ScheduleDrawer extends JComponent {
 
                 if(course.getFreqAsNum() == 2) {
                     indexRect.y += 1;
-                    System.out.println("1");
                 }
                 else if(courseCellOnSamePos.get().getCourse().getFreqAsNum() == 2) {
                     courseCellOnSamePos.get().indexRect.y += 1;
-                    System.out.println("2");
-                } else if (courseCellOnSamePos.get().indexRect.width >= indexRect.y) {
+                } else if (courseCellOnSamePos.get().indexRect.width >= indexRect.width) {
                     indexRect.y += 1;
-                    System.out.println("3");
                 } else {
                     courseCellOnSamePos.get().indexRect.y += 1;
-                    System.out.println("4");
                 }
 
                 courseCellOnSamePos.get().evaluateStringsBasedOnSpace();
@@ -245,7 +236,7 @@ public class ScheduleDrawer extends JComponent {
                 subjectColorIndex = 0;
             }
 
-            Cell clsDrw = new Cell(course, indexRect, courseCol, 0, cellMargin, cellPadding, scale);
+            Cell clsDrw = new Cell(course, indexRect, courseCol, 0, cellPadding, scale);
 
             clsDrw.setBottomFontSize(font, (float) (this.scale.x * 5F));
             clsDrw.setTopLeftFontSize(font, (float) (this.scale.x * 3.5F));

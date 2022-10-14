@@ -8,9 +8,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 public class Cell {
-    private Point2D.Double padding; // makes sure text leaves this padding to the cell's border
-    private Point2D.Double margin;
-    private Point2D.Double scale;
+    private final Point2D.Double padding; // makes sure text leaves this padding to the cell's border
+    private final Point2D.Double scale;
 
     public Rectangle indexRect; // index-based rectangle
 
@@ -30,12 +29,11 @@ public class Cell {
     private final DrawableText bottomDrwText = new DrawableText();
     private final DrawableText topLeftDrwText = new DrawableText();
 
-    public Cell(Course course, Rectangle indexRect, Color color, double lineGap, Point2D.Double margin, Point2D.Double padding, Point2D.Double scale)
+    public Cell(Course course, Rectangle indexRect, Color color, double lineGap, Point2D.Double padding, Point2D.Double scale)
     {
         this.course = course;
         this.indexRect = indexRect;
         this.color = color;
-        this.margin = margin;
         this.padding = padding;
         this.scale = scale;
 
@@ -45,11 +43,10 @@ public class Cell {
         bottomDrwText.setLineGap(lineGap);
         topLeftDrwText.setLineGap(lineGap);
     }
-    public Cell(Rectangle indexRect, Color col, String centerText, String bottomText, String topLeftText, double lineGap, Point2D.Double margin, Point2D.Double padding, Point2D.Double scale)
+    public Cell(Rectangle indexRect, Color col, String centerText, String bottomText, String topLeftText, double lineGap, Point2D.Double padding, Point2D.Double scale)
     {
         this.indexRect = indexRect;
         this.color = col;
-        this.margin = margin;
         this.padding = padding;
         this.scale = scale;
 
@@ -175,6 +172,15 @@ public class Cell {
 
     public void setTopLeftFontSize(Font font, float fontSize) {
         topLeftDrwText.setFontSize(font, fontSize);
+    }
+
+    public boolean isCourseCell() {
+        return getCourse() != null;
+    }
+
+    public boolean isOverlapping(Rectangle indexRect) {
+        return  this.indexRect.y == indexRect.y && (this.indexRect.x == indexRect.x || (indexRect.x > this.indexRect.x && indexRect.x < this.indexRect.x + this.indexRect.width) ||
+                (indexRect.x + indexRect.width > this.indexRect.x && indexRect.x + indexRect.width < this.indexRect.x + this.indexRect.width));
     }
 
     public void drawCell(Graphics2D g2d) {
