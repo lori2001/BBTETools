@@ -24,7 +24,7 @@ public class CoursesTable extends JPanel {
           //   "Cadrul didactic",
             "Törlés"
     };
-    int DELETE_COL = 8;
+    int DELETE_COL = 7;
 
     private ArrayList<Course> rows;
 
