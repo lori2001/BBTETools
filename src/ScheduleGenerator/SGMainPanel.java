@@ -96,8 +96,8 @@ public class SGMainPanel extends JPanel {
             }
         });
 
-        JCheckBox colorAfterType = new JCheckBox("Color after type", false);
-        colorAfterType.setBounds(20,520, 150,50);
+        JCheckBox colorAfterType = new JCheckBox("Színezd típus szerint (Lab, Szem, Kurz)", false);
+        colorAfterType.setBounds(5,520, 250,50);
         colorAfterType.addItemListener(e -> scheduleDrawer.recolor(e.getStateChange() == ItemEvent.SELECTED));
 
         add(colorAfterType);

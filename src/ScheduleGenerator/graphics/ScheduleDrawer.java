@@ -186,15 +186,24 @@ public class ScheduleDrawer extends JComponent {
         // courses
         int subjectColorIndex = 0;
         for(Course course : courses) {
+            if(course.getIntervalAsLocalTimeArr() == null ||
+                    course.getDayIndexInRO_DAYS() == -1 ||
+                    course.getTypeInHu() == null
+            ) {
+                continue;
+            }
+
             // cell coordinates
             int startX = 0;
             int endX = 0;
             LocalTime[] courseIntArr = course.getIntervalAsLocalTimeArr();
+
             for(int i = 0; i < intervals.size(); i++) {
                 if(intervals.get(i)[0].equals(courseIntArr[0])) startX = i + 1;
                 if(intervals.get(i)[1].equals(courseIntArr[1])) endX = i + 2;
             }
             int dayIndex = course.getDayIndexInRO_DAYS();
+
             int width = endX - startX;
             Rectangle indexRect = new Rectangle(startX, dayIndex * 2 + 1, width, 2);
 

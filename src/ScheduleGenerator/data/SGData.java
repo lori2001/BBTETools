@@ -70,9 +70,17 @@ public class SGData {
     }
 
     public static final Map<String, CourseType> RO_TO_HU_TYPES = new HashMap<>() {{
-        put("Curs", new CourseType("Kurzus", "Kurz." ,"K", SGData.Colors.COURSE_TYPE_COLORS[0]));
-        put("Seminar", new CourseType("Szeminárium", "Szem." , "SZ", SGData.Colors.COURSE_TYPE_COLORS[1]));
-        put("Laborator", new CourseType("Labor", "Lab." , "L", SGData.Colors.COURSE_TYPE_COLORS[2]));
+        put("c", new CourseType("Kurzus", "Kurz." ,"K", SGData.Colors.COURSE_TYPE_COLORS[0]));
+        put("s", new CourseType("Szeminárium", "Szem." , "SZ", SGData.Colors.COURSE_TYPE_COLORS[1]));
+        put("l", new CourseType("Labor", "Lab." , "L", SGData.Colors.COURSE_TYPE_COLORS[2]));
+    }};
+
+    public static final ArrayList<String> RO_DAYS = new ArrayList<>() {{
+        add("Luni");
+        add("Marti");
+        add("Miercuri");
+        add("Joi");
+        add("Vineri");
     }};
 
     public static final String[] DAYS_OF_WEEK_HU = { "Hé", "Ke", "Sze", "Csü", "Pé" };

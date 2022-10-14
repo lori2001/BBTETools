@@ -37,9 +37,9 @@ public class SGSettings {
 
             // get the property value and print it out
             courses = prop.getProperty("courses");
+
         } catch (IOException e) {
             LogPanel.logln("MEGJEGYZÉS: A kurzus file olvasása sikertelen. Új kurzusfile", SG_LOG_INSTANCE);
-            e.printStackTrace();
         }
     }
 
