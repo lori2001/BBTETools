@@ -21,7 +21,7 @@ public class CoursesTable extends JPanel {
             "Formatia",
             "Tipul",
             "Disciplina",
-            "Cadrul didactic",
+          //   "Cadrul didactic",
             "Törlés"
     };
     int DELETE_COL = 8;
@@ -33,7 +33,7 @@ public class CoursesTable extends JPanel {
     private final JScrollPane scrollPane = new JScrollPane(table);
     private boolean settingDataInProgress = false;
 
-    private final JButton addRow = new JButton("Új Óra");
+    private final JButton addRow = new JButton("Új Óra (az elsõ órát duplázza oszt meglehet cserélni az adatait s a rajzon megjelenik :> )");
 
     public CoursesTable(Rectangle bounds) {
         setLayout(null);
@@ -45,7 +45,7 @@ public class CoursesTable extends JPanel {
 
         setBounds(bounds);
         scrollPane.setBounds(0, 0, getWidth(), getHeight() - 75);
-        addRow.setBounds(0, getHeight() - 75, 100, 25);
+        addRow.setBounds(0, getHeight() - 75, 650, 25);
 
         add(addRow);
         add(scrollPane);

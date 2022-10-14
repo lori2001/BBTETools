@@ -18,7 +18,7 @@ public class Course {
         SUBGROUP,
         TYPE,
         COURSE_NAME,
-        TEACHER
+      //  TEACHER
     }
     public static final String[] HEADERS = new String[]{
             "Ziua",
@@ -28,7 +28,7 @@ public class Course {
             "Formatia",
             "Tipul",
             "Disciplina",
-            "Cadrul didactic",
+       //     "Cadrul didactic",
     };
 
     private final ArrayList<String> content = new ArrayList<>();
