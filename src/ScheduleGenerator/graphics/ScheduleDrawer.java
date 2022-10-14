@@ -40,7 +40,7 @@ public class ScheduleDrawer extends JComponent {
     private String subGroup;
 
     private boolean colorAfterType = false; // if false -- colors after type(Course, Seminar)
-    private final HashMap<String, Color> subjectColor = new HashMap<>();
+    private HashMap<String, Color> subjectColors = new HashMap<>();
 
     private final Point2D.Double cellPadding; // makes sure text leaves this padding to the cell's border
     private final Point2D.Double cellMargin;
@@ -156,6 +156,7 @@ public class ScheduleDrawer extends JComponent {
         }
 
         ArrayList<Cell> cells = new ArrayList<>();
+        subjectColors = new HashMap<>();
 
         // top left content
         Cell topLeftCell = new Cell(new Rectangle(0, 0, 1, 1),
@@ -233,11 +234,11 @@ public class ScheduleDrawer extends JComponent {
             Color courseCol = course.getTypeInHu().getCol();
 
             if(!colorAfterType) {
-                if(!subjectColor.containsKey(course.getContent(Course.HEADER_CONTENT.COURSE_NAME))) {
-                    subjectColor.put(course.getContent(Course.HEADER_CONTENT.COURSE_NAME), SGData.Colors.SUBJECT_COLORS[subjectColorIndex]);
+                if(!subjectColors.containsKey(course.getContent(Course.HEADER_CONTENT.COURSE_NAME))) {
+                    subjectColors.put(course.getContent(Course.HEADER_CONTENT.COURSE_NAME), SGData.Colors.SUBJECT_COLORS[subjectColorIndex]);
                     subjectColorIndex++;
                 }
-                courseCol = subjectColor.get(course.getContent(Course.HEADER_CONTENT.COURSE_NAME));
+                courseCol = subjectColors.get(course.getContent(Course.HEADER_CONTENT.COURSE_NAME));
             }
 
             if(subjectColorIndex >= SGData.Colors.SUBJECT_COLORS.length - 1) {
