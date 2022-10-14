@@ -61,7 +61,6 @@ public class SGData {
             put("Ingineria sistemelor soft", "Software Engineering");
             put("Practica pedagogica in invatamantul preuniversitar obligatoriu (1)", "Peda Praktika");
             put("Limbaje formale si tehnici de compilare", "Nyelvek/Fordítóprogramok");
-
     }
     };
     public static String getAlias(String str) {

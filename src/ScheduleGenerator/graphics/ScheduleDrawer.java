@@ -39,7 +39,7 @@ public class ScheduleDrawer extends JComponent {
     private String group;
     private String subGroup;
 
-    private final boolean colorAfterSubjects = true; // if false -- colors after type(Course, Seminar)
+    private boolean colorAfterType = false; // if false -- colors after type(Course, Seminar)
     private final HashMap<String, Color> subjectColor = new HashMap<>();
 
     private final Point2D.Double cellPadding; // makes sure text leaves this padding to the cell's border
@@ -223,7 +223,7 @@ public class ScheduleDrawer extends JComponent {
 
             Color courseCol = course.getTypeInHu().getCol();
 
-            if(colorAfterSubjects) {
+            if(!colorAfterType) {
                 if(!subjectColor.containsKey(course.getContent(Course.HEADER_CONTENT.COURSE_NAME))) {
                     subjectColor.put(course.getContent(Course.HEADER_CONTENT.COURSE_NAME), SGData.Colors.SUBJECT_COLORS[subjectColorIndex]);
                     subjectColorIndex++;
@@ -260,4 +260,10 @@ public class ScheduleDrawer extends JComponent {
         tmp.repaintWithNewProps(intervals, courses, group, subGroup);
         return tmp;
     }
+
+    public void recolor(boolean colorAfterType) {
+        this.colorAfterType = colorAfterType;
+        repaintWithNewProps(intervals, courses, group, subGroup);
+    }
+
 }

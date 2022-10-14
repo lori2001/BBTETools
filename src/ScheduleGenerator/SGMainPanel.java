@@ -10,6 +10,7 @@ import ScheduleGenerator.graphics.ScheduleDrawer;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ItemEvent;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -94,6 +95,12 @@ public class SGMainPanel extends JPanel {
                 LogPanel.logln(Arrays.toString(ex.getStackTrace()), SG_LOG_INSTANCE);
             }
         });
+
+        JCheckBox colorAfterType = new JCheckBox("Color after type", false);
+        colorAfterType.setBounds(20,520, 150,50);
+        colorAfterType.addItemListener(e -> scheduleDrawer.recolor(e.getStateChange() == ItemEvent.SELECTED));
+
+        add(colorAfterType);
 
         add(topPanel);
         add(logPanel);
