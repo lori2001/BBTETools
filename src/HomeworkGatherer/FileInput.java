@@ -16,6 +16,8 @@ public class FileInput extends JPanel {
         setBounds(pos.x, pos.y, size.x, size.y);
         setLayout(new FlowLayout(FlowLayout.CENTER, 15, 0));
 
+        if(pathStr == null) pathStr = "";
+
         path = Paths.get(pathStr);
         chooser = new JFileChooser(pathStr);
         chooser.setDialogTitle(text);

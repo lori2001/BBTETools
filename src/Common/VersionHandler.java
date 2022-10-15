@@ -14,7 +14,7 @@ import java.net.URL;
 
 public class VersionHandler {
 
-    public static final String VERSION = "v.3.0.0";
+    public static final String VERSION = "v.3.0.1";
     JFrame updatePrompt;
 
     public VersionHandler(JFrame parentFrame) {
