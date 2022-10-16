@@ -1,6 +1,9 @@
 # BBTETools
 Órarend generáló és házi begyüjtő app ami könnyíti a mindennapi egyetemi életet.  
 
+#### Megjegyzés: Néhány esetben a vírusirtó megjelölheti a programot mint vírus. Aggodalomra nincs ok, ez egy "false positive".     
+(Itt a source kód... -_-)     
+
 ### Órarend generálás:
 Készíts saját, nyomtatható órarendet egyetemre =)
 
@@ -29,9 +32,6 @@ Az ajánlott elnevezés a bemeneti fileoknak: <alpont>.<kiterjesztés> (pl. "1.c
 
 A kimeneti file vagy filerendszer tantárgyfüggő és megfelel a kiválasztott tantárgy kiritériumainak.  
 Habár a lehetséges hiba esetek számát igyekeztem minimalizálni, ajánlott a fileokat generálás után gyorsan leellenőrizni.  
-  
-#### Megjegyzés: Néhány esetben a vírusirtó megjelölheti a programot mint vírus. Aggodalomra nincs ok, ez egy "false positive".     
-(Itt a source kód... -_-)     
   
 -- Jelenleg csak algoritmikára és OOP-re mûködik az app de hamarosan ki lesz terjesztve AC-re és más olyan tantárgyakra is
   amikkel matek-infós karrierem során meg kell birkóznom --
