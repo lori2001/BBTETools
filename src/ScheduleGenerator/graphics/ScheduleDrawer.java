@@ -62,6 +62,10 @@ public class ScheduleDrawer extends JComponent {
         cellMargin = new Point2D.Double(0.5 * scale.x, 0.5  * scale.y); // milimeters
     }
 
+    public void repaintWithNewProps(ArrayList<LocalTime[]> intervals, ArrayList<Course> courses, String group, String subGroup, boolean colorAfterType) {
+        this.colorAfterType = colorAfterType;
+        repaintWithNewProps(intervals, courses, group, subGroup);
+    }
     public void repaintWithNewProps(ArrayList<LocalTime[]> intervals, ArrayList<Course> courses, String group, String subGroup) {
         this.intervals = intervals;
         this.courses = courses;
@@ -270,13 +274,12 @@ public class ScheduleDrawer extends JComponent {
 
     public ScheduleDrawer getHighResVersion() {
         ScheduleDrawer tmp = new ScheduleDrawer(new Point2D.Double(0,0), new Point2D.Double(3508, 2480));
-        tmp.repaintWithNewProps(intervals, courses, group, subGroup);
+        tmp.repaintWithNewProps(intervals, courses, group, subGroup, colorAfterType);
         return tmp;
     }
 
     public void recolor(boolean colorAfterType) {
-        this.colorAfterType = colorAfterType;
-        repaintWithNewProps(intervals, courses, group, subGroup);
+        repaintWithNewProps(intervals, courses, group, subGroup, colorAfterType);
     }
 
 }
