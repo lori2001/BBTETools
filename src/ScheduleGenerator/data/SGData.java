@@ -59,8 +59,10 @@ public class SGData {
             put("Instruire asistata de calculator", "Pedagógia 3");
             put("Proiect colectiv", "Csoportos Projekt");
             put("Ingineria sistemelor soft", "Software Engineering");
-            put("Practica pedagogica in invatamantul preuniversitar obligatoriu (1)", "Peda Praktika");
+            put("Practica pedagogica in invatamantul preuniversitar obligatoriu (1)", "Peda gyakorlat");
             put("Limbaje formale si tehnici de compilare", "Nyelvek/Fordítóprogramok");
+            put("Analiza functionala", "Funk. Anal.");
+            put("Complemente de geometrie sintetica", "Síkmértan");
     }
     };
     public static String getAlias(String str) {
